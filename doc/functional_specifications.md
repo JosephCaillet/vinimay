@@ -17,3 +17,9 @@
 - **Constraint #6**: Performance: The system must be able to run on small material configurations (ex: Raspberry Pi).
 
 ## Features
+
+### Post
+
+- **A post**:
+	- is a textual content, with a publication date
+	- has a privacy setting (is the post shared with only me, only my friends, or is it public?)
