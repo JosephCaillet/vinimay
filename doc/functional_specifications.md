@@ -20,6 +20,13 @@
 
 ### Post
 
-- **A post**:
-	- is a textual content, with a publication date
-	- has a privacy setting (is the post shared with only me, only my friends, or is it public?)
+A post is a textual content, with a publication date, a privacy setting (is the post shared with only me, only my friends, or is it public?), and reactions to it by other users.
+
+A post can be :
+- **Created**: The post is created, with the current date as its publication date, and a privacy setting chosen by the user. Its content is also set by the user.
+- **Edited**: The post's content and/or privacy setting are set to different values by the user.
+- **Deleted**: All data related to the post (publication date, privacy setting, content, reactions and comments) is removed.
+- **Viewed**: Depending of the post's privacy setting (or the user is the post's author), an user can display all data related to a post.
+
+### Comments
+
