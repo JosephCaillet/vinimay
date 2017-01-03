@@ -27,7 +27,7 @@ A post can be :
 - **Read**: Depending of the post's privacy setting (or the user is the post's author), an user can display all data related to a post.
 - **Update**: The post's content and/or privacy setting are set to different values by the user. The last edition date is set to current date.
 - **Deleted**: All data related to the post (publication date, privacy setting, content, reactions and comments) is removed.
-- **Commented**: see [comments section](#comments).
+- **Commented**: See [comments section](#comments).
 
 ### Comments
 
@@ -35,7 +35,7 @@ A comment is a **text**, in reaction to a **post**. It has an **author**, a **pu
 
 A comment can be:
 - **Created**: The comment is created by an author, linked to a post, with the current date as publication date, an empty last modification date, a text as content.
-- **Read**: The comment can be read by anyone having read access on the post it refers to.
+- **Read**: The comment can be read by anyone having read access on the post it links to.
 - **Updated**: The comment's content can be updated, and the last modification date is set to current date.
 - **Deleted**: Both the post's and the comment's authors can delete a comment.
 
