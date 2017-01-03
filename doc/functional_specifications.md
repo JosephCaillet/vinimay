@@ -39,4 +39,37 @@ A comment can be:
 - **Updated**: The comment's content can be updated, and the last modification date is set to current date.
 - **Deleted**: Both the post's and the comment's authors can delete a comment.
 
-### 
+### Relationships
+
+Relationships define the way a content can be interacted with according to privacy rules. It can be categorised in three types:
+
+#### Server owner
+
+Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (statuses, conmments, etc) stored on it.
+
+In other terms, it means that the user has control over its own data, as they can:
+
+- Create a post
+- Read, update or delete their own posts
+- Create, read or delete a comment on their own posts
+- Update their own comments
+
+
+#### Friend
+
+A friend is an user that has been authorised to access a content published by another server's owner, according to privacy rules. A practical example is that, if Alice creates a post and shares it with her friends (by setting the privacy rule in order to do so), and if Bob is a friend of Alice, Bob will see Alice's post.
+
+A friend can:
+
+- Read posts shared with a friend's friends
+- Comment on posts shared with a friend's friends
+- Update or delete their own comments
+
+#### The rest of the world
+
+The rest of the world includes everyone that isn't already included in the "Server owner" or "Friend" relationships.
+
+The rest of the world can:
+
+- Read posts shared with the rest of the world
+- Read comments linked to posts shared with the rest of the world
