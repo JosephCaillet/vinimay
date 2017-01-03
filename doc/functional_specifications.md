@@ -41,6 +41,14 @@ A comment can be:
 - **Updated**: The comment's content can be updated, and the last modification date is set to current date.
 - **Deleted**: Both the post's and the comment's authors can delete a comment.
 
+### Reactions
+
+Reactions are **interactions** with a post wich content **don't rely on a media** (text, or any other media that might be supported by the system as comments in the future), and coming with a **positive connotation** (liking a content, supporting an action, etc). It is a feature similar to Facebook's like or Twitter's favorite (now also renamed "like").
+
+A reaction can be:
+- **Added to a post**: An user can add a reaction to a friend's post or to one of its own. An user can only add one reaction per post.
+- **Removed from a post**: An user can remove a reaction it added on a friend's post or one of its own.
+
 ### Friendship
 
 Friendship describes the relationship between two users as described in the [section below](#friend). It works based on **requests**: Alice sends a friend request to Bob's server, Bob accepts the request, then both are each other's **friend** and can interact with posts the other share with its friends.
