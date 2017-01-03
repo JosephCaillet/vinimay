@@ -13,7 +13,7 @@
 - **Constraint #2**: Privacy by design: The system must respect the user's privacy, and must allow them to select the content shared with others.
 - **Constraint #3**: Free software: In order to fully fulfill constraint #2, the system must be powered by free software (as defined by the Free Software Foundation) and placed under the AGPL v3 license.
 - **Constraint #4**: Migration: The system must be able to easily export the user's data in order to migrate from one instance of the system to another.
-- **Constraint #5**: Ergonomy: The system must provide an ergonomic and easy to use graphic interface.
+- **Constraint #5**: User adoption: The system must provide an ergonomic and easy to use graphic interface. It must also be able to be translated in new languages, and be available at least in English and French.
 - **Constraint #6**: Performance: The system must be able to run on small material configurations (ex: Raspberry Pi).
 - **Constraint #7**: Data ownership: The user has full ownership and control over the data it produces.
 - **Constraint #8**: Security: The system must ensure that each communication comes from the source it pretends.
@@ -43,7 +43,7 @@ A comment can be:
 
 ### Reaction
 
-Reactions are **interactions** with a post wich content **don't rely on a media** (text, or any other media that might be supported by the system as comments in the future), and coming with a **positive connotation** (liking a content, supporting an action, etc). It is a feature similar to Facebook's like or Twitter's favorite (now also renamed "like").
+Reactions are **interactions** with a post wich content **isn't a media** (text, or any other media that might be supported by the system as comments in the future), and brings an **information** with a **positive connotation** (liking a content, supporting an action, etc). It is a feature similar to Facebook's like or Twitter's favorite (now also renamed "like").
 
 A reaction can be:
 - **Added to a post**: An user can add a reaction to a friend's post or to one of its own. An user can only add one reaction per post.
