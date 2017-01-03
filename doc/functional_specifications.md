@@ -16,6 +16,7 @@
 - **Constraint #5**: Ergonomy: The system must provide an ergonomic and easy to use graphic interface.
 - **Constraint #6**: Performance: The system must be able to run on small material configurations (ex: Raspberry Pi).
 - **Constraint #7**: Data ownership: The user has full ownership and control over the data it produce.
+- **Constraint #8**: Security: The system must ensure that each communication comes from the source it pretends.
 
 ## Features
 
@@ -40,6 +41,18 @@ A comment can be:
 - **Updated**: The comment's content can be updated, and the last modification date is set to current date.
 - **Deleted**: Both the post's and the comment's authors can delete a comment.
 
+### Friendship
+
+Friendship describes the relationship between two users as described in the [section below](#friend). It works based on **requests**: Alice sends a friend request to Bob's server, Bob accepts the request, then both are each other's **friend** and can interact with posts the other share with its friends.
+
+A friend request can be:
+- **Sent**: Alice can send Bob a friend request
+- **Accepted**: Bob can accept Alice's request
+- **Refused**: Bob can refuse Alice's request
+- **Canceled**: Alice can cancel her friend request to Bob
+
+Once a friend request is accepted, both servers save data (**the user's displayed name**, **the server's address**, **tokens to use in further communications**) about the other to ensure the next communications will happen within the "Friend" relationship.
+
 ### Relationships
 
 Relationships define the way a content can be interacted with according to privacy rules. It can be categorised in three types:
@@ -54,7 +67,6 @@ In other terms, it means that the user has control over its own data, as they ca
 - Read, update or delete their own posts
 - Create, read or delete a comment on their own posts
 - Update their own comments
-
 
 #### Friend
 
