@@ -45,7 +45,7 @@ Relationships define the way a content can be interacted with according to priva
 
 #### Server owner
 
-Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (statuses, conmments, etc) stored on it.
+Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (statuses, comments, etc) stored on it.
 
 In other terms, it means that the user has control over its own data, as they can:
 
