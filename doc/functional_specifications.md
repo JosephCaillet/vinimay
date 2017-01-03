@@ -31,7 +31,7 @@ A post can be :
 
 ### Comments
 
-A comment is a **text**, in reaction to a **post**. It has an **author**, a **publication date**, a **last modification date** and is related to a post.
+A comment is a **text**, in reaction to a **post**. It has an **author**, a **publication date**, a **last modification date** and is linked to a post.
 
 A comment can be:
 - **Created**: The comment is created by an author, linked to a post, with the current date as publication date, an empty last modification date, a text as content.
