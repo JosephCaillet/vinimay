@@ -33,10 +33,10 @@ A post can be :
 
 ### Comments
 
-A comment is a **text**, in reaction to a **post**. It has an **author**, a **publication date**, a **last modification date** and is linked to a post.
+A comment is a **text**, is linked to a **post**. It has an **author**, a **publication date** and a **last modification date**.
 
 A comment can be:
-- **Created**: The comment is created by an author, linked to a post, with the current date as publication date, an empty last modification date, a text as content.
+- **Created**: The comment is created by an author, linked to a post, with the current date as its publication date and a textual content set by the user.
 - **Read**: The comment can be read by anyone having read access on the post it links to.
 - **Updated**: The comment's content can be updated, and the last modification date is set to current date.
 - **Deleted**: Both the post's and the comment's authors can delete a comment.
@@ -59,7 +59,7 @@ Relationships define the way a content can be interacted with according to priva
 
 #### Server owner
 
-Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (statuses, comments, etc) stored on it.
+Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (posts, comments, etc) stored on it.
 
 In other terms, it means that the user has control over its own data, as they can:
 
