@@ -15,7 +15,7 @@
 - **Constraint #4**: Migration: The system must be able to easily export the user's data in order to migrate from one instance of the system to another.
 - **Constraint #5**: Ergonomy: The system must provide an ergonomic and easy to use graphic interface.
 - **Constraint #6**: Performance: The system must be able to run on small material configurations (ex: Raspberry Pi).
-- **Constraint #7**: Data ownership: The user has full ownership and control over the data it produce.
+- **Constraint #7**: Data ownership: The user has full ownership and control over the data it produces.
 - **Constraint #8**: Security: The system must ensure that each communication comes from the source it pretends.
 
 ## Features
@@ -26,7 +26,7 @@ A post is a **textual content** published by an **author**. It has a **publicati
 
 A post can be :
 - **Created**: The post is created by an author, with the current date as its publication date, and a privacy setting chosen by the user. Its content is also set by the user.
-- **Read**: Depending of the post's privacy setting (or the user is the post's author), an user can display all data related to a post.
+- **Read**: Depending on the post's privacy setting (or if the user is the post's author), an user can display all data related to a post.
 - **Update**: The post's content and/or privacy setting are set to different values by the user. The last edition date is set to current date.
 - **Deleted**: All data related to the post (publication date, privacy setting, content, reactions and comments) is removed.
 - **Commented**: See [comments section](#comments).
