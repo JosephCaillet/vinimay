@@ -9,7 +9,7 @@
 ## Function and constraints
 
 - **Main function**: Allowing two or more users to exchange via social interactions (*posts* publication, reaction to other's statuses, instant messaging...).
-- **Constraint #1**: Decentralized: The system must work using user-owned servers which must be able to request one another without the need for a central server.
+- **Constraint #1**: Decentralised: The system must work using user-owned servers which must be able to request one another without the need for a central server.
 - **Constraint #2**: Privacy by design: The system must respect the user's privacy, and must allow them to select the content shared with others.
 - **Constraint #3**: Free software: In order to fully fulfill constraint #2, the system must be powered by free software.
 - **Constraint #4**: The system must be able to easily export the user's data in order to migrate from one instance of the system to another.
@@ -41,11 +41,11 @@ A comment can be:
 
 ### Relationships
 
-Relationships define the way a content can be interacted with according to privacy rules. It can be categorized in three types:
+Relationships define the way a content can be interacted with according to privacy rules. It can be categorised in three types:
 
 #### Server owner
 
-Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (statuses, comments, etc) stored on it.
+Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (statuses, conmments, etc) stored on it.
 
 In other terms, it means that the user has control over its own data, as they can:
 
@@ -57,7 +57,7 @@ In other terms, it means that the user has control over its own data, as they ca
 
 #### Friend
 
-A friend is an user that has been authorized to access a content published by another server's owner, according to privacy rules. A practical example is that, if Alice creates a post and shares it with her friends (by setting the privacy rule in order to do so), and if Bob is a friend of Alice, Bob will see Alice's post.
+A friend is an user that has been authorised to access a content published by another server's owner, according to privacy rules. A practical example is that, if Alice creates a post and shares it with her friends (by setting the privacy rule in order to do so), and if Bob is a friend of Alice, Bob will see Alice's post.
 
 A friend can:
 
