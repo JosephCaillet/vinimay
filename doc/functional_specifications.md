@@ -59,6 +59,10 @@ A friend request can be:
 - **Refused**: Bob can refuse Alice's request
 - **Canceled**: Alice can cancel her friend request to Bob
 
+A friendship can be:
+- **Established**: Successful friend request
+- **Removed**: After a successful friend request, an user can still remove the request author's from it's friends list.
+
 Once a friend request is accepted, both servers save data (**the user's displayed name**, **the server's address**, **tokens to use in further communications**) about the other to ensure the next communications will happen within the "Friend" relationship.
 
 ### Relationship
