@@ -8,14 +8,14 @@
 
 ## Function and constraints
 
-- **Main function**: Allowing two or more users to exchange via social interactions (*posts* publication, reaction to other's statuses, instant messaging...).
+- **Main function**: Allowing two or more users to exchange via social interactions (connect with other users, publish posts, react to other's posts...).
 - **Constraint #1**: Decentralised: The system must work using user-owned servers which must be able to request one another without the need for a central server.
 - **Constraint #2**: Privacy by design: The system must respect the user's privacy, and must allow them to select the content shared with others.
-- **Constraint #3**: Free software: In order to fully fulfill constraint #2, the system must be powered by free software.
+- **Constraint #3**: Free software: In order to fully fulfill constraint #2, the system must be powered by free software (as defined by the Free Software Foundation) and placed under the AGPL v3 license.
 - **Constraint #4**: Migration: The system must be able to easily export the user's data in order to migrate from one instance of the system to another.
-- **Constraint #5**: Ergonomy: The system must provide an ergonomic and easy to use graphic interface.
+- **Constraint #5**: User adoption: The system must provide an ergonomic and easy to use graphic interface. It must also be able to be translated in new languages, and be available at least in English and French.
 - **Constraint #6**: Performance: The system must be able to run on small material configurations (ex: Raspberry Pi).
-- **Constraint #7**: Data ownership: The user has full ownership and control over the data it produce.
+- **Constraint #7**: Data ownership: The user has full ownership and control over the data it produces.
 - **Constraint #8**: Security: The system must ensure that each communication comes from the source it pretends.
 
 ## Features
@@ -26,20 +26,28 @@ A post is a **textual content** published by an **author**. It has a **publicati
 
 A post can be :
 - **Created**: The post is created by an author, with the current date as its publication date, and a privacy setting chosen by the user. Its content is also set by the user.
-- **Read**: Depending of the post's privacy setting (or the user is the post's author), an user can display all data related to a post.
+- **Read**: Depending on the post's privacy setting (or if the user is the post's author), an user can display all data related to a post.
 - **Update**: The post's content and/or privacy setting are set to different values by the user. The last edition date is set to current date.
 - **Deleted**: All data related to the post (publication date, privacy setting, content, reactions and comments) is removed.
 - **Commented**: See [comments section](#comments).
 
-### Comments
+### Comment
 
-A comment is a **text**, in reaction to a **post**. It has an **author**, a **publication date**, a **last modification date** and is linked to a post.
+A comment is a **text**, is linked to a **post**. It has an **author**, a **publication date** and a **last modification date**.
 
 A comment can be:
-- **Created**: The comment is created by an author, linked to a post, with the current date as publication date, an empty last modification date, a text as content.
+- **Created**: The comment is created by an author, linked to a post, with the current date as its publication date and a textual content set by the user.
 - **Read**: The comment can be read by anyone having read access on the post it links to.
 - **Updated**: The comment's content can be updated, and the last modification date is set to current date.
 - **Deleted**: Both the post's and the comment's authors can delete a comment.
+
+### Reaction
+
+Reactions are **interactions** with a post wich content **isn't a media** (text, or any other media that might be supported by the system as comments in the future), and brings an **information** with a **positive connotation** (liking a content, supporting an action, etc). It is a feature similar to Facebook's like or Twitter's favorite (now also renamed "like").
+
+A reaction can be:
+- **Added to a post**: An user can add a reaction to a friend's post or to one of its own. An user can only add one reaction per post.
+- **Removed from a post**: An user can remove a reaction it added on a friend's post or one of its own.
 
 ### Friendship
 
@@ -57,13 +65,13 @@ A friendship can be:
 
 Once a friend request is accepted, both servers save data (**the user's displayed name**, **the server's address**, **tokens to use in further communications**) about the other to ensure the next communications will happen within the "Friend" relationship.
 
-### Relationships
+### Relationship
 
 Relationships define the way a content can be interacted with according to privacy rules. It can be categorised in three types:
 
 #### Server owner
 
-Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (statuses, comments, etc) stored on it.
+Servers are user-owned, which means that each server should represent an unique user. This means that the server owner has full read and write access over the content (posts, comments, etc) stored on it.
 
 In other terms, it means that the user has control over its own data, as they can:
 
