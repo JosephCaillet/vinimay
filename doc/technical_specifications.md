@@ -46,8 +46,8 @@ In all responses shown below, a post will be depicted as such:
 
 ```http
 {
-    "creation_ts": "1483484400",
-    "last_edit_ts": "1483484400",
+    "creationTs": 1483484400,
+    "lastEditTs": 1483484400,
     "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
@@ -56,7 +56,7 @@ In all responses shown below, a post will be depicted as such:
 
 The first two fields are the creation date and the last edition date, as a timestamp. If the post was never edited, the last edition date will be the same as the creation date.
 
-Other fields are the post's author (formatted as `username@instance_url`), content and privacy setting. The last one has three possible values:
+Other fields are the post's author (formatted as `username@instanceUrl`), content and privacy setting. The last one has three possible values:
 
 * `public`: Everyone with an application using Vinimay's API can see the post and interact with it
 * `friends`: Only the server's owner's friends can see the post and interact with it
@@ -87,8 +87,8 @@ If the post's creation was successful, the server will send the following respon
 201 Created
 
 [{
-    "creation_ts": 1483484400,
-    "last_edit_ts": 1483484400,
+    "creationTs": 1483484400,
+    "lastEditTs": 1483484400,
     "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
@@ -127,29 +127,29 @@ If the posts' retrieval was successful, the server will send a response looking 
 
 [
     {
-        "creation_ts": 1483484700,
-        "last_edit_ts": 1483484700,
+        "creationTs": 1483484700,
+        "lastEditTs": 1483484700,
         "author": "jdoe@example.com",
         "content": "Hello myself",
         "privacy": "private"
     },
     {
-        "creation_ts": 1483484600,
-        "last_edit_ts": 1483484600,
+        "creationTs": 1483484600,
+        "lastEditTs": 1483484600,
         "author": "jdoe@example.com",
         "content": "Hello my friends",
         "privacy": "friends"
     },
     {
-        "creation_ts": 1483484500,
-        "last_edit_ts": 1483484500,
+        "creationTs": 1483484500,
+        "lastEditTs": 1483484500,
         "author": "jdoe@example.com",
         "content": "This is a status",
         "privacy": "public"
     },
     {
-        "creation_ts": 1483484400,
-        "last_edit_ts": 1483484400,
+        "creationTs": 1483484400,
+        "lastEditTs": 1483484400,
         "author": "jdoe@example.com",
         "content": "Hello world",
         "privacy": "public"
@@ -177,8 +177,8 @@ If the post's exists, the server will send the following response:
 200 OK
 
 [{
-    "creation_ts": 1483484400,
-    "last_edit_ts": 1483484400,
+    "creationTs": 1483484400,
+    "lastEditTs": 1483484400,
     "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
@@ -207,8 +207,8 @@ The response is similar to the post's creation:
 200 OK
 
 [{
-    "creation_ts": 1483484400,
-    "last_edit_ts": 1483485400,
+    "creationTs": 1483484400,
+    "lastEditTs": 1483485400,
     "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
@@ -236,10 +236,10 @@ In all responses shown below, a comment will be depicted as such:
 
 ```http
 {
-    "post_autor": "fbar@example.com",
-    "post_ts": "1483484400",
-    "creation_ts": "1483485400",
-    "last_edit_ts": "1483485400",
+    "post_author": "fbar@example.com",
+    "post_ts": 1483484400,
+    "creationTs": "1483485400",
+    "lastEditTs": "1483485400",
     "author": "jdoe@example.com",
     "content": "Hello world"
 }
@@ -249,7 +249,7 @@ The first field is the timestamp of the post the comment has been posted on.
 
 The following two fields are the creation date and the last edition date, as a timestamp. If the comment was never edited, the last edition date will be the same as the creation date.
 
-Other fields are the post's author (formatted as `username@instance_url`) and content.
+Other fields are the post's author (formatted as `username@instanceUrl`) and content.
 
 ### Retrieval
 
@@ -278,34 +278,34 @@ If the posts' retrieval was successful, the server will send a response looking 
 
 [
     {
-        "post_autor": "fbar@example.com",
-        "creation_ts": 1483484700,
-        "last_edit_ts": 1483484700,
+        "post_author": "fbar@example.com",
+        "creationTs": 1483484700,
+        "lastEditTs": 1483484700,
         "author": "jdoe@example.com",
         "content": "Hello myself",
         "privacy": "private"
     },
     {
-        "post_autor": "fbar@example.com",
-        "creation_ts": 1483484600,
-        "last_edit_ts": 1483484600,
+        "post_author": "fbar@example.com",
+        "creationTs": 1483484600,
+        "lastEditTs": 1483484600,
         "author": "jdoe@example.com",
         "content": "Hello my friends",
         "privacy": "friends"
     },
     {
-        "post_autor": "fbar@example.com",
-        "post_ts": "1483484400",
-        "creation_ts": 1483484500,
-        "last_edit_ts": 1483484500,
+        "post_author": "fbar@example.com",
+        "post_ts": 1483484400,
+        "creationTs": 1483484500,
+        "lastEditTs": 1483484500,
         "author": "jdoe@example.com",
         "content": "Hello world"
     },
     {
-        "post_autor": "fbar@example.com",
-        "post_ts": "1483484400",
-        "creation_ts": "1483485400",
-        "last_edit_ts": "1483485400",
+        "post_author": "fbar@example.com",
+        "post_ts": 1483484400,
+        "creationTs": "1483485400",
+        "lastEditTs": "1483485400",
         "author": "jdoe@example.com",
         "content": "Hello world"
     }
@@ -337,10 +337,10 @@ If the comment's creation was successful, the server will send the following res
 201 Created
 
 [{
-    "post_autor": "fbar@example.com",
-    "post_ts": "1483484400",
-    "creation_ts": "1483485400",
-    "last_edit_ts": "1483485400",
+    "post_author": "fbar@example.com",
+    "post_ts": 1483484400,
+    "creationTs": "1483485400",
+    "lastEditTs": "1483485400",
     "author": "jdoe@example.com",
     "content": "Hello world!"
 }]
@@ -370,10 +370,10 @@ The response is similar to the comment's creation:
 200 OK
 
 [{
-    "post_autor": "fbar@example.com",
-    "post_ts": "1483484400",
-    "creation_ts": 1483484400,
-    "last_edit_ts": 1483485400,
+    "post_author": "fbar@example.com",
+    "post_ts": 1483484400,
+    "creationTs": 1483484400,
+    "lastEditTs": 1483485400,
     "author": "jdoe@example.com",
     "content": "Hello world!"
 }]
