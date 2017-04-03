@@ -73,8 +73,7 @@ POST /client/posts
 
 {
     "content": "Hello world!",
-    "privacy": "public",
-    "signature": "foobar"
+    "privacy": "public"
 }
 ```
 
@@ -98,8 +97,6 @@ If the post's creation was successful, the server will send the following respon
 
 The object sent in this response describes the post created. The format is described below.
 
-If the creation fails, the server will send an error response as detailled in the section relative to errors above.
-
 ### Retrieval
 
 #### Retrieve several posts
@@ -120,8 +117,6 @@ GET /client/posts?from=1483484400&to=1491213194
 ```
 
 The `to` parameter is optional. If omitted, all posts since a given timestamp will be sent.
-
-If the client isn't authenticated, only public posts in this range will be included in the response.
 
 #### Response
 
@@ -202,8 +197,7 @@ An update on a post can be made using the post's timestamp, by specifying the fi
 PUT /client/posts/[ts]
 
 {
-    "content": "Hello world!",
-    "signature": "foobar"
+    "content": "Hello world!"
 }
 ```
 
@@ -216,7 +210,7 @@ The response is similar to the post's creation:
 
 [{
     "creation_ts": 1483484400,
-    "last_edit_ts": 1483484400,
+    "last_edit_ts": 1483485400,
     "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
@@ -265,18 +259,16 @@ Other fields are the post's author (formatted as `username@instance_url`) and co
 Retrieving a range of posts can be done using the post's timestamp, and request parameters to define the range:
 
 ```http
-GET /client/posts/[fs]/comments?start=20&nb=10
+GET /client/posts/[ts]/comments?start=20&nb=10
 ```
 
 This request will retrieve 10 posts between the 20th and the 30th most recents posts (10 posts starting from the 20th most recent).
 
 ```http
-GET /client/posts/[fs]/comments?from=1483484400&to=1491213194
+GET /client/posts/[ts]/comments?from=1483484400&to=1491213194
 ```
 
 The `to` parameter is optional. If omitted, all comments since a given timestamp will be sent.
-
-If the client isn't authenticated, only public posts in this range will be included in the response.
 
 #### Response
 
@@ -322,3 +314,78 @@ The `length` attribute is the number of statuses sent.
 
 ### Creation
 
+#### Request
+
+A comment is created with a `POST` request as such:
+
+```http
+POST /client/posts/[ts]/comments
+
+{
+    "content": "Hello world!"
+}
+```
+
+Comment creation depends on the post's privacy: Everyone for a "public" post, friends only for a "friends"-shared post, and only the server's owner for a "private" post.
+
+#### Response
+
+If the post's creation was successful, the server will send the following response:
+
+```http
+201 Created
+
+[{
+    "post_ts": "1483484400",
+    "creation_ts": "1483485400",
+    "last_edit_ts": "1483485400",
+    "author": "jdoe@example.com",
+    "content": "Hello world!"
+}]
+```
+
+The object sent in this response describes the post created. The format is described below.
+
+### Update
+
+#### Request
+
+An update on a comment can be made using the comment's timestamp, by specifying the new content:
+
+```http
+PUT /client/posts/[post_ts]/comments/[comment_ts]
+
+{
+    "content": "Hello world!"
+}
+```
+
+#### Response
+
+The response is similar to the comment's creation:
+
+```http
+200 OK
+
+[{
+    "post_ts": "1483484400",
+    "creation_ts": 1483484400,
+    "last_edit_ts": 1483485400,
+    "author": "jdoe@example.com",
+    "content": "Hello world!"
+}]
+```
+
+### Deletion
+
+#### Request
+
+A comment's deletion can be made using the comment's timestamp:
+
+```http
+DELETE /client/posts/[post_ts]/comments/[comment_ts]
+```
+
+#### Response
+
+The deletion is confirmed with a `204 No Content` response.
