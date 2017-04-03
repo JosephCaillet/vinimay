@@ -49,7 +49,7 @@ In all responses shown below, a post will be depicted as such:
 
 The first two fields are the creation date and the last edition date, as a timestamp. If the post was never edited, the last edition date will be the same as the creation date.
 
-Other fields are the post's author (formatted as `username@instance_url`), content and privacy setting. The latest has three possible values:
+Other fields are the post's author (formatted as `username@instance_url`), content and privacy setting. The last one has three possible values:
 
 * `public`: Everyone with an application using Vinimay's API can see the post and interact with it
 * `friends`: Only the server's owner's friends can see the post and interact with it
