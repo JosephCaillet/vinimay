@@ -157,19 +157,17 @@ If the posts' retrieval was successful, the server will send a response looking 
 ]
 ```
 
-The `length` attribute is the number of statuses sent.
-
 #### Retrieve one post
 
 #### Request
 
-One can retrieve a single post using its creation timestamp:
+One can retrieve a single post using its creation timestamp and its author's username :
 
 ```http
-GET /client/posts/[ts]
+GET /client/posts/[username]/[ts]
 ```
 
-With `[ts]` being the post's timestamp.
+With `[ts]` being the post's timestamp and `[username]` being its author.
 
 #### Response
 
@@ -191,10 +189,10 @@ If the post's exists, the server will send the following response:
 
 #### Request
 
-An update on a post can be made using the post's timestamp, by specifying the fields to update and their new value:
+An update on a post can be made using the post's timestamp ant its author's username, by specifying the fields to update and their new value:
 
 ```http
-PUT /client/posts/[ts]
+PUT /client/posts/[username]/[ts]
 
 {
     "content": "Hello world!"
@@ -221,10 +219,10 @@ The response is similar to the post's creation:
 
 #### Request
 
-A post's deletion can be made using the post's timestamp:
+A post's deletion can be made using the post's timestamp and its author's username:
 
 ```http
-DELETE /client/posts/[ts]
+DELETE /client/posts/[username]/[ts]
 ```
 
 #### Response
@@ -238,6 +236,7 @@ In all responses shown below, a comment will be depicted as such:
 
 ```http
 {
+    "post_autor": "fbar@example.com",
     "post_ts": "1483484400",
     "creation_ts": "1483485400",
     "last_edit_ts": "1483485400",
@@ -256,16 +255,16 @@ Other fields are the post's author (formatted as `username@instance_url`) and co
 
 #### Request
 
-Retrieving a range of posts can be done using the post's timestamp, and request parameters to define the range:
+Retrieving a range of posts can be done using the post's timestamp and its author's username, and request parameters to define the range:
 
 ```http
-GET /client/posts/[ts]/comments?start=20&nb=10
+GET /client/posts/[username]/[ts]/comments?start=20&nb=10
 ```
 
 This request will retrieve 10 posts between the 20th and the 30th most recents posts (10 posts starting from the 20th most recent).
 
 ```http
-GET /client/posts/[ts]/comments?from=1483484400&to=1491213194
+GET /client/posts/[username]/[ts]/comments?from=1483484400&to=1491213194
 ```
 
 The `to` parameter is optional. If omitted, all comments since a given timestamp will be sent.
@@ -279,6 +278,7 @@ If the posts' retrieval was successful, the server will send a response looking 
 
 [
     {
+        "post_autor": "fbar@example.com",
         "creation_ts": 1483484700,
         "last_edit_ts": 1483484700,
         "author": "jdoe@example.com",
@@ -286,6 +286,7 @@ If the posts' retrieval was successful, the server will send a response looking 
         "privacy": "private"
     },
     {
+        "post_autor": "fbar@example.com",
         "creation_ts": 1483484600,
         "last_edit_ts": 1483484600,
         "author": "jdoe@example.com",
@@ -293,6 +294,7 @@ If the posts' retrieval was successful, the server will send a response looking 
         "privacy": "friends"
     },
     {
+        "post_autor": "fbar@example.com",
         "post_ts": "1483484400",
         "creation_ts": 1483484500,
         "last_edit_ts": 1483484500,
@@ -300,6 +302,7 @@ If the posts' retrieval was successful, the server will send a response looking 
         "content": "Hello world"
     },
     {
+        "post_autor": "fbar@example.com",
         "post_ts": "1483484400",
         "creation_ts": "1483485400",
         "last_edit_ts": "1483485400",
@@ -309,8 +312,6 @@ If the posts' retrieval was successful, the server will send a response looking 
 ]
 ```
 
-The `length` attribute is the number of statuses sent.
-
 
 ### Creation
 
@@ -319,7 +320,7 @@ The `length` attribute is the number of statuses sent.
 A comment is created with a `POST` request as such:
 
 ```http
-POST /client/posts/[ts]/comments
+POST /client/posts/[username]/[ts]/comments
 
 {
     "content": "Hello world!"
@@ -330,12 +331,13 @@ Comment creation depends on the post's privacy: Everyone for a "public" post, fr
 
 #### Response
 
-If the post's creation was successful, the server will send the following response:
+If the comment's creation was successful, the server will send the following response:
 
 ```http
 201 Created
 
 [{
+    "post_autor": "fbar@example.com",
     "post_ts": "1483484400",
     "creation_ts": "1483485400",
     "last_edit_ts": "1483485400",
@@ -353,7 +355,7 @@ The object sent in this response describes the post created. The format is descr
 An update on a comment can be made using the comment's timestamp, by specifying the new content:
 
 ```http
-PUT /client/posts/[post_ts]/comments/[comment_ts]
+PUT /client/posts/[username]/[post_ts]/comments/[comment_ts]
 
 {
     "content": "Hello world!"
@@ -368,6 +370,7 @@ The response is similar to the comment's creation:
 200 OK
 
 [{
+    "post_autor": "fbar@example.com",
     "post_ts": "1483484400",
     "creation_ts": 1483484400,
     "last_edit_ts": 1483485400,
@@ -383,7 +386,7 @@ The response is similar to the comment's creation:
 A comment's deletion can be made using the comment's timestamp:
 
 ```http
-DELETE /client/posts/[post_ts]/comments/[comment_ts]
+DELETE /client/posts/[username]/[post_ts]/comments/[comment_ts]
 ```
 
 #### Response
