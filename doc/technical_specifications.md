@@ -41,7 +41,7 @@ In all responses shown below, a post will be depicted as such:
 {
     "creation_ts": "1483484400",
     "last_edit_ts": "1483484400",
-    "author": "jdoe@example.com"
+    "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
 }
@@ -49,7 +49,7 @@ In all responses shown below, a post will be depicted as such:
 
 The first two fields are the creation date and the last edition date, as a timestamp. If the post was never edited, the last edition date will be the same as the creation date.
 
-Other fields are the post's author (formatted as `username@instance_url`), content and privacy setting. The latest has three possible values:
+Other fields are the post's author (formatted as `username@instance_url`), content and privacy setting. The last one has three possible values:
 
 * `public`: Everyone with an application using Vinimay's API can see the post and interact with it
 * `friends`: Only the server's owner's friends can see the post and interact with it
@@ -81,7 +81,7 @@ If the post's creation was successful, the server will send the following respon
 [{
     "creation_ts": 1483484400,
     "last_edit_ts": 1483484400,
-    "author": "jdoe@example.com"
+    "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
 }]
@@ -120,33 +120,33 @@ If the posts' retrieval was successful, the server will send a response looking 
 200 OK
 
 {
-    "length": 4
+    "length": 4,
     "statuses": [
         {
             "creation_ts": 1483484700,
             "last_edit_ts": 1483484700,
-            "author": "jdoe@example.com"
+            "author": "jdoe@example.com",
             "content": "Hello myself",
             "privacy": "private"
         },
         {
             "creation_ts": 1483484600,
             "last_edit_ts": 1483484600,
-            "author": "jdoe@example.com"
+            "author": "jdoe@example.com",
             "content": "Hello my friends",
             "privacy": "friends"
         },
         {
             "creation_ts": 1483484500,
             "last_edit_ts": 1483484500,
-            "author": "jdoe@example.com"
+            "author": "jdoe@example.com",
             "content": "This is a status",
             "privacy": "public"
         },
         {
             "creation_ts": 1483484400,
             "last_edit_ts": 1483484400,
-            "author": "jdoe@example.com"
+            "author": "jdoe@example.com",
             "content": "Hello world",
             "privacy": "public"
         }
@@ -176,7 +176,7 @@ If the post's exists, the server will send the following response:
 [{
     "creation_ts": 1483484400,
     "last_edit_ts": 1483484400,
-    "author": "jdoe@example.com"
+    "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
 }]
