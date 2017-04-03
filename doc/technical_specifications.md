@@ -64,6 +64,8 @@ Other fields are the post's author (formatted as `username@instance_url`), conte
 
 ### Creation
 
+#### Request
+
 A post is created with a `POST` request on `/client/posts` as such:
 
 ```http
@@ -78,7 +80,7 @@ POST /client/posts
 
 Post creation is allowed only from the server's owner.
 
-##### Response
+#### Response
 
 If the post's creation was successful, the server will send the following response:
 
@@ -101,6 +103,8 @@ If the creation fails, the server will send an error response as detailled in th
 ### Retrieval
 
 #### Retrieve several posts
+
+#### Request
 
 Retrieving a range of posts can be done using a `GET` request on `/client/posts`, using request parameters to define the range:
 
@@ -126,44 +130,43 @@ If the posts' retrieval was successful, the server will send a response looking 
 ```http
 200 OK
 
-{
-    "length": 4,
-    "statuses": [
-        {
-            "creation_ts": 1483484700,
-            "last_edit_ts": 1483484700,
-            "author": "jdoe@example.com",
-            "content": "Hello myself",
-            "privacy": "private"
-        },
-        {
-            "creation_ts": 1483484600,
-            "last_edit_ts": 1483484600,
-            "author": "jdoe@example.com",
-            "content": "Hello my friends",
-            "privacy": "friends"
-        },
-        {
-            "creation_ts": 1483484500,
-            "last_edit_ts": 1483484500,
-            "author": "jdoe@example.com",
-            "content": "This is a status",
-            "privacy": "public"
-        },
-        {
-            "creation_ts": 1483484400,
-            "last_edit_ts": 1483484400,
-            "author": "jdoe@example.com",
-            "content": "Hello world",
-            "privacy": "public"
-        }
-    ]
-}
+[
+    {
+        "creation_ts": 1483484700,
+        "last_edit_ts": 1483484700,
+        "author": "jdoe@example.com",
+        "content": "Hello myself",
+        "privacy": "private"
+    },
+    {
+        "creation_ts": 1483484600,
+        "last_edit_ts": 1483484600,
+        "author": "jdoe@example.com",
+        "content": "Hello my friends",
+        "privacy": "friends"
+    },
+    {
+        "creation_ts": 1483484500,
+        "last_edit_ts": 1483484500,
+        "author": "jdoe@example.com",
+        "content": "This is a status",
+        "privacy": "public"
+    },
+    {
+        "creation_ts": 1483484400,
+        "last_edit_ts": 1483484400,
+        "author": "jdoe@example.com",
+        "content": "Hello world",
+        "privacy": "public"
+    }
+]
 ```
 
 The `length` attribute is the number of statuses sent.
 
 #### Retrieve one post
+
+#### Request
 
 One can retrieve a single post using its creation timestamp:
 
@@ -190,6 +193,8 @@ If the post's exists, the server will send the following response:
 ```
 
 ### Update
+
+#### Request
 
 An update on a post can be made using the post's timestamp, by specifying the fields to update and their new value:
 
@@ -219,6 +224,8 @@ The response is similar to the post's creation:
 ```
 
 ### Deletion
+
+#### Request
 
 A post's deletion can be made using the post's timestamp:
 
@@ -253,6 +260,8 @@ Other fields are the post's author (formatted as `username@instance_url`) and co
 
 ### Retrieval
 
+#### Request
+
 Retrieving a range of posts can be done using the post's timestamp, and request parameters to define the range:
 
 ```http
@@ -276,39 +285,36 @@ If the posts' retrieval was successful, the server will send a response looking 
 ```http
 200 OK
 
-{
-    "length": 4,
-    "statuses": [
-        {
-            "creation_ts": 1483484700,
-            "last_edit_ts": 1483484700,
-            "author": "jdoe@example.com",
-            "content": "Hello myself",
-            "privacy": "private"
-        },
-        {
-            "creation_ts": 1483484600,
-            "last_edit_ts": 1483484600,
-            "author": "jdoe@example.com",
-            "content": "Hello my friends",
-            "privacy": "friends"
-        },
-        {
-            "post_ts": "1483484400",
-            "creation_ts": 1483484500,
-            "last_edit_ts": 1483484500,
-            "author": "jdoe@example.com",
-            "content": "Hello world"
-        },
-        {
-            "post_ts": "1483484400",
-            "creation_ts": "1483485400",
-            "last_edit_ts": "1483485400",
-            "author": "jdoe@example.com",
-            "content": "Hello world"
-        }
-    ]
-}
+[
+    {
+        "creation_ts": 1483484700,
+        "last_edit_ts": 1483484700,
+        "author": "jdoe@example.com",
+        "content": "Hello myself",
+        "privacy": "private"
+    },
+    {
+        "creation_ts": 1483484600,
+        "last_edit_ts": 1483484600,
+        "author": "jdoe@example.com",
+        "content": "Hello my friends",
+        "privacy": "friends"
+    },
+    {
+        "post_ts": "1483484400",
+        "creation_ts": 1483484500,
+        "last_edit_ts": 1483484500,
+        "author": "jdoe@example.com",
+        "content": "Hello world"
+    },
+    {
+        "post_ts": "1483484400",
+        "creation_ts": "1483485400",
+        "last_edit_ts": "1483485400",
+        "author": "jdoe@example.com",
+        "content": "Hello world"
+    }
+]
 ```
 
 The `length` attribute is the number of statuses sent.
