@@ -33,6 +33,13 @@ POST /client/auth
 }
 ```
 
+## Un-authenticated requests
+
+If an un-authenticated request is sent, what happens depends on the request:
+
+* If the request is about retrieving data, only public content is sent
+* If the request is about creating, updating or deleting data, a `401 Unauthorized` HTTP error is sent and the request isn't processed further
+
 ## Posts
 
 In all responses shown below, a post will be depicted as such:
@@ -57,7 +64,7 @@ Other fields are the post's author (formatted as `username@instance_url`), conte
 
 ### Creation
 
-A post is created with a `POST` request on `/posts` as such:
+A post is created with a `POST` request on `/client/posts` as such:
 
 ```http
 POST /client/posts
@@ -89,26 +96,26 @@ If the post's creation was successful, the server will send the following respon
 
 The object sent in this response describes the post created. The format is described below.
 
-If the creation fails, the server will send an error response as detailled in the section relative to errors below.
+If the creation fails, the server will send an error response as detailled in the section relative to errors above.
 
 ### Retrieval
 
 #### Retrieve several posts
 
-Retrieving a range of posts can be done using a `GET` request on `/posts`, using request parameters to define the range:
+Retrieving a range of posts can be done using a `GET` request on `/client/posts`, using request parameters to define the range:
 
 ```http
-GET /client/posts?start=1483484400&stop=1491213194
+GET /client/posts?start=20&nb=10
 ```
 
-The `stop` parameter is optional. If omitted, all posts since a given timestamp will be sent.
+This request will retrieve 10 posts between the 20th and the 30th most recents posts (10 posts starting from the 20th most recent).
 
-
-Additionnaly, one can retrieve the n latests posts using the `nb` parameter:
 
 ```http
-GET /client/posts?nb=20
+GET /client/posts?from=1483484400&to=1491213194
 ```
+
+The `to` parameter is optional. If omitted, all posts since a given timestamp will be sent.
 
 If the client isn't authenticated, only public posts in this range will be included in the response.
 
@@ -205,7 +212,7 @@ The response is similar to the post's creation:
 [{
     "creation_ts": 1483484400,
     "last_edit_ts": 1483484400,
-    "author": "jdoe@example.com"
+    "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
 }]
@@ -222,3 +229,90 @@ DELETE /client/posts/[ts]
 #### Response
 
 The deletion is confirmed with a `204 No Content` response.
+
+
+## Comments
+
+In all responses shown below, a comment will be depicted as such:
+
+```http
+{
+    "post_ts": "1483484400",
+    "creation_ts": "1483485400",
+    "last_edit_ts": "1483485400",
+    "author": "jdoe@example.com",
+    "content": "Hello world"
+}
+```
+
+The first field is the timestamp of the post the comment has been posted on.
+
+The following two fields are the creation date and the last edition date, as a timestamp. If the comment was never edited, the last edition date will be the same as the creation date.
+
+Other fields are the post's author (formatted as `username@instance_url`) and content.
+
+### Retrieval
+
+Retrieving a range of posts can be done using the post's timestamp, and request parameters to define the range:
+
+```http
+GET /client/posts/[fs]/comments?start=20&nb=10
+```
+
+This request will retrieve 10 posts between the 20th and the 30th most recents posts (10 posts starting from the 20th most recent).
+
+```http
+GET /client/posts/[fs]/comments?from=1483484400&to=1491213194
+```
+
+The `to` parameter is optional. If omitted, all comments since a given timestamp will be sent.
+
+If the client isn't authenticated, only public posts in this range will be included in the response.
+
+#### Response
+
+If the posts' retrieval was successful, the server will send a response looking like this:
+
+```http
+200 OK
+
+{
+    "length": 4,
+    "statuses": [
+        {
+            "creation_ts": 1483484700,
+            "last_edit_ts": 1483484700,
+            "author": "jdoe@example.com",
+            "content": "Hello myself",
+            "privacy": "private"
+        },
+        {
+            "creation_ts": 1483484600,
+            "last_edit_ts": 1483484600,
+            "author": "jdoe@example.com",
+            "content": "Hello my friends",
+            "privacy": "friends"
+        },
+        {
+            "post_ts": "1483484400",
+            "creation_ts": 1483484500,
+            "last_edit_ts": 1483484500,
+            "author": "jdoe@example.com",
+            "content": "Hello world"
+        },
+        {
+            "post_ts": "1483484400",
+            "creation_ts": "1483485400",
+            "last_edit_ts": "1483485400",
+            "author": "jdoe@example.com",
+            "content": "Hello world"
+        }
+    ]
+}
+```
+
+The `length` attribute is the number of statuses sent.
+
+
+### Creation
+
