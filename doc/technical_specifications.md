@@ -535,7 +535,7 @@ GET /client/profile
 			"description": "Can we do it? Yes, we can!"
 		}
 	],
-	"received",[
+	"received": [
 
 		{
 			"user": "Heenok@heenok.com",
