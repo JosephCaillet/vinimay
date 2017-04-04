@@ -536,7 +536,6 @@ GET /client/profile
 		}
 	],
 	"received": [
-
 		{
 			"user": "Heenok@heenok.com",
 			"description": "I am the king, t'endend?"
