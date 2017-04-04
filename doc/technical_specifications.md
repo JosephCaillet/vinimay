@@ -95,7 +95,7 @@ If the post's creation was successful, the server will send the following respon
     "lastEditTs": 1483484400,
     "author": "jdoe@example.com",
     "content": "Hello world",
-    "privacy": "public"
+    "privacy": "public",
     "comments": 0,
     "reactions": 0
 }]
