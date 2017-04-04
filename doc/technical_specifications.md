@@ -627,9 +627,12 @@ POST vinimay-server2.com/server/friends
 
 {
 	"from": "alice@vinimay-server1.com",
-	"to": "bob@vinimay-server2.com"
+	"to": "bob@vinimay-server2.com",
+    "token": "b5aebeb0e9007e0ac856c06ab71581943d5cb1fe2b8f43eda9c1a3454050f32e"
 }
 ```
+
+The `token` field here is a temporary randomly-generated token used to identify the request and ensure someone won't try to act as Bob by accepting it (mandatory since the time frame between a request being sent and a request being accepted can be quite large).
 
 *Note: from this moment on, if Bob tries to send a friend request to Alice, her server will reply with a `409 Conflict` HTTP error, telling Bob's server that a request is already ongoing.*
 
@@ -649,6 +652,7 @@ POST vinimay-server1.com/server/friends
 {
 	"step": 1,
 	"requestAuthor": "alice@vinimay-server1.com",
+    "token": "b5aebeb0e9007e0ac856c06ab71581943d5cb1fe2b8f43eda9c1a3454050f32e",
 	"idTokenDh": {
 		"generator": "02",
 		"prime": "dbd625c7de95d68bc229a63016a506cff4ff44ee5fe11aca8666ca2c0b490a5b",
@@ -661,6 +665,8 @@ POST vinimay-server1.com/server/friends
 	}
 }
 ```
+
+For identification purposes, the temporary token Bob's server got from Alice's friend request has to be included in this request.
 
 Alice will then use these two packages to compute her two intermediary values and send them in the HTTP response:
 
