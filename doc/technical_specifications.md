@@ -50,17 +50,21 @@ In all responses shown below, a post will be depicted as such:
     "lastEditTs": 1483484400,
     "author": "jdoe@example.com",
     "content": "Hello world",
-    "privacy": "public"
+    "privacy": "public",
+    "comments": 4,
+    "reactions": 20
 }
 ```
 
 The first two fields are the creation date and the last edition date, as a timestamp. If the post was never edited, the last edition date will be the same as the creation date.
 
-Other fields are the post's author (formatted as `username@instanceUrl`), content and privacy setting. The last one has three possible values:
+Other fields are the post's author (formatted as `username@instanceUrl`), content and privacy setting. The latest has three possible values:
 
 * `public`: Everyone with an application using Vinimay's API can see the post and interact with it
 * `friends`: Only the server's owner's friends can see the post and interact with it
 * `private`: Only the server's owner can see the post and interact with it
+
+Finally, the two last fields indicate how much comments and reactions have been created for this post.
 
 ### Creation
 
@@ -92,6 +96,8 @@ If the post's creation was successful, the server will send the following respon
     "author": "jdoe@example.com",
     "content": "Hello world",
     "privacy": "public"
+    "comments": 0,
+    "reactions": 0
 }]
 ```
 
@@ -111,12 +117,13 @@ GET /client/posts?start=20&nb=10
 
 This request will retrieve 10 posts between the 20th and the 30th most recents posts (10 posts starting from the 20th most recent).
 
+Additionnaly, retrieval of posts can be made using timestamps:
 
 ```http
 GET /client/posts?from=1483484400&to=1491213194
 ```
 
-The `to` parameter is optional. If omitted, all posts since a given timestamp will be sent.
+The `to` parameter is optional. If omitted, all posts created after a given timestamp will be sent.
 
 #### Response
 
@@ -131,28 +138,36 @@ If the posts' retrieval was successful, the server will send a response looking 
         "lastEditTs": 1483484700,
         "author": "jdoe@example.com",
         "content": "Hello myself",
-        "privacy": "private"
+        "privacy": "private",
+        "comments": 1,
+        "reactions": 0
     },
     {
         "creationTs": 1483484600,
         "lastEditTs": 1483484600,
         "author": "jdoe@example.com",
         "content": "Hello my friends",
-        "privacy": "friends"
+        "privacy": "friends",
+        "comments": 5,
+        "reactions": 17
     },
     {
         "creationTs": 1483484500,
         "lastEditTs": 1483484500,
         "author": "jdoe@example.com",
         "content": "This is a status",
-        "privacy": "public"
+        "privacy": "public",
+        "comments": 2,
+        "reactions": 30
     },
     {
         "creationTs": 1483484400,
         "lastEditTs": 1483484400,
         "author": "jdoe@example.com",
         "content": "Hello world",
-        "privacy": "public"
+        "privacy": "public",
+        "comments": 6,
+        "reactions": 10
     }
 ]
 ```
@@ -164,10 +179,10 @@ If the posts' retrieval was successful, the server will send a response looking 
 One can retrieve a single post using its creation timestamp and its author's username :
 
 ```http
-GET /client/posts/[username]/[ts]
+GET /client/posts/[author]/[ts]
 ```
 
-With `[ts]` being the post's timestamp and `[username]` being its author.
+With `[ts]` being the post's timestamp and `[author]` being its author.
 
 #### Response
 
@@ -181,7 +196,9 @@ If the post's exists, the server will send the following response:
     "lastEditTs": 1483484400,
     "author": "jdoe@example.com",
     "content": "Hello world",
-    "privacy": "public"
+    "privacy": "public",
+    "comments": 4,
+    "reactions": 20
 }]
 ```
 
@@ -192,7 +209,7 @@ If the post's exists, the server will send the following response:
 An update on a post can be made using the post's timestamp ant its author's username, by specifying the fields to update and their new value:
 
 ```http
-PUT /client/posts/[username]/[ts]
+PUT /client/posts/[author]/[ts]
 
 {
     "content": "Hello world!"
@@ -211,7 +228,9 @@ The response is similar to the post's creation:
     "lastEditTs": 1483485400,
     "author": "jdoe@example.com",
     "content": "Hello world",
-    "privacy": "public"
+    "privacy": "public",
+    "comments": 4,
+    "reactions": 20
 }]
 ```
 
@@ -222,7 +241,7 @@ The response is similar to the post's creation:
 A post's deletion can be made using the post's timestamp and its author's username:
 
 ```http
-DELETE /client/posts/[username]/[ts]
+DELETE /client/posts/[author]/[ts]
 ```
 
 #### Response
@@ -236,8 +255,8 @@ In all responses shown below, a comment will be depicted as such:
 
 ```http
 {
-    "post_author": "fbar@example.com",
-    "post_ts": 1483484400,
+    "postAuthor": "fbar@example.com",
+    "postTs": 1483484400,
     "creationTs": "1483485400",
     "lastEditTs": "1483485400",
     "author": "jdoe@example.com",
@@ -245,7 +264,7 @@ In all responses shown below, a comment will be depicted as such:
 }
 ```
 
-The first field is the timestamp of the post the comment has been posted on.
+The two first fields are the author and the timestamp of the post the comment has been posted on.
 
 The following two fields are the creation date and the last edition date, as a timestamp. If the comment was never edited, the last edition date will be the same as the creation date.
 
@@ -255,55 +274,57 @@ Other fields are the post's author (formatted as `username@instanceUrl`) and con
 
 #### Request
 
-Retrieving a range of posts can be done using the post's timestamp and its author's username, and request parameters to define the range:
+Retrieving a range of comments can be done using the post's timestamp and its author's username, and request parameters to define the range:
 
 ```http
-GET /client/posts/[username]/[ts]/comments?start=20&nb=10
+GET /client/posts/[author]/[ts]/comments?start=20&nb=10
 ```
 
-This request will retrieve 10 posts between the 20th and the 30th most recents posts (10 posts starting from the 20th most recent).
+This request will retrieve 10 comments between the 20th and the 30th most recents comments (10 comments starting from the 20th most recent) on a given post.
+
+Additionnaly, retrieval of comments can be made using timestamps:
 
 ```http
-GET /client/posts/[username]/[ts]/comments?from=1483484400&to=1491213194
+GET /client/posts/[author]/[ts]/comments?from=1483484400&to=1491213194
 ```
 
-The `to` parameter is optional. If omitted, all comments since a given timestamp will be sent.
+The `to` parameter is optional. If omitted, all comments created after a given timestamp will be sent.
 
 #### Response
 
-If the posts' retrieval was successful, the server will send a response looking like this:
+If the comments' retrieval was successful, the server will send a response looking like this:
 
 ```http
 200 OK
 
 [
     {
-        "post_author": "fbar@example.com",
+        "postAuthor": "fbar@example.com",
+        "postTs": 1483484400,
         "creationTs": 1483484700,
         "lastEditTs": 1483484700,
         "author": "jdoe@example.com",
-        "content": "Hello myself",
-        "privacy": "private"
+        "content": "Another comment!"
     },
     {
-        "post_author": "fbar@example.com",
+        "postAuthor": "fbar@example.com",
+        "postTs": 1483484400,
         "creationTs": 1483484600,
         "lastEditTs": 1483484600,
         "author": "jdoe@example.com",
-        "content": "Hello my friends",
-        "privacy": "friends"
+        "content": "This is a second comment"
     },
     {
-        "post_author": "fbar@example.com",
-        "post_ts": 1483484400,
+        "postAuthor": "fbar@example.com",
+        "postTs": 1483484400,
         "creationTs": 1483484500,
         "lastEditTs": 1483484500,
         "author": "jdoe@example.com",
-        "content": "Hello world"
+        "content": "This is a comment"
     },
     {
-        "post_author": "fbar@example.com",
-        "post_ts": 1483484400,
+        "postAuthor": "fbar@example.com",
+        "postTs": 1483484400,
         "creationTs": "1483485400",
         "lastEditTs": "1483485400",
         "author": "jdoe@example.com",
@@ -320,14 +341,14 @@ If the posts' retrieval was successful, the server will send a response looking 
 A comment is created with a `POST` request as such:
 
 ```http
-POST /client/posts/[username]/[ts]/comments
+POST /client/posts/[author]/[ts]/comments
 
 {
     "content": "Hello world!"
 }
 ```
 
-Comment creation depends on the post's privacy: Everyone for a "public" post, friends only for a "friends"-shared post, and only the server's owner for a "private" post.
+Comment creation depends on the post's privacy: friends only for a "public" or "friends"-shared post, and only the server's owner for a "private" post.
 
 #### Response
 
@@ -337,8 +358,8 @@ If the comment's creation was successful, the server will send the following res
 201 Created
 
 [{
-    "post_author": "fbar@example.com",
-    "post_ts": 1483484400,
+    "postAuthor": "fbar@example.com",
+    "postTs": 1483484400,
     "creationTs": "1483485400",
     "lastEditTs": "1483485400",
     "author": "jdoe@example.com",
@@ -346,7 +367,7 @@ If the comment's creation was successful, the server will send the following res
 }]
 ```
 
-The object sent in this response describes the post created. The format is described below.
+The object sent in this response describes the comment created. The format is described below.
 
 ### Update
 
@@ -355,7 +376,7 @@ The object sent in this response describes the post created. The format is descr
 An update on a comment can be made using the comment's timestamp, by specifying the new content:
 
 ```http
-PUT /client/posts/[username]/[post_ts]/comments/[comment_ts]
+PUT /client/posts/[author]/[postTs]/comments/[comment_ts]
 
 {
     "content": "Hello world!"
@@ -370,8 +391,8 @@ The response is similar to the comment's creation:
 200 OK
 
 [{
-    "post_author": "fbar@example.com",
-    "post_ts": 1483484400,
+    "postAuthor": "fbar@example.com",
+    "postTs": 1483484400,
     "creationTs": 1483484400,
     "lastEditTs": 1483485400,
     "author": "jdoe@example.com",
@@ -386,9 +407,136 @@ The response is similar to the comment's creation:
 A comment's deletion can be made using the comment's timestamp:
 
 ```http
-DELETE /client/posts/[username]/[post_ts]/comments/[comment_ts]
+DELETE /client/posts/[author]/[postTs]/comments/[comment_ts]
 ```
 
 #### Response
 
 The deletion is confirmed with a `204 No Content` response.
+
+## Reactions
+
+In all responses shown below, a reaction will be depicted as such:
+
+```http
+{
+    "postAuthor": "fbar@example.com",
+    "postTs": 1483484400,
+    "author": "jdoe@example.com"
+}
+```
+
+The two first fields are the author and the timestamp of the post the reaction has been posted on. The last field is the user (again, formatted as `username@instanceUrl`) the reaction is coming from.
+
+### Creation
+
+#### Request
+
+A reaction is created with a `POST` request as such:
+
+```http
+POST /client/posts/[author]/[ts]/reactions
+```
+
+Reaction creation depends on the post's privacy: friends only for a "public" or "friends"-shared post, and only the server's owner for a "private" post.
+
+#### Response
+
+If the reaction's creation was successful, the server will send the following response:
+
+```http
+201 Created
+ 
+[{
+    "postAuthor": "fbar@example.com",
+    "postTs": 1483484400,
+    "author": "jdoe@example.com"
+}]
+```
+
+The object sent in this response describes the reaction created. The format is described below.
+
+### Deletion
+
+#### Request
+
+A comment's deletion can be made using the reaction's timestamp:
+
+```http
+DELETE /client/posts/[post_author]/[postTs]/reactions/[reaction_author]
+```
+ 
+#### Response
+
+The deletion is confirmed with a `204 No Content` response.
+
+### Retrieval
+
+#### Request
+
+Retrieving a range of reactions can be done using the post's timestamp and its author's username, and request parameters to define the range:
+
+```http
+GET /client/posts/[author]/[ts]/comments?start=20&nb=10
+```
+
+This request will retrieve 10 reactions between the 20th and the 30th most recents reactions (10 comments starting from the 20th most recent) on a given post.
+
+#### Response
+
+If the reactions' retrieval was successful, the server will send a response looking like this:
+
+```http
+[
+    {
+        "postAuthor": "fbar@example.com",
+        "postTs": 1483484400,
+        "author": "jdoe@example.com"
+    },
+    {
+        "postAuthor": "fbar@example.com",
+        "postTs": 1483484400,
+        "author": "babolivier@vinimay.example.fr"
+    },
+    {
+        "postAuthor": "fbar@example.com",
+        "postTs": 1483484400,
+        "author": "jcaillet@example.com"
+    }
+    {
+        "postAuthor": "fbar@example.com",
+        "postTs": 1483484400,
+        "author": "fbar@example.com"
+    }
+]
+```
+
+## Friend requests
+
+[TODO]
+
+# Server-server API
+
+## Friend requests
+
+This section will rather describe the protocol followed by Vinimay to create a friendly relationship between two server than the API used only, even though it will also be described along the way.
+
+### Sending the request
+
+To clarify all further explanation, in this part, we'll use a scenario in which Alice asks Bob to be her friend (and Bob is OK with that).
+
+When Alice uses here client to send a friend request, the server retrieves the request and send the following request to Bob's server:
+
+```http
+POST /server/friends/request
+
+{
+    "from": "alice@vinimay-server1.com",
+    "to": "bob@vinimay-server2.com"
+}
+```
+
+*Note: from this moment on, if Bob tries to send a friend request to Alice, her server will reply with a `409	Conflict` HTTP error, telling Bob's server that a request is already ongoing.*
+
+### Replying to the request
+
