@@ -637,46 +637,43 @@ POST vinimay-server2.com/server/friends
 
 #### Step 1: Token processing
 
-Once Bob accepted the request, it will initiate two Diffie-Hellman exchanges: one to compute the identifying token, the other to compute the token use for signing next requests.
+Once Bob accepted the request, it will initiate two [Diffie-Hellman](https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange) exchanges: one to compute the identifying token, the other to compute the token use for signing next requests.
 
 As both servers are already communicating over a secure (HTTPS) channel, we don't need to add more security to the exchanges.
 
-Bob's server will compute two generators and prime numbers and send them both to Alice's server, along with its own secret:
+Bob's server will compute two generators and prime numbers and send them both to Alice's server, along with its own intermediary values (called "mod" since they're both processed using modulos):
 
 ```http
 POST vinimay-server1.com/server/friends
 
 {
 	"step": 1,
-	"request": {
-		"from": "alice@vinimay-server1.com",
-		"to": "bob@vinimay-server2.com"
-	},
+	"requestAuthor": "alice@vinimay-server1.com",
 	"idTokenDh": {
 		"generator": "02",
 		"prime": "dbd625c7de95d68bc229a63016a506cff4ff44ee5fe11aca8666ca2c0b490a5b",
-		"secret": "99e95fd7f9afe480c5983e9725fd65c51e10d5edf9f75cfd82805b3a0ce17e17"
+		"mod": "99e95fd7f9afe480c5983e9725fd65c51e10d5edf9f75cfd82805b3a0ce17e17"
 	},
 	"sigTokenDh": {
 		"generator": "02",
 		"prime": "88225ed5ae660b1d6d3d0f75f7916296875fe8e31d26ea229e87805e41bdb34b",
-		"secret": "836166128b49ad25feae9c6465bee7af7b90e023a08c2f72fb7673ebf4b6909a"
+		"mod": "836166128b49ad25feae9c6465bee7af7b90e023a08c2f72fb7673ebf4b6909a"
 	}
 }
 ```
 
-Alice will then use these two packages to compute her two secrets and send them in the HTTP response:
+Alice will then use these two packages to compute her two intermediary values and send them in the HTTP response:
 
 ```http
 202 Accepted
 
 {
-	"idTokenSecret": "732639488b9a88f518c20c8c6052de45547cc3e4db84cb056626e11bf039abce",
-	"sigTokenSecret": "59cda028ac0d1a8d1f894a139570919ed535b28f794259b7df984142db811a54"
+	"idTokenMod": "732639488b9a88f518c20c8c6052de45547cc3e4db84cb056626e11bf039abce",
+	"sigTokenMod": "59cda028ac0d1a8d1f894a139570919ed535b28f794259b7df984142db811a54"
 }
 ```
 
-#### Step 3: Confirming tokens have been processed
+#### Step 2: Confirming tokens have been processed
 
 Now both servers have the necessary data to compute both tokens. As the last verification, and so that Alice's server is informed that the friendship is going on, Bob's server will send it a final request:
 
@@ -684,11 +681,8 @@ Now both servers have the necessary data to compute both tokens. As the last ver
 POST vinimay-server1.com/server/friends
 
 {
-	"step": 3,
-	"request": {
-		"from": "alice@vinimay-server1.com",
-		"to": "bob@vinimay-server2.com"
-	},
+	"step": 2,
+	"requestAuthor": "alice@vinimay-server1.com",
 	"idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
 	"signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
 }
@@ -709,7 +703,7 @@ Let's take our previous request as an example. Here's what its body looks like w
 
 ```json
 {
-	"step": 3,
+	"step": 2,
 	"request": {
 		"from": "alice@vinimay-server1.com",
 		"to": "bob@vinimay-server2.com"
@@ -720,7 +714,7 @@ Let's take our previous request as an example. Here's what its body looks like w
 
 Converted into a single-line string and process all of the replacements, it results in this string:
 
-`step=3&request={from=alice@vinimay-server1.com&to=bob@vinimay-server2.com}&idToken=225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433`
+`step=2&request={from=alice@vinimay-server1.com&to=bob@vinimay-server2.com}&idToken=225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433`
 
 Now all there is to do is compute the string's SHA256 checksum:
 
@@ -730,7 +724,7 @@ And include it into the body to sign the request:
 
 ```json
 {
-	"step": 3,
+	"step": 2,
 	"request": {
 		"from": "alice@vinimay-server1.com",
 		"to": "bob@vinimay-server2.com"
