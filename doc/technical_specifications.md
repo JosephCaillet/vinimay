@@ -28,8 +28,8 @@ A `POST` on `/client/auth` will result in processing authentication data sent by
 POST /client/auth
 
 {
-    "username": "jdoe",
-    "password": "h4ckm3"
+	"username": "jdoe",
+	"password": "h4ckm3"
 }
 ```
 
@@ -46,13 +46,13 @@ In all responses shown below, a post will be depicted as such:
 
 ```http
 {
-    "creationTs": 1483484400,
-    "lastEditTs": 1483484400,
-    "author": "jdoe@example.com",
-    "content": "Hello world",
-    "privacy": "public",
-    "comments": 4,
-    "reactions": 20
+	"creationTs": 1483484400,
+	"lastEditTs": 1483484400,
+	"author": "jdoe@example.com",
+	"content": "Hello world",
+	"privacy": "public",
+	"comments": 4,
+	"reactions": 20
 }
 ```
 
@@ -76,8 +76,8 @@ A post is created with a `POST` request on `/client/posts` as such:
 POST /client/posts
 
 {
-    "content": "Hello world!",
-    "privacy": "public"
+	"content": "Hello world!",
+	"privacy": "public"
 }
 ```
 
@@ -91,13 +91,13 @@ If the post's creation was successful, the server will send the following respon
 201 Created
 
 [{
-    "creationTs": 1483484400,
-    "lastEditTs": 1483484400,
-    "author": "jdoe@example.com",
-    "content": "Hello world",
-    "privacy": "public",
-    "comments": 0,
-    "reactions": 0
+	"creationTs": 1483484400,
+	"lastEditTs": 1483484400,
+	"author": "jdoe@example.com",
+	"content": "Hello world",
+	"privacy": "public",
+	"comments": 0,
+	"reactions": 0
 }]
 ```
 
@@ -133,42 +133,42 @@ If the posts' retrieval was successful, the server will send a response looking 
 200 OK
 
 [
-    {
-        "creationTs": 1483484700,
-        "lastEditTs": 1483484700,
-        "author": "jdoe@example.com",
-        "content": "Hello myself",
-        "privacy": "private",
-        "comments": 1,
-        "reactions": 0
-    },
-    {
-        "creationTs": 1483484600,
-        "lastEditTs": 1483484600,
-        "author": "jdoe@example.com",
-        "content": "Hello my friends",
-        "privacy": "friends",
-        "comments": 5,
-        "reactions": 17
-    },
-    {
-        "creationTs": 1483484500,
-        "lastEditTs": 1483484500,
-        "author": "jdoe@example.com",
-        "content": "This is a status",
-        "privacy": "public",
-        "comments": 2,
-        "reactions": 30
-    },
-    {
-        "creationTs": 1483484400,
-        "lastEditTs": 1483484400,
-        "author": "jdoe@example.com",
-        "content": "Hello world",
-        "privacy": "public",
-        "comments": 6,
-        "reactions": 10
-    }
+	{
+		"creationTs": 1483484700,
+		"lastEditTs": 1483484700,
+		"author": "jdoe@example.com",
+		"content": "Hello myself",
+		"privacy": "private",
+		"comments": 1,
+		"reactions": 0
+	},
+	{
+		"creationTs": 1483484600,
+		"lastEditTs": 1483484600,
+		"author": "jdoe@example.com",
+		"content": "Hello my friends",
+		"privacy": "friends",
+		"comments": 5,
+		"reactions": 17
+	},
+	{
+		"creationTs": 1483484500,
+		"lastEditTs": 1483484500,
+		"author": "jdoe@example.com",
+		"content": "This is a status",
+		"privacy": "public",
+		"comments": 2,
+		"reactions": 30
+	},
+	{
+		"creationTs": 1483484400,
+		"lastEditTs": 1483484400,
+		"author": "jdoe@example.com",
+		"content": "Hello world",
+		"privacy": "public",
+		"comments": 6,
+		"reactions": 10
+	}
 ]
 ```
 
@@ -192,13 +192,13 @@ If the post's exists, the server will send the following response:
 200 OK
 
 [{
-    "creationTs": 1483484400,
-    "lastEditTs": 1483484400,
-    "author": "jdoe@example.com",
-    "content": "Hello world",
-    "privacy": "public",
-    "comments": 4,
-    "reactions": 20
+	"creationTs": 1483484400,
+	"lastEditTs": 1483484400,
+	"author": "jdoe@example.com",
+	"content": "Hello world",
+	"privacy": "public",
+	"comments": 4,
+	"reactions": 20
 }]
 ```
 
@@ -212,7 +212,7 @@ An update on a post can be made using the post's timestamp ant its author's user
 PUT /client/posts/[author]/[ts]
 
 {
-    "content": "Hello world!"
+	"content": "Hello world!"
 }
 ```
 
@@ -224,13 +224,13 @@ The response is similar to the post's creation:
 200 OK
 
 [{
-    "creationTs": 1483484400,
-    "lastEditTs": 1483485400,
-    "author": "jdoe@example.com",
-    "content": "Hello world",
-    "privacy": "public",
-    "comments": 4,
-    "reactions": 20
+	"creationTs": 1483484400,
+	"lastEditTs": 1483485400,
+	"author": "jdoe@example.com",
+	"content": "Hello world",
+	"privacy": "public",
+	"comments": 4,
+	"reactions": 20
 }]
 ```
 
@@ -255,12 +255,12 @@ In all responses shown below, a comment will be depicted as such:
 
 ```http
 {
-    "postAuthor": "fbar@example.com",
-    "postTs": 1483484400,
-    "creationTs": "1483485400",
-    "lastEditTs": "1483485400",
-    "author": "jdoe@example.com",
-    "content": "Hello world"
+	"postAuthor": "fbar@example.com",
+	"postTs": 1483484400,
+	"creationTs": "1483485400",
+	"lastEditTs": "1483485400",
+	"author": "jdoe@example.com",
+	"content": "Hello world"
 }
 ```
 
@@ -298,38 +298,38 @@ If the comments' retrieval was successful, the server will send a response looki
 200 OK
 
 [
-    {
-        "postAuthor": "fbar@example.com",
-        "postTs": 1483484400,
-        "creationTs": 1483484700,
-        "lastEditTs": 1483484700,
-        "author": "jdoe@example.com",
-        "content": "Another comment!"
-    },
-    {
-        "postAuthor": "fbar@example.com",
-        "postTs": 1483484400,
-        "creationTs": 1483484600,
-        "lastEditTs": 1483484600,
-        "author": "jdoe@example.com",
-        "content": "This is a second comment"
-    },
-    {
-        "postAuthor": "fbar@example.com",
-        "postTs": 1483484400,
-        "creationTs": 1483484500,
-        "lastEditTs": 1483484500,
-        "author": "jdoe@example.com",
-        "content": "This is a comment"
-    },
-    {
-        "postAuthor": "fbar@example.com",
-        "postTs": 1483484400,
-        "creationTs": "1483485400",
-        "lastEditTs": "1483485400",
-        "author": "jdoe@example.com",
-        "content": "Hello world"
-    }
+	{
+		"postAuthor": "fbar@example.com",
+		"postTs": 1483484400,
+		"creationTs": 1483484700,
+		"lastEditTs": 1483484700,
+		"author": "jdoe@example.com",
+		"content": "Another comment!"
+	},
+	{
+		"postAuthor": "fbar@example.com",
+		"postTs": 1483484400,
+		"creationTs": 1483484600,
+		"lastEditTs": 1483484600,
+		"author": "jdoe@example.com",
+		"content": "This is a second comment"
+	},
+	{
+		"postAuthor": "fbar@example.com",
+		"postTs": 1483484400,
+		"creationTs": 1483484500,
+		"lastEditTs": 1483484500,
+		"author": "jdoe@example.com",
+		"content": "This is a comment"
+	},
+	{
+		"postAuthor": "fbar@example.com",
+		"postTs": 1483484400,
+		"creationTs": "1483485400",
+		"lastEditTs": "1483485400",
+		"author": "jdoe@example.com",
+		"content": "Hello world"
+	}
 ]
 ```
 
@@ -344,7 +344,7 @@ A comment is created with a `POST` request as such:
 POST /client/posts/[author]/[ts]/comments
 
 {
-    "content": "Hello world!"
+	"content": "Hello world!"
 }
 ```
 
@@ -358,12 +358,12 @@ If the comment's creation was successful, the server will send the following res
 201 Created
 
 [{
-    "postAuthor": "fbar@example.com",
-    "postTs": 1483484400,
-    "creationTs": "1483485400",
-    "lastEditTs": "1483485400",
-    "author": "jdoe@example.com",
-    "content": "Hello world!"
+	"postAuthor": "fbar@example.com",
+	"postTs": 1483484400,
+	"creationTs": "1483485400",
+	"lastEditTs": "1483485400",
+	"author": "jdoe@example.com",
+	"content": "Hello world!"
 }]
 ```
 
@@ -379,7 +379,7 @@ An update on a comment can be made using the comment's timestamp, by specifying 
 PUT /client/posts/[author]/[postTs]/comments/[comment_ts]
 
 {
-    "content": "Hello world!"
+	"content": "Hello world!"
 }
 ```
 
@@ -391,12 +391,12 @@ The response is similar to the comment's creation:
 200 OK
 
 [{
-    "postAuthor": "fbar@example.com",
-    "postTs": 1483484400,
-    "creationTs": 1483484400,
-    "lastEditTs": 1483485400,
-    "author": "jdoe@example.com",
-    "content": "Hello world!"
+	"postAuthor": "fbar@example.com",
+	"postTs": 1483484400,
+	"creationTs": 1483484400,
+	"lastEditTs": 1483485400,
+	"author": "jdoe@example.com",
+	"content": "Hello world!"
 }]
 ```
 
@@ -420,9 +420,9 @@ In all responses shown below, a reaction will be depicted as such:
 
 ```http
 {
-    "postAuthor": "fbar@example.com",
-    "postTs": 1483484400,
-    "author": "jdoe@example.com"
+	"postAuthor": "fbar@example.com",
+	"postTs": 1483484400,
+	"author": "jdoe@example.com"
 }
 ```
 
@@ -448,9 +448,9 @@ If the reaction's creation was successful, the server will send the following re
 201 Created
 
 [{
-    "postAuthor": "fbar@example.com",
-    "postTs": 1483484400,
-    "author": "jdoe@example.com"
+	"postAuthor": "fbar@example.com",
+	"postTs": 1483484400,
+	"author": "jdoe@example.com"
 }]
 ```
 
@@ -488,26 +488,26 @@ If the reactions' retrieval was successful, the server will send a response look
 
 ```http
 [
-    {
-        "postAuthor": "fbar@example.com",
-        "postTs": 1483484400,
-        "author": "jdoe@example.com"
-    },
-    {
-        "postAuthor": "fbar@example.com",
-        "postTs": 1483484400,
-        "author": "babolivier@vinimay.example.fr"
-    },
-    {
-        "postAuthor": "fbar@example.com",
-        "postTs": 1483484400,
-        "author": "jcaillet@example.com"
-    }
-    {
-        "postAuthor": "fbar@example.com",
-        "postTs": 1483484400,
-        "author": "fbar@example.com"
-    }
+	{
+		"postAuthor": "fbar@example.com",
+		"postTs": 1483484400,
+		"author": "jdoe@example.com"
+	},
+	{
+		"postAuthor": "fbar@example.com",
+		"postTs": 1483484400,
+		"author": "babolivier@vinimay.example.fr"
+	},
+	{
+		"postAuthor": "fbar@example.com",
+		"postTs": 1483484400,
+		"author": "jcaillet@example.com"
+	}
+	{
+		"postAuthor": "fbar@example.com",
+		"postTs": 1483484400,
+		"author": "fbar@example.com"
+	}
 ]
 ```
 
@@ -623,11 +623,11 @@ To clarify all further explanation, in this part, we'll use a scenario in which 
 When Alice uses here client to send a friend request, the server retrieves the request and send the following request to Bob's server:
 
 ```http
-POST vinimay-server2.com/server/friends/request
+POST vinimay-server2.com/server/friends
 
 {
-    "from": "alice@vinimay-server1.com",
-    "to": "bob@vinimay-server2.com"
+	"from": "alice@vinimay-server1.com",
+	"to": "bob@vinimay-server2.com"
 }
 ```
 
@@ -644,24 +644,24 @@ As both servers are already communicating over a secure (HTTPS) channel, we don'
 Bob's server will compute two generators and prime numbers and send them both to Alice's server, along with its own secret:
 
 ```http
-POST vinimay-server1.com/server/friends/request
+POST vinimay-server1.com/server/friends
 
 {
-    "step": 1,
-    "request": {
-        "from": "alice@vinimay-server1.com",
-        "to": "bob@vinimay-server2.com"
-    },
-    "idTokenDh": {
-        "generator": "02",
-        "prime": "dbd625c7de95d68bc229a63016a506cff4ff44ee5fe11aca8666ca2c0b490a5b",
-        "secret": "99e95fd7f9afe480c5983e9725fd65c51e10d5edf9f75cfd82805b3a0ce17e17"
-    },
-    "sigTokenDh": {
-        "generator": "02",
-        "prime": "88225ed5ae660b1d6d3d0f75f7916296875fe8e31d26ea229e87805e41bdb34b",
-        "secret": "836166128b49ad25feae9c6465bee7af7b90e023a08c2f72fb7673ebf4b6909a"
-    }
+	"step": 1,
+	"request": {
+		"from": "alice@vinimay-server1.com",
+		"to": "bob@vinimay-server2.com"
+	},
+	"idTokenDh": {
+		"generator": "02",
+		"prime": "dbd625c7de95d68bc229a63016a506cff4ff44ee5fe11aca8666ca2c0b490a5b",
+		"secret": "99e95fd7f9afe480c5983e9725fd65c51e10d5edf9f75cfd82805b3a0ce17e17"
+	},
+	"sigTokenDh": {
+		"generator": "02",
+		"prime": "88225ed5ae660b1d6d3d0f75f7916296875fe8e31d26ea229e87805e41bdb34b",
+		"secret": "836166128b49ad25feae9c6465bee7af7b90e023a08c2f72fb7673ebf4b6909a"
+	}
 }
 ```
 
@@ -671,8 +671,8 @@ Alice will then use these two packages to compute her two secrets and send them 
 202 Accepted
 
 {
-    "idTokenSecret": "732639488b9a88f518c20c8c6052de45547cc3e4db84cb056626e11bf039abce",
-    "sigTokenSecret": "59cda028ac0d1a8d1f894a139570919ed535b28f794259b7df984142db811a54"
+	"idTokenSecret": "732639488b9a88f518c20c8c6052de45547cc3e4db84cb056626e11bf039abce",
+	"sigTokenSecret": "59cda028ac0d1a8d1f894a139570919ed535b28f794259b7df984142db811a54"
 }
 ```
 
@@ -681,16 +681,16 @@ Alice will then use these two packages to compute her two secrets and send them 
 Now both servers have the necessary data to compute both tokens. As the last verification, and so that Alice's server is informed that the friendship is going on, Bob's server will send it a final request:
 
 ```http
-POST vinimay-server1.com/server/friends/request
+POST vinimay-server1.com/server/friends
 
 {
-    "step": 3,
-    "request": {
-        "from": "alice@vinimay-server1.com",
-        "to": "bob@vinimay-server2.com"
-    },
-    "idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
-    "signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
+	"step": 3,
+	"request": {
+		"from": "alice@vinimay-server1.com",
+		"to": "bob@vinimay-server2.com"
+	},
+	"idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
+	"signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
 }
 ```
 
@@ -709,12 +709,12 @@ Let's take our previous request as an example. Here's what its body looks like w
 
 ```json
 {
-    "step": 3,
-    "request": {
-        "from": "alice@vinimay-server1.com",
-        "to": "bob@vinimay-server2.com"
-    },
-    "idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433"
+	"step": 3,
+	"request": {
+		"from": "alice@vinimay-server1.com",
+		"to": "bob@vinimay-server2.com"
+	},
+	"idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433"
 }
 ```
 
@@ -730,12 +730,12 @@ And include it into the body to sign the request:
 
 ```json
 {
-    "step": 3,
-    "request": {
-        "from": "alice@vinimay-server1.com",
-        "to": "bob@vinimay-server2.com"
-    },
-    "idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
-    "signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
+	"step": 3,
+	"request": {
+		"from": "alice@vinimay-server1.com",
+		"to": "bob@vinimay-server2.com"
+	},
+	"idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
+	"signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
 }
 ```
