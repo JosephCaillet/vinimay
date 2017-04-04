@@ -446,7 +446,7 @@ If the reaction's creation was successful, the server will send the following re
 
 ```http
 201 Created
- 
+
 [{
     "postAuthor": "fbar@example.com",
     "postTs": 1483484400,
@@ -465,7 +465,7 @@ A comment's deletion can be made using the reaction's timestamp:
 ```http
 DELETE /client/posts/[post_author]/[postTs]/reactions/[reaction_author]
 ```
- 
+
 #### Response
 
 The deletion is confirmed with a `204 No Content` response.
@@ -513,7 +513,103 @@ If the reactions' retrieval was successful, the server will send a response look
 
 ## Friend requests
 
-[TODO]
+### Retrieval
+
+#### Request
+
+```http
+GET /client/profile
+```
+
+#### Response
+
+```http
+{
+	"accepted": [
+		{
+			"user": "Alice@alice.com",
+			"description": "Hi! My name is Alice."
+		},
+		{
+			"user": "Bob@bob.com",
+			"description": "Can we do it? Yes, we can!"
+		}
+	],
+	"received",[
+
+		{
+			"user": "Heenok@heenok.com",
+			"description": "I am the king, t'endend?"
+		}
+	],
+	"sent": [
+		{
+			"user": "Charlie@charlie.com",
+			"status": "pending"
+		},
+		{
+			"user": "Doug@doug.com",
+			"status": "refused"
+		}
+	]
+}
+```
+
+### Creation
+
+#### Request
+
+To send a friend request, you need the url of your friend's server url:
+
+```http
+POST /client/friends
+
+{
+	"to": "alice@alice.com"
+}
+```
+
+#### Response
+
+```http
+202 Accepted
+```
+
+### Acceptation / Refusal
+
+#### Request
+
+```http
+PUT /client/friends/[user]
+
+{
+	"accepted": true
+}
+```
+
+Whith `user` formated as `username@instanceUrl`
+
+#### Response
+
+```http
+202 Accepted
+```
+
+### Deletion
+
+#### Request
+
+```http
+DELETE /client/friends/[user]
+```
+
+Whith `user` formated as `username@instanceUrl`
+
+#### Response
+
+```http
+202 Accepted
+```
 
 # Server-server API
 
