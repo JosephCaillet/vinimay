@@ -628,7 +628,7 @@ POST vinimay-server2.com/server/friends
 {
 	"from": "alice@vinimay-server1.com",
 	"to": "bob@vinimay-server2.com",
-    "token": "b5aebeb0e9007e0ac856c06ab71581943d5cb1fe2b8f43eda9c1a3454050f32e"
+	"token": "b5aebeb0e9007e0ac856c06ab71581943d5cb1fe2b8f43eda9c1a3454050f32e"
 }
 ```
 
@@ -652,7 +652,7 @@ POST vinimay-server1.com/server/friends
 {
 	"step": 1,
 	"requestAuthor": "alice@vinimay-server1.com",
-    "token": "b5aebeb0e9007e0ac856c06ab71581943d5cb1fe2b8f43eda9c1a3454050f32e",
+	"token": "b5aebeb0e9007e0ac856c06ab71581943d5cb1fe2b8f43eda9c1a3454050f32e",
 	"idTokenDh": {
 		"generator": "02",
 		"prime": "dbd625c7de95d68bc229a63016a506cff4ff44ee5fe11aca8666ca2c0b490a5b",
