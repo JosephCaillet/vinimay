@@ -523,12 +523,12 @@ This section will rather describe the protocol followed by Vinimay to create a f
 
 ### Sending the request
 
-To clarify all further explanation, in this part, we'll use a scenario in which Alice asks Bob to be her friend (and Bob is OK with that).
+To clarify all further explanation, in this part, we'll use a scenario in which Alice asks Bob to be her friend (and Bob is OK with that). Alice is hosting her Vinimay instance on `vinimay-server1.com` and Bob's instance is on `vinimay-server2.com`
 
 When Alice uses here client to send a friend request, the server retrieves the request and send the following request to Bob's server:
 
 ```http
-POST /server/friends/request
+POST vinimay-server2.com/server/friends/request
 
 {
     "from": "alice@vinimay-server1.com",
@@ -536,7 +536,111 @@ POST /server/friends/request
 }
 ```
 
-*Note: from this moment on, if Bob tries to send a friend request to Alice, her server will reply with a `409	Conflict` HTTP error, telling Bob's server that a request is already ongoing.*
+*Note: from this moment on, if Bob tries to send a friend request to Alice, her server will reply with a `409 Conflict` HTTP error, telling Bob's server that a request is already ongoing.*
 
-### Replying to the request
+### Accepting the request
 
+#### Step 1: Token processing
+
+Once Bob accepted the request, it will initiate two Diffie-Hellman exchanges: one to compute the identifying token, the other to compute the token use for signing next requests.
+
+As both servers are already communicating over a secure (HTTPS) channel, we don't need to add more security to the exchanges.
+
+Bob's server will compute two generators and prime numbers and send them both to Alice's server, along with its own secret:
+
+```http
+POST vinimay-server1.com/server/friends/request
+
+{
+    "step": 1,
+    "request": {
+        "from": "alice@vinimay-server1.com",
+        "to": "bob@vinimay-server2.com"
+    },
+    "idTokenDh": {
+        "generator": "02",
+        "prime": "dbd625c7de95d68bc229a63016a506cff4ff44ee5fe11aca8666ca2c0b490a5b",
+        "secret": "99e95fd7f9afe480c5983e9725fd65c51e10d5edf9f75cfd82805b3a0ce17e17"
+    },
+    "sigTokenDh": {
+        "generator": "02",
+        "prime": "88225ed5ae660b1d6d3d0f75f7916296875fe8e31d26ea229e87805e41bdb34b",
+        "secret": "836166128b49ad25feae9c6465bee7af7b90e023a08c2f72fb7673ebf4b6909a"
+    }
+}
+```
+
+Alice will then use these two packages to compute her two secrets and send them in the HTTP response:
+
+```http
+202 Accepted
+
+{
+    "idTokenSecret": "732639488b9a88f518c20c8c6052de45547cc3e4db84cb056626e11bf039abce",
+    "sigTokenSecret": "59cda028ac0d1a8d1f894a139570919ed535b28f794259b7df984142db811a54"
+}
+```
+
+#### Step 3: Confirming tokens have been processed
+
+Now both servers have the necessary data to compute both tokens. As the last verification, and so that Alice's server is informed that the friendship is going on, Bob's server will send it a final request:
+
+```http
+POST vinimay-server1.com/server/friends/request
+
+{
+    "step": 3,
+    "request": {
+        "from": "alice@vinimay-server1.com",
+        "to": "bob@vinimay-server2.com"
+    },
+    "idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
+    "signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
+}
+```
+
+Alice's server will check if the identifying token matches its computed value and will also check the request's signature (signing a request is described below). If everything is matching, it will reply with a `204 No Content` HTTP status, and a `417 Expectation failed` error if one of the tokens doesn't match.
+
+## Signing request
+
+Authenticated requests much include two elements:
+
+* A token identifying the user who made the request
+* A signature to ensure the request's integrity
+
+To compute a signature, we format all of the parameters in one single-line string, replace all commas (",") with ampersand ("&"), replace all colons (":") with equals signs ("="), and compute a SHA256 checksum of the result.
+
+Let's take our previous request as an example. Here's what its body looks like without a signature:
+
+```json
+{
+    "step": 3,
+    "request": {
+        "from": "alice@vinimay-server1.com",
+        "to": "bob@vinimay-server2.com"
+    },
+    "idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433"
+}
+```
+
+Converted into a single-line string and process all of the replacements, it results in this string:
+
+`step=3&request={from=alice@vinimay-server1.com&to=bob@vinimay-server2.com}&idToken=225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433`
+
+Now all there is to do is compute the string's SHA256 checksum:
+
+`6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2`
+
+And include it into the body to sign the request:
+
+```json
+{
+    "step": 3,
+    "request": {
+        "from": "alice@vinimay-server1.com",
+        "to": "bob@vinimay-server2.com"
+    },
+    "idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
+    "signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
+}
+```
