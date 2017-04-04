@@ -418,7 +418,7 @@ The deletion is confirmed with a `204 No Content` response.
 
 In all responses shown below, a reaction will be depicted as such:
 
-```http
+```json
 {
 	"postAuthor": "fbar@example.com",
 	"postTs": 1483484400,
@@ -487,6 +487,8 @@ This request will retrieve 10 reactions between the 20th and the 30th most recen
 If the reactions' retrieval was successful, the server will send a response looking like this:
 
 ```http
+200 OK
+
 [
 	{
 		"postAuthor": "fbar@example.com",
@@ -524,6 +526,8 @@ GET /client/profile
 #### Response
 
 ```http
+200 OK
+
 {
 	"accepted": [
 		{
