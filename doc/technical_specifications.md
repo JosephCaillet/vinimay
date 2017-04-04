@@ -620,7 +620,7 @@ This section will rather describe the protocol followed by Vinimay to create a f
 
 To clarify all further explanation, in this part, we'll use a scenario in which Alice asks Bob to be her friend (and Bob is OK with that). Alice is hosting her Vinimay instance on `vinimay-server1.com` and Bob's instance is on `vinimay-server2.com`
 
-When Alice uses here client to send a friend request, the server retrieves the request and send the following request to Bob's server:
+When Alice uses here client to send a friend request, the server retrieves the request, along with Alice's profile's description and send the following request to Bob's server:
 
 ```http
 POST vinimay-server2.com/server/friends
@@ -628,6 +628,7 @@ POST vinimay-server2.com/server/friends
 {
 	"from": "alice@vinimay-server1.com",
 	"to": "bob@vinimay-server2.com",
+	"description": "Hi, I'm Alice!",
 	"token": "b5aebeb0e9007e0ac856c06ab71581943d5cb1fe2b8f43eda9c1a3454050f32e"
 }
 ```
@@ -635,6 +636,21 @@ POST vinimay-server2.com/server/friends
 The `token` field here is a temporary randomly-generated token used to identify the request and ensure someone won't try to act as Bob by accepting it (mandatory since the time frame between a request being sent and a request being accepted can be quite large).
 
 *Note: from this moment on, if Bob tries to send a friend request to Alice, her server will reply with a `409 Conflict` HTTP error, telling Bob's server that a request is already ongoing.*
+
+### Refusing the request
+
+Once Bob refused the request, its server will send this request to Alice's server:
+
+```http
+DELETE vinimay-server1.com/server/friends
+
+{
+	"requestAuthor": "alice@vinimay-server1.com",
+	"token": "b5aebeb0e9007e0ac856c06ab71581943d5cb1fe2b8f43eda9c1a3454050f32e"
+}
+```
+
+For identification purposes, the temporary token Bob's server got from Alice's friend request has to be included in this request.
 
 ### Accepting the request
 
@@ -681,7 +697,7 @@ Alice will then use these two packages to compute her two intermediary values an
 
 #### Step 2: Confirming tokens have been processed
 
-Now both servers have the necessary data to compute both tokens. As the last verification, and so that Alice's server is informed that the friendship is going on, Bob's server will send it a final request:
+Now both servers have the necessary data to compute both tokens. As the last verification, and so that Alice's server is informed that the friendship is going on, Bob's server will send it a final request, containing Bob's profile's description:
 
 ```http
 POST vinimay-server1.com/server/friends
@@ -690,7 +706,8 @@ POST vinimay-server1.com/server/friends
 	"step": 2,
 	"requestAuthor": "alice@vinimay-server1.com",
 	"idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
-	"signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
+	"description": "Hi, I'm Bob",
+	"signature": "1cf26f380bb9825e4bc5b1e013c36ad6a42a585c8825fbead5baa5f393e29aff"
 }
 ```
 
@@ -703,39 +720,35 @@ Authenticated requests much include two elements:
 * A token identifying the user who made the request
 * A signature to ensure the request's integrity
 
-To compute a signature, we format all of the parameters in one single-line string, replace all commas (",") with ampersand ("&"), replace all colons (":") with equals signs ("="), and compute a SHA256 checksum of the result.
+To compute a signature, we format all of the parameters in one single-line string, replace all commas (",") with ampersand ("&"), replace all colons (":") with equals signs ("="), encode it as a URI component, and compute a SHA256 checksum of the result.
 
 Let's take our previous request as an example. Here's what its body looks like without a signature:
 
 ```json
 {
 	"step": 2,
-	"request": {
-		"from": "alice@vinimay-server1.com",
-		"to": "bob@vinimay-server2.com"
-	},
-	"idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433"
+	"requestAuthor": "alice@vinimay-server1.com",
+	"idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
+	"description": "Hi, I'm Bob"
 }
 ```
 
-Converted into a single-line string and process all of the replacements, it results in this string:
+Converted into a single-line string and process all of the replacements and the encoding, it results in this string:
 
-`step=2&request={from=alice@vinimay-server1.com&to=bob@vinimay-server2.com}&idToken=225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433`
+`step%3D2%26requestAuthor%3Dalice%40vinimay-server1.com%26idToken%3D225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433%26description%3DHi%2C%20I\'m%20Bob`
 
 Now all there is to do is compute the string's SHA256 checksum:
 
-`6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2`
+`1cf26f380bb9825e4bc5b1e013c36ad6a42a585c8825fbead5baa5f393e29aff`
 
 And include it into the body to sign the request:
 
 ```json
 {
 	"step": 2,
-	"request": {
-		"from": "alice@vinimay-server1.com",
-		"to": "bob@vinimay-server2.com"
-	},
+	"requestAuthor": "alice@vinimay-server1.com",
 	"idToken": "225dd21ced92fe1b965bfc69091e0439793dccaa995ee59ab7bad69728aa2433",
-	"signature": "6281a374d0dc7a9c909657eed508158c99d3ea7b27b164d47a0a3e0cc0a49bd2"
+	"description": "Hi, I'm Bob",
+	"signature": "1cf26f380bb9825e4bc5b1e013c36ad6a42a585c8825fbead5baa5f393e29aff"
 }
 ```
