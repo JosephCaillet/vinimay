@@ -29,6 +29,7 @@ CREATE TABLE Profile(
 	description     TEXT ,
 	idToken         TEXT ,
 	signatureToken  TEXT ,
+	status          TEXT ,
 	PRIMARY KEY (username,url)
 );
 
