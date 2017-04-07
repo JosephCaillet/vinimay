@@ -4,7 +4,17 @@
   "description": "Vinimay is a decentralised social network focused on giving back control of its data to the user",
   "main": "server.js",
   "repository": "https://github.com/JosephCaillet/vinimay.git",
-  "author": "Brendan Abolivier <contact@brendanabolivier.com>",
+  "contributors": [
+	{
+	  "name": "Brendan Abolivier",
+	  "email": "foss@brendanabolivier.com"
+    },
+    {
+      "name": "Joseph Caillet",
+      "email": "contact@josephcaillet.fr"
+    }
+  
+  ],
   "license": "AGPL-3.0",
   "dependencies": {
     "@types/node": "7.0.12",
