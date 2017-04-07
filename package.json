@@ -13,9 +13,9 @@
   },
   "scripts": {
       "watch:server": "tsc -w",
-      "watch:client": "",
+      "watch:client": "cd client && ng serve --open",
       "build:server": "tsc",
-      "build:client": "",
+      "build:client": "cd client && ng build --prod --bh ./ -op ../build/client",
       "build": "npm run build:server && npm run build:client",
       "resetdb": "cd db && ./resetdb.sh"
   }
