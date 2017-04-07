@@ -38,3 +38,11 @@ jspm_packages
 
 #locks
 */.~*
+*.lock
+
+# Temporary files
+*~
+*.swp
+
+# Databases
+*.db

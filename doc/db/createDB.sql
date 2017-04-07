@@ -1,12 +1,12 @@
-#------------------------------------------------------------
-#        Script SQLite  
-#------------------------------------------------------------
+-------------------------------------------------------------
+--        Script SQLite  
+-------------------------------------------------------------
 
 
-#------------------------------------------------------------
-# Table: Post
-#------------------------------------------------------------
-CREATE TABLE Post(
+-------------------------------------------------------------
+-- Table: Post
+-------------------------------------------------------------
+CREATE TABLE post(
 	creationTs          INTEGER NOT NULL ,
 	lastModificationTs  INTEGER NOT NULL ,
 	content             TEXT NOT NULL ,
@@ -20,12 +20,12 @@ CREATE TABLE Post(
 );
 
 
-#------------------------------------------------------------
-# Table: Profile
-#------------------------------------------------------------
-CREATE TABLE Profile(
+--------------------------------------------------------------
+-- Table: Profile
+--------------------------------------------------------------
+CREATE TABLE profile(
 	username        TEXT NOT NULL ,
-	url             TEXT NOT NULL ,
+	url             TEXT ,
 	description     TEXT ,
 	idToken         TEXT ,
 	signatureToken  TEXT ,
@@ -34,10 +34,10 @@ CREATE TABLE Profile(
 );
 
 
-#------------------------------------------------------------
-# Table: Comments
-#------------------------------------------------------------
-CREATE TABLE Comments(
+--------------------------------------------------------------
+-- Table: Comments
+--------------------------------------------------------------
+CREATE TABLE comments(
 	creationTs          INTEGER NOT NULL ,
 	lastModificationTs  INTEGER NOT NULL ,
 	content             TEXT NOT NULL ,
@@ -52,10 +52,10 @@ CREATE TABLE Comments(
 );
 
 
-#------------------------------------------------------------
-# Table: Reaction
-#------------------------------------------------------------
-CREATE TABLE Reaction(
+--------------------------------------------------------------
+-- Table: Reaction
+--------------------------------------------------------------
+CREATE TABLE reaction(
 	creationTs  INTEGER NOT NULL ,
 	username    TEXT NOT NULL ,
 	url         TEXT NOT NULL ,
