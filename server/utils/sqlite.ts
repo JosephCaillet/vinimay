@@ -28,6 +28,8 @@ export class DatabaseConnector {
 	 */	 
 	private constructor(username: string) {
 		this.connection = new sqlite.Database('db/' + username + '.db');
+		// Enable foreign keys constraints
+		this.connection.run('PRAGMA foreign_keys = ON');
 	}
 
 
