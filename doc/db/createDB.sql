@@ -11,12 +11,10 @@ CREATE TABLE Post(
 	lastModificationTs  INTEGER NOT NULL ,
 	content             TEXT NOT NULL ,
 	privacy             TEXT NOT NULL ,
-	username            TEXT ,
-	url                 TEXT ,
+	username            TEXT NOT NULL,
 	PRIMARY KEY (creationTs) ,
 	
-	FOREIGN KEY (username) REFERENCES Friend(username),
-	FOREIGN KEY (url) REFERENCES Friend(url)
+	FOREIGN KEY (username) REFERENCES User(username),
 );
 
 
