@@ -1,12 +1,12 @@
--------------------------------------------------------------
---        Script SQLite  
--------------------------------------------------------------
+#------------------------------------------------------------
+#        Script SQLite  
+#------------------------------------------------------------
 
 
--------------------------------------------------------------
--- Table: Post
--------------------------------------------------------------
-CREATE TABLE post(
+#------------------------------------------------------------
+# Table: Post
+#------------------------------------------------------------
+CREATE TABLE Post(
 	creationTs          INTEGER NOT NULL ,
 	lastModificationTs  INTEGER NOT NULL ,
 	content             TEXT NOT NULL ,
@@ -15,17 +15,17 @@ CREATE TABLE post(
 	url                 TEXT ,
 	PRIMARY KEY (creationTs) ,
 	
-	FOREIGN KEY (username) REFERENCES Profile(username),
-	FOREIGN KEY (url) REFERENCES Profile(url)
+	FOREIGN KEY (username) REFERENCES Friend(username),
+	FOREIGN KEY (url) REFERENCES Friend(url)
 );
 
 
---------------------------------------------------------------
--- Table: Profile
---------------------------------------------------------------
-CREATE TABLE profile(
+#------------------------------------------------------------
+# Table: Friend
+#------------------------------------------------------------
+CREATE TABLE Friend(
 	username        TEXT NOT NULL ,
-	url             TEXT ,
+	url             TEXT NOT NULL ,
 	description     TEXT ,
 	idToken         TEXT ,
 	signatureToken  TEXT ,
@@ -34,10 +34,10 @@ CREATE TABLE profile(
 );
 
 
---------------------------------------------------------------
--- Table: Comments
---------------------------------------------------------------
-CREATE TABLE comments(
+#------------------------------------------------------------
+# Table: Comments
+#------------------------------------------------------------
+CREATE TABLE Comments(
 	creationTs          INTEGER NOT NULL ,
 	lastModificationTs  INTEGER NOT NULL ,
 	content             TEXT NOT NULL ,
@@ -47,23 +47,35 @@ CREATE TABLE comments(
 	PRIMARY KEY (creationTs) ,
 	
 	FOREIGN KEY (creationTs_Post) REFERENCES Post(creationTs),
-	FOREIGN KEY (username) REFERENCES Profile(username),
-	FOREIGN KEY (url) REFERENCES Profile(url)
+	FOREIGN KEY (username) REFERENCES Friend(username),
+	FOREIGN KEY (url) REFERENCES Friend(url)
 );
 
 
---------------------------------------------------------------
--- Table: Reaction
---------------------------------------------------------------
-CREATE TABLE reaction(
+#------------------------------------------------------------
+# Table: User
+#------------------------------------------------------------
+CREATE TABLE User(
+	username     TEXT NOT NULL ,
+	description  TEXT NOT NULL ,
+	password     TEXT NOT NULL ,
+	salt         TEXT NOT NULL ,
+	PRIMARY KEY (username)
+);
+
+
+#------------------------------------------------------------
+# Table: Reaction
+#------------------------------------------------------------
+CREATE TABLE Reaction(
 	creationTs  INTEGER NOT NULL ,
 	username    TEXT NOT NULL ,
 	url         TEXT NOT NULL ,
 	PRIMARY KEY (creationTs,username,url) ,
 	
 	FOREIGN KEY (creationTs) REFERENCES Post(creationTs),
-	FOREIGN KEY (username) REFERENCES Profile(username),
-	FOREIGN KEY (url) REFERENCES Profile(url)
+	FOREIGN KEY (username) REFERENCES Friend(username),
+	FOREIGN KEY (url) REFERENCES Friend(url)
 );
 
 
