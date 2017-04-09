@@ -1,11 +1,11 @@
-#------------------------------------------------------------
-#        Script SQLite  
-#------------------------------------------------------------
+--------------------------------------------------------------
+--        Script SQLite  
+--------------------------------------------------------------
 
 
-#------------------------------------------------------------
-# Table: Post
-#------------------------------------------------------------
+--------------------------------------------------------------
+-- Table: Post
+--------------------------------------------------------------
 CREATE TABLE Post(
 	creationTs          INTEGER NOT NULL ,
 	lastModificationTs  INTEGER NOT NULL ,
@@ -20,9 +20,9 @@ CREATE TABLE Post(
 );
 
 
-#------------------------------------------------------------
-# Table: Friend
-#------------------------------------------------------------
+--------------------------------------------------------------
+-- Table: Friend
+--------------------------------------------------------------
 CREATE TABLE Friend(
 	username        TEXT NOT NULL ,
 	url             TEXT NOT NULL ,
@@ -34,9 +34,9 @@ CREATE TABLE Friend(
 );
 
 
-#------------------------------------------------------------
-# Table: Comments
-#------------------------------------------------------------
+--------------------------------------------------------------
+-- Table: Comments
+--------------------------------------------------------------
 CREATE TABLE Comments(
 	creationTs          INTEGER NOT NULL ,
 	lastModificationTs  INTEGER NOT NULL ,
@@ -46,15 +46,15 @@ CREATE TABLE Comments(
 	url                 TEXT ,
 	PRIMARY KEY (creationTs) ,
 	
-	FOREIGN KEY (creationTs_Post) REFERENCES Post(creationTs),
-	FOREIGN KEY (username) REFERENCES Friend(username),
-	FOREIGN KEY (url) REFERENCES Friend(url)
+	FOREIGN KEY (creationTs_Post) REFERENCES Post(creationTs) ON DELETE CASCADE,
+	FOREIGN KEY (username) REFERENCES Friend(username) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (url) REFERENCES Friend(url) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
-#------------------------------------------------------------
-# Table: User
-#------------------------------------------------------------
+--------------------------------------------------------------
+-- Table: User
+--------------------------------------------------------------
 CREATE TABLE User(
 	username     TEXT NOT NULL ,
 	description  TEXT NOT NULL ,
@@ -64,18 +64,18 @@ CREATE TABLE User(
 );
 
 
-#------------------------------------------------------------
-# Table: Reaction
-#------------------------------------------------------------
+--------------------------------------------------------------
+-- Table: Reaction
+--------------------------------------------------------------
 CREATE TABLE Reaction(
 	creationTs  INTEGER NOT NULL ,
 	username    TEXT NOT NULL ,
 	url         TEXT NOT NULL ,
 	PRIMARY KEY (creationTs,username,url) ,
 	
-	FOREIGN KEY (creationTs) REFERENCES Post(creationTs),
-	FOREIGN KEY (username) REFERENCES Friend(username),
-	FOREIGN KEY (url) REFERENCES Friend(url)
+	FOREIGN KEY (creationTs) REFERENCES Post(creationTs) ON DELETE CASCADE,
+	FOREIGN KEY (username) REFERENCES Friend(username) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (url) REFERENCES Friend(url) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
