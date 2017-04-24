@@ -11,23 +11,17 @@ CREATE TABLE Post(
 	lastModificationTs  INTEGER NOT NULL ,
 	content             TEXT NOT NULL ,
 	privacy             TEXT NOT NULL ,
-	username            TEXT NOT NULL,
-	PRIMARY KEY (creationTs) ,
-	
-	FOREIGN KEY (username) REFERENCES User(username),
+	PRIMARY KEY (creationTs)
 );
 
 
 --------------------------------------------------------------
--- Table: Friend
+-- Table: Profile
 --------------------------------------------------------------
-CREATE TABLE Friend(
-	username        TEXT NOT NULL ,
-	url             TEXT NOT NULL ,
-	description     TEXT ,
-	idToken         TEXT ,
-	signatureToken  TEXT ,
-	status          TEXT ,
+CREATE TABLE Profile(
+	username     TEXT NOT NULL ,
+	url          TEXT NOT NULL ,
+	description  TEXT ,
 	PRIMARY KEY (username,url)
 );
 
@@ -45,8 +39,8 @@ CREATE TABLE Comments(
 	PRIMARY KEY (creationTs) ,
 	
 	FOREIGN KEY (creationTs_Post) REFERENCES Post(creationTs) ON DELETE CASCADE,
-	FOREIGN KEY (username) REFERENCES Friend(username) ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY (url) REFERENCES Friend(url) ON UPDATE CASCADE ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES Profile(username) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (url) REFERENCES Profile(url) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -54,11 +48,30 @@ CREATE TABLE Comments(
 -- Table: User
 --------------------------------------------------------------
 CREATE TABLE User(
-	username     TEXT NOT NULL ,
-	description  TEXT NOT NULL ,
-	password     TEXT NOT NULL ,
-	salt         TEXT NOT NULL ,
-	PRIMARY KEY (username)
+	password  TEXT NOT NULL ,
+	salt      TEXT NOT NULL ,
+	username  TEXT NOT NULL ,
+	url       TEXT NOT NULL ,
+	PRIMARY KEY (username,url) ,
+	
+	FOREIGN KEY (username) REFERENCES Profile(username) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (url) REFERENCES Profile(url) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+--------------------------------------------------------------
+-- Table: Friend
+--------------------------------------------------------------
+CREATE TABLE Friend(
+	id_token         TEXT NOT NULL ,
+	signature_token  TEXT NOT NULL ,
+	status           TEXT NOT NULL ,
+	username         TEXT NOT NULL ,
+	url              TEXT NOT NULL ,
+	PRIMARY KEY (username,url) ,
+	
+	FOREIGN KEY (username) REFERENCES Profile(username) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (url) REFERENCES Profile(url) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
@@ -72,8 +85,8 @@ CREATE TABLE Reaction(
 	PRIMARY KEY (creationTs,username,url) ,
 	
 	FOREIGN KEY (creationTs) REFERENCES Post(creationTs) ON DELETE CASCADE,
-	FOREIGN KEY (username) REFERENCES Friend(username) ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY (url) REFERENCES Friend(url) ON UPDATE CASCADE ON DELETE CASCADE
+	FOREIGN KEY (username) REFERENCES Profile(username) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (url) REFERENCES Profile(url) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 
