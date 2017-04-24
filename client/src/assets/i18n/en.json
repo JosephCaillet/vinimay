@@ -1,0 +1,12 @@
+{
+	"test": "It works !",
+	"posts": {
+		"title": "Posts"
+	},
+	"friends": {
+		"title": "Friends"
+	},
+	"me": {
+		"title": "Me"
+	}
+}
