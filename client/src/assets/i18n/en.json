@@ -13,7 +13,7 @@
 		"modal": {
 			"title": "Add a friend",
 			"url": "Profile's url",
-			"url_placeholder": "usernam@server.com",
+			"url_placeholder": "https://usernam@server.com",
 			"type": "Relation type",
 			"friend": "Friend",
 			"follow": "Follower",

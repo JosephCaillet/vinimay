@@ -1,5 +1,7 @@
 import { IonicPage, ViewController } from 'ionic-angular';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import UrlRegExp from '../../utils/urlRegExp';
 
 /**
  * Generated class for the AddProfileModal component.
@@ -9,23 +11,35 @@ import { Component } from '@angular/core';
  */
 @IonicPage()
 @Component({
-  selector: 'add-profile-modal',
-  templateUrl: 'add-profile-modal.html'
+	selector: 'add-profile-modal',
+	templateUrl: 'add-profile-modal.html'
 })
 export class AddProfileModal {
 
-  url = '';
+	@ViewChild('urlInput') urlInput
+	url = '';
 	relationType = 'friend'
+	addProfileForm: FormGroup
+	urlRegex: RegExp
 
-  constructor(private viewCtrl: ViewController) {
-  }
+	constructor(private viewCtrl: ViewController) {
+		this.addProfileForm = new FormGroup({
+			"url": new FormControl('', Validators.compose([Validators.pattern(UrlRegExp), Validators.required])),
+			"type": new FormControl(this.relationType, Validators.required)
+		})
+	}
 
+	initUrlRegex
 
-  dismiss(cancel: boolean) {
-    if(cancel) {
+	ionViewDidLoad() {
+		this.urlInput.setFocus()
+	}
+
+	dismiss(cancel: boolean) {
+		if (cancel) {
 			this.viewCtrl.dismiss(false);
 		} else {
-			this.viewCtrl.dismiss({"url": this.url, "rel": this.relationType})
+			this.viewCtrl.dismiss({ "url": this.url, "rel": this.relationType })
 		}
-  }
+	}
 }
