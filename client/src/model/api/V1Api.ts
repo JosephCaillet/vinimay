@@ -75,6 +75,22 @@ export class V1Api {
     }
 
     /**
+     * Update data on the current user
+     * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
+     * @param description New user description
+     */
+    public postV1ClientMe(description: string, extraHttpRequestParams?: any): Observable<models.User> {
+        return this.postV1ClientMeWithHttpInfo(description, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
      * @param content 
@@ -178,6 +194,50 @@ export class V1Api {
 
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Update data on the current user
+     * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
+     * @param description New user description
+     */
+    public postV1ClientMeWithHttpInfo(description: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + `/v1/client/me`;
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+        // verify required parameter 'description' is not null or undefined
+        if (description === null || description === undefined) {
+            throw new Error('Required parameter description was null or undefined when calling postV1ClientMe.');
+        }
+        if (description !== undefined) {
+            if(description instanceof Date) {
+                queryParameters.set('description', <any>description.d.toISOString());
+            } else {
+                queryParameters.set('description', <any>description);
+            }
+        }
+
+        // to determine the Content-Type header
+        let consumes: string[] = [
+        ];
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
             headers: headers,
             search: queryParameters
         });

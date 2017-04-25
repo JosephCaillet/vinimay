@@ -13,6 +13,9 @@
 import * as models from './models';
 
 export interface PostsResponse {
+    /**
+     * Boolean indicating whether the user is authenticated
+     */
     authenticated: boolean;
 
     posts: models.PostsArray;

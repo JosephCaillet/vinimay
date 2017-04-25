@@ -13,10 +13,19 @@
 import * as models from './models';
 
 export interface User {
+    /**
+     * User's username
+     */
     username: string;
 
+    /**
+     * Domain of the instance the user is on
+     */
     url: string;
 
+    /**
+     * Description (aka bio in some social medias) of the user
+     */
     description?: string;
 
 }

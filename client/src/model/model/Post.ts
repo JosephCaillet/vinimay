@@ -24,7 +24,7 @@ export interface Post {
     lastEditTs: number;
 
     /**
-     * Post author (using the `username@instanceurl.tld` format)
+     * Post author (using the `username@instance-domain.tld` format)
      */
     author: string;
 
@@ -34,12 +34,18 @@ export interface Post {
     content: string;
 
     /**
-     * Post privacy setting ()
+     * Post privacy setting (private, friends or public)
      */
     privacy: Post.PrivacyEnum;
 
+    /**
+     * Number of comments on the post
+     */
     comments: number;
 
+    /**
+     * Numer of reactions on the post
+     */
     reactions: number;
 
 }
