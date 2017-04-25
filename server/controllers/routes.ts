@@ -72,8 +72,8 @@ module.exports = {
 				notes: 'Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).',
 				handler: posts.create,
 				validate: { params: {
-					content: Joi.string().required(),
-					privacy: Joi.string().valid('public', 'private', 'friends').required()
+					content: Joi.string().required().description('Post content'),
+					privacy: Joi.string().valid('public', 'private', 'friends').required().description('Post privacy setting (private, friends or public)')
 				}},
 				plugins: {
 					'hapi-swagger': {

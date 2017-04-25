@@ -93,8 +93,8 @@ export class V1Api {
     /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
-     * @param content 
-     * @param privacy 
+     * @param content Post content
+     * @param privacy Post privacy setting (private, friends or public)
      */
     public postV1ClientPosts(content: string, privacy: string, extraHttpRequestParams?: any): Observable<models.Post> {
         return this.postV1ClientPostsWithHttpInfo(content, privacy, extraHttpRequestParams)
@@ -253,8 +253,8 @@ export class V1Api {
     /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
-     * @param content 
-     * @param privacy 
+     * @param content Post content
+     * @param privacy Post privacy setting (private, friends or public)
      */
     public postV1ClientPostsWithHttpInfo(content: string, privacy: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + `/v1/client/posts`;
