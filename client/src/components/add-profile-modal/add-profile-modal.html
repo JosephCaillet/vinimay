@@ -14,7 +14,9 @@
 	<form [formGroup]="addProfileForm" (submit)="dismiss(true)">
 		<div padding>
 			<h1>{{ 'f.modal.url' | translate }}</h1>
-			<ion-input #urlInput type="email" [placeholder]="'f.modal.url_placeholder' | translate" formControlName="url"></ion-input>
+			<ion-item>
+				<ion-input #urlInput type="email" [placeholder]="'f.modal.url_placeholder' | translate" formControlName="url"></ion-input>
+			</ion-item>
 		</div>
 
 		<div padding>
