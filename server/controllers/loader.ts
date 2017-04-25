@@ -23,7 +23,6 @@ module.exports = (server: Hapi.Server) => {
 				route.config.tags = ['api', tag];
 				
 				delete route.config.handler;
-				delete route.config.category;
 
 				server.route(route);
 			}

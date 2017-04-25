@@ -6,7 +6,7 @@ import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
 const username = 'alice'; // TEMPORARY
 
-module.exports.get = async function(request: h.Request, reply: h.IReply) {
+export function get(request: h.Request, reply: h.IReply) {
 	SequelizeWrapper.getInstance(username).model('profile').findOne({
 		where: {
 			username: username,
@@ -23,8 +23,12 @@ module.exports.get = async function(request: h.Request, reply: h.IReply) {
 	});
 };
 
-module.exports.schema = j.object({
-	username: j.string().required(),
-	url: j.string().required(),
-	description: j.string()
+export function update(request: h.Request, reply: h.IReply) {
+	reply('hello')
+};
+
+export let schema = j.object({
+	username: j.string().required().description('User\'s username'),
+	url: j.string().required().description('Domain of the instance the user is on'),
+	description: j.string().description('Description (aka bio in some social medias) of the user')
 }).label('User');
