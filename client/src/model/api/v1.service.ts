@@ -16,9 +16,12 @@ import { RequestMethod, RequestOptions, RequestOptionsArgs } from '@angular/http
 import { Response, ResponseContentType }                     from '@angular/http';
 
 import { Observable }                                        from 'rxjs/Observable';
-import 'rxjs/add/operator/map';
+import '../rxjs-operators';
 
-import * as models                                           from '../model/models';
+import { Post } from '../model/post';
+import { PostsResponse } from '../model/postsResponse';
+import { User } from '../model/user';
+
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
 
@@ -26,8 +29,8 @@ import { Configuration }                                     from '../configurat
 
 
 @Injectable()
-export class V1Api {
-    protected basePath = 'http://127.0.0.1:3000/';
+export class V1Service {
+    protected basePath = 'http://127.0.0.1:3000';
     public defaultHeaders: Headers = new Headers();
     public configuration: Configuration = new Configuration();
 
@@ -37,14 +40,44 @@ export class V1Api {
         }
         if (configuration) {
             this.configuration = configuration;
+			this.basePath = basePath || configuration.basePath || this.basePath;
         }
+    }
+
+    /**
+     * 
+     * Extends object by coping non-existing properties.
+     * @param objA object to be extended
+     * @param objB source object
+     */
+    private extendObj<T1,T2>(objA: T1, objB: T2) {
+        for(let key in objB){
+            if(objB.hasOwnProperty(key)){
+                (objA as any)[key] = (objB as any)[key];
+            }
+        }
+        return <T1&T2>objA;
+    }
+
+    /**
+     * @param consumes string[] mime-types
+     * @return true: consumes contains 'multipart/form-data', false: otherwise
+     */
+    private canConsumeForm(consumes: string[]): boolean {
+        const form = 'multipart/form-data';
+        for (let consume of consumes) {
+            if (form === consume) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
      * Retrieve data on the current user
      * Retrieve data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval).
      */
-    public getV1ClientMe(extraHttpRequestParams?: any): Observable<models.User> {
+    public getV1ClientMe(extraHttpRequestParams?: any): Observable<User> {
         return this.getV1ClientMeWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -63,7 +96,7 @@ export class V1Api {
      * @param from Smallest timestamp for a time frame retrieval
      * @param to Biggest timestamp for a time frame retrieval
      */
-    public getV1ClientPosts(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<models.PostsResponse> {
+    public getV1ClientPosts(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<PostsResponse> {
         return this.getV1ClientPostsWithHttpInfo(start, nb, from, to, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -79,7 +112,7 @@ export class V1Api {
      * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
      * @param description New user description
      */
-    public postV1ClientMe(description: string, extraHttpRequestParams?: any): Observable<models.User> {
+    public postV1ClientMe(description: string, extraHttpRequestParams?: any): Observable<User> {
         return this.postV1ClientMeWithHttpInfo(description, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -96,7 +129,7 @@ export class V1Api {
      * @param content Post content
      * @param privacy Post privacy setting (private, friends or public)
      */
-    public postV1ClientPosts(content: string, privacy: string, extraHttpRequestParams?: any): Observable<models.Post> {
+    public postV1ClientPosts(content: string, privacy: string, extraHttpRequestParams?: any): Observable<Post> {
         return this.postV1ClientPostsWithHttpInfo(content, privacy, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -113,22 +146,22 @@ export class V1Api {
      * Retrieve data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval).
      */
     public getV1ClientMeWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + `/v1/client/me`;
+        const path = this.basePath + '/v1/client/me';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-        // to determine the Content-Type header
-        let consumes: string[] = [
-        ];
+
 
         // to determine the Accept header
         let produces: string[] = [
         ];
 
+            
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:true
         });
 
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -148,54 +181,38 @@ export class V1Api {
      * @param to Biggest timestamp for a time frame retrieval
      */
     public getV1ClientPostsWithHttpInfo(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + `/v1/client/posts`;
+        const path = this.basePath + '/v1/client/posts';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
         if (start !== undefined) {
-            if(start instanceof Date) {
-                queryParameters.set('start', <any>start.d.toISOString());
-            } else {
-                queryParameters.set('start', <any>start);
-            }
+            queryParameters.set('start', <any>start);
         }
 
         if (nb !== undefined) {
-            if(nb instanceof Date) {
-                queryParameters.set('nb', <any>nb.d.toISOString());
-            } else {
-                queryParameters.set('nb', <any>nb);
-            }
+            queryParameters.set('nb', <any>nb);
         }
 
         if (from !== undefined) {
-            if(from instanceof Date) {
-                queryParameters.set('from', <any>from.d.toISOString());
-            } else {
-                queryParameters.set('from', <any>from);
-            }
+            queryParameters.set('from', <any>from);
         }
 
         if (to !== undefined) {
-            if(to instanceof Date) {
-                queryParameters.set('to', <any>to.d.toISOString());
-            } else {
-                queryParameters.set('to', <any>to);
-            }
+            queryParameters.set('to', <any>to);
         }
 
-        // to determine the Content-Type header
-        let consumes: string[] = [
-        ];
 
         // to determine the Accept header
         let produces: string[] = [
         ];
 
+            
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Get,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:true
         });
 
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -212,34 +229,27 @@ export class V1Api {
      * @param description New user description
      */
     public postV1ClientMeWithHttpInfo(description: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + `/v1/client/me`;
+        const path = this.basePath + '/v1/client/me'
+                    .replace('${' + 'description' + '}', String(description));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
         // verify required parameter 'description' is not null or undefined
         if (description === null || description === undefined) {
             throw new Error('Required parameter description was null or undefined when calling postV1ClientMe.');
         }
-        if (description !== undefined) {
-            if(description instanceof Date) {
-                queryParameters.set('description', <any>description.d.toISOString());
-            } else {
-                queryParameters.set('description', <any>description);
-            }
-        }
-
-        // to determine the Content-Type header
-        let consumes: string[] = [
-        ];
 
         // to determine the Accept header
         let produces: string[] = [
         ];
 
+            
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:true
         });
 
         // https://github.com/swagger-api/swagger-codegen/issues/4037
@@ -257,10 +267,13 @@ export class V1Api {
      * @param privacy Post privacy setting (private, friends or public)
      */
     public postV1ClientPostsWithHttpInfo(content: string, privacy: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + `/v1/client/posts`;
+        const path = this.basePath + '/v1/client/posts'
+                    .replace('${' + 'content' + '}', String(content))
+                    .replace('${' + 'privacy' + '}', String(privacy));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
         // verify required parameter 'content' is not null or undefined
         if (content === null || content === undefined) {
             throw new Error('Required parameter content was null or undefined when calling postV1ClientPosts.');
@@ -269,18 +282,17 @@ export class V1Api {
         if (privacy === null || privacy === undefined) {
             throw new Error('Required parameter privacy was null or undefined when calling postV1ClientPosts.');
         }
-        // to determine the Content-Type header
-        let consumes: string[] = [
-        ];
 
         // to determine the Accept header
         let produces: string[] = [
         ];
 
+            
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
-            search: queryParameters
+            search: queryParameters,
+            withCredentials:true
         });
 
         // https://github.com/swagger-api/swagger-codegen/issues/4037
