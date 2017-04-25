@@ -10,8 +10,17 @@
  * Do not edit the class manually.
  */
 
-import { Post } from './post';
 
 
-export interface PostsArray extends models.Array<Post> {
+export interface Friend {
+    /**
+     * User (formatted as `username@instance-domain.tld`)
+     */
+    user: string;
+
+    /**
+     * User description
+     */
+    description?: string;
+
 }

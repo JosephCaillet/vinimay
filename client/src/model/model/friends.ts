@@ -10,8 +10,16 @@
  * Do not edit the class manually.
  */
 
-import { Post } from './post';
+import { FriendsAccepted } from './friendsAccepted';
+import { FriendsReceived } from './friendsReceived';
+import { FriendsSent } from './friendsSent';
 
 
-export interface PostsArray extends models.Array<Post> {
+export interface Friends {
+    accepted?: FriendsAccepted;
+
+    received?: FriendsReceived;
+
+    sent?: FriendsSent;
+
 }

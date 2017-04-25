@@ -10,8 +10,11 @@
  * Do not edit the class manually.
  */
 
-import { Post } from './post';
+import { Friend } from './friend';
 
 
-export interface PostsArray extends models.Array<Post> {
+/**
+ * Accepted friend requests
+ */
+export interface FriendsAccepted extends models.Array<Friend> {
 }
