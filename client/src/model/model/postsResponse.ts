@@ -10,22 +10,15 @@
  * Do not edit the class manually.
  */
 
-import * as models from './models';
+import { PostsArray } from './postsArray';
 
-export interface User {
-    /**
-     * User's username
-     */
-    username: string;
 
+export interface PostsResponse {
     /**
-     * Domain of the instance the user is on
+     * Boolean indicating whether the user is authenticated
      */
-    url: string;
+    authenticated: boolean;
 
-    /**
-     * Description (aka bio in some social medias) of the user
-     */
-    description?: string;
+    posts: PostsArray;
 
 }

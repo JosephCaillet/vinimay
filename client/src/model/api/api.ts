@@ -1,3 +1,3 @@
-export * from './V1Api';
-import { V1Api }  from './V1Api';
-export const APIS = [ V1Api, ];
+export * from './v1.service';
+import { V1Service } from './v1.service';
+export const APIS = [V1Service];

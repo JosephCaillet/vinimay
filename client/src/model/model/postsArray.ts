@@ -10,14 +10,8 @@
  * Do not edit the class manually.
  */
 
-import * as models from './models';
+import { Post } from './post';
 
-export interface PostsResponse {
-    /**
-     * Boolean indicating whether the user is authenticated
-     */
-    authenticated: boolean;
 
-    posts: models.PostsArray;
-
+export interface PostsArray extends Array<Post> {
 }
