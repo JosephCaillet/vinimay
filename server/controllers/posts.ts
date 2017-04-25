@@ -13,11 +13,11 @@ export function create(request: h.Request, reply: h.IReply) {
 }
 
 export let postSchema = j.object({
-	"creationTs": j.number().min(1).required(),
-	"lastEditTs": j.number().min(1).required(),
-	"author": j.string().email().required(),
-	"content": j.string().required(),
-	"privacy": j.string().valid('public', 'private', 'friends').required(),
+	"creationTs": j.number().min(1).required().description('Post creation timestamp'),
+	"lastEditTs": j.number().min(1).required().description('Last modification timestamp (equals to the creation timestamp if the post has never been edited)'),
+	"author": j.string().email().required().description('Post author (using the `username@instanceurl.tld` format)'),
+	"content": j.string().required().description('Post content'),
+	"privacy": j.string().valid('public', 'private', 'friends').required().description('Post privacy setting ()'),
 	"comments": j.number().min(0).required(),
 	"reactions": j.number().min(0).required()
 }).label('Post');
