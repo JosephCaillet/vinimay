@@ -16,5 +16,5 @@ import { Friend } from './friend';
 /**
  * Incoming friend requests
  */
-export interface FriendsReceived extends models.Array<Friend> {
+export interface FriendsReceived extends Array<Friend> {
 }

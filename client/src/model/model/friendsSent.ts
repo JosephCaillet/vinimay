@@ -16,5 +16,5 @@ import { FriendSent } from './friendSent';
 /**
  * Sent (pending) friend requests
  */
-export interface FriendsSent extends models.Array<FriendSent> {
+export interface FriendsSent extends Array<FriendSent> {
 }

@@ -13,5 +13,5 @@
 import { Post } from './post';
 
 
-export interface PostsArray extends models.Array<Post> {
+export interface PostsArray extends Array<Post> {
 }
