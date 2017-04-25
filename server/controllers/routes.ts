@@ -1,8 +1,9 @@
 import * as Hapi from 'hapi';
 import * as Joi from 'joi';
 
-import * as posts from './posts';
+import * as posts from './post';
 import * as user from './user';
+import * as friend from './friend';
 
 module.exports = {
 	v1: {
@@ -28,7 +29,7 @@ module.exports = {
 				description: 'Update data on the current user',
 				notes: 'Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).',
 				handler: user.update,
-				validate: { query: {
+				validate: { params: {
 					description: Joi.string().required().description('New user description'),
 				}},
 				plugins: {
@@ -83,6 +84,23 @@ module.exports = {
 								schema: posts.postSchema
 							}, '401': {
 								description: 'The user is not authenticated as a server user.'
+							}
+						}
+					}
+				}
+			}
+		},
+		'/client/friends': {
+			get: {
+				description: 'Retrieve all friend requests',
+				notes: 'Retrieve all friend requests (accepted, incoming and sent). Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-4).',
+				handler: friend.get,
+				plugins: {
+					'hapi-swagger': {
+						responses: {
+							'200': {
+								description: 'A list of friend requests',
+								schema: friend.friendsSchema
 							}
 						}
 					}
