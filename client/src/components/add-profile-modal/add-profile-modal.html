@@ -1,0 +1,34 @@
+<!-- Generated template for the AddProfileModal component -->
+<ion-header>
+	<ion-navbar>
+		<ion-buttons start>
+			<button ion-button icon-only (click)="dismiss(null)">
+        <ion-icon name="close"></ion-icon>
+      </button>
+		</ion-buttons>
+		<ion-title>{{ 'f.modal.title' | translate }}</ion-title>
+	</ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<div padding>
+		<h1>{{ 'f.modal.url' | translate }}</h1>
+		<ion-input type="url" [placeholder]="'f.modal.url_placeholder' | translate" [(ngModel)]="url"></ion-input>
+	</div>
+
+	<div padding>
+		<ion-list radio-group [(ngModel)]="relationType">
+			<h1>{{ 'f.modal.type' | translate }}</h1>
+			<ion-item>
+				<ion-label>{{ 'f.modal.friend' | translate }}</ion-label>
+				<ion-radio value="friend"></ion-radio>
+			</ion-item>
+			<ion-item>
+				<ion-label>{{ 'f.modal.follow' | translate }}</ion-label>
+				<ion-radio value="follow"></ion-radio>
+			</ion-item>
+		</ion-list>
+	</div>
+
+	<button ion-button full (click)="dismiss(true)">{{ relationType == 'friend' ? ('f.modal.submit_friend' | translate) : ('f.modal.submit_follow' | translate) }}</button>
+</ion-content>

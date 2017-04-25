@@ -7,12 +7,13 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>{{ 'me.title' | translate }}</ion-title>
+    <ion-title>{{ 'm.title' | translate }}</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
-
+	<h1>{{ user.username }}<i>@{{ user.url }}</i></h1>
+	<p>{{ user.description }}</p>
 </ion-content>

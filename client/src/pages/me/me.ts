@@ -1,5 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { UserDAO } from '../../providers/user-dao';
+
+import User from "../../model/user";
 
 /**
  * Generated class for the Me page.
@@ -14,11 +17,13 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class MePage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
-  }
+	public user = new User('','','')
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad Me');
+  constructor(public navCtrl: NavController, public navParams: NavParams, private userDAO: UserDAO) {
+		console.log("recup user data");
+		userDAO.get().then((user: User) => {
+			this.user = user
+		})
   }
 
 }

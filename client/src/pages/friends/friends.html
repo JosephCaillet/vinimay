@@ -6,13 +6,37 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>{{ 'friends.title' | translate }}</ion-title>
-  </ion-navbar>
+	<ion-navbar>
+		<ion-title>{{ 'f.title' | translate }}</ion-title>
+	</ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+	<h1>{{'f.add' | translate}}</h1>
+	<button ion-button icon-left (click)="addProfile()">
+		<ion-icon name="person-add"></ion-icon>
+		Add
+	</button>
 
+	<h1>{{'f.sent' | translate}}</h1>
+	<ion-list>
+		<ion-item></ion-item>
+	</ion-list>
+
+	<h1>{{'f.received' | translate}}</h1>
+	<ion-list>
+		<ion-item></ion-item>
+	</ion-list>
+
+	<h1>{{'f.friend' | translate}}</h1>
+	<ion-list>
+		<ion-item></ion-item>
+	</ion-list>
+
+	<h1>{{'f.following' | translate}}</h1>
+	<ion-list>
+		<ion-item></ion-item>
+	</ion-list>
 </ion-content>

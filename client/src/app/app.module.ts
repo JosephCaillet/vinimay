@@ -1,10 +1,12 @@
+import { AddProfileModal } from './../components/add-profile-modal/add-profile-modal';
+import { UserDAO } from './../providers/user-dao';
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpModule, Http } from '@angular/http';
 
@@ -14,7 +16,8 @@ import { HomePage } from '../pages/home/home';
 @NgModule({
   declarations: [
     MyApp,
-    HomePage
+    HomePage,
+		AddProfileModal
   ],
   imports: [
     BrowserModule,
@@ -37,11 +40,13 @@ import { HomePage } from '../pages/home/home';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage
+    HomePage,
+		AddProfileModal
   ],
   providers: [
     StatusBar,
     SplashScreen,
+		UserDAO,
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
