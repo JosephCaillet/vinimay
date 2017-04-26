@@ -19,7 +19,7 @@ import { FriendsSent } from './friendsSent';
 export interface Friends {
     accepted: FriendsAccepted;
 
-    received: FriendsReceived;
+    incoming: FriendsReceived;
 
     sent: FriendsSent;
 

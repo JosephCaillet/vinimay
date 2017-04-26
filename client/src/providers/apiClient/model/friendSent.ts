@@ -27,6 +27,6 @@ export interface FriendSent {
 export namespace FriendSent {
     export enum StatusEnum {
         Pending = <any> 'pending',
-        Refused = <any> 'refused'
+        Declined = <any> 'declined'
     }
 }

@@ -8,7 +8,7 @@ export class OutgoingRequests {
 
 export class Response {
     private accepted: Friend[] = new Array<Friend>();
-	private received: Friend[] = new Array<Friend>();
+	private incoming: Friend[] = new Array<Friend>();
 	private sent: OutgoingRequests[] = new Array<OutgoingRequests>();
 	private following: Friend[] = new Array<Friend>();
 
@@ -16,8 +16,8 @@ export class Response {
 		this.accepted.push(friend);
 	}
 
-	public addReceived(friend: Friend): void {
-		this.received.push(friend);
+	public addIncoming(friend: Friend): void {
+		this.incoming.push(friend);
 	}
 
 	public addSent(friend: OutgoingRequests): void {
