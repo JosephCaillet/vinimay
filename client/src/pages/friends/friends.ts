@@ -32,7 +32,6 @@ export class FriendsPage {
 	) {
 		api.getV1ClientFriends().subscribe((data) => {
 			this.friends = data
-			console.log(data)
 		}, (err) => {
 			console.error(err)
 		})
