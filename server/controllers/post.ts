@@ -10,7 +10,21 @@ const username = 'alice'; // TEMPORARY
 
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
-	instance.model('post').findAll({ raw: true }).then((posts: Post[]) => {
+	let options = <s.FindOptions>{};
+	// Apply filters
+	if(request.query.start) options.offset = request.query.start;
+	if(request.query.nb) options.limit = request.query.nb;
+	// Filter by timestamp require a WHERE clause
+	if(request.query.from || request.query.to) {
+		let timestamp = <s.WhereOptions>{};
+		if(request.query.from) timestamp['$gte'] = request.query.from;
+		if(request.query.to) timestamp['$lte'] = request.query.to;
+		options.where = { creationTs: timestamp };
+	}
+	// We cast directly as post, so we don't need getters and setters
+	options.raw = true;
+
+	instance.model('post').findAll(options).then((posts: Post[]) => {
 		instance.model('user').findOne().then((user: s.Instance<any>) => {
 			for(let i in posts) {
 				let post = posts[i];
