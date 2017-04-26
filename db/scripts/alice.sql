@@ -8,4 +8,4 @@ INSERT INTO profile(username, url, description)
 VALUES('bob', 'localhost:3001', 'Hello, I''m Bob');
 
 INSERT INTO friend(username, url, id_token, signature_token, status)
-VALUES('bob', 'localhost:3001', 'idtoken', 'sigtoken', 'friends');
+VALUES('bob', 'localhost:3001', 'idtoken', 'sigtoken', 'accepted');
