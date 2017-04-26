@@ -1,18 +1,31 @@
 export class Friend {
-	private _user: string;
-	private _description?: string;
+	public constructor(public user: string, public description?: string) {}
+}
 
-	public constructor(user: string, description?: string) {
-		this._user = user;
-		if(description) this._description = description;
-	}
-	
-	public get user(): string {
-		return this._user;
+export class OutgoingRequests {
+	public constructor(public user: string, public status: string) {}
+}
+
+export class Response {
+    private accepted: Friend[] = new Array<Friend>();
+	private received: Friend[] = new Array<Friend>();
+	private sent: OutgoingRequests[] = new Array<OutgoingRequests>();
+	private following: Friend[] = new Array<Friend>();
+
+	public addAccepted(friend: Friend): void {
+		this.accepted.push(friend);
 	}
 
-	public get description(): string | undefined {
-		return this._description;
+	public addReceived(friend: Friend): void {
+		this.received.push(friend);
+	}
+
+	public addSent(friend: OutgoingRequests): void {
+		this.sent.push(friend);
+	}
+
+	public addFollowing(friend: Friend): void {
+		this.following.push(friend);
 	}
 }
 
@@ -22,9 +35,4 @@ export enum Status {
 	incoming,
 	accepted,
 	following
-}
-
-export interface OutgoingRequests {
-	user: string,
-	status: Status
 }
