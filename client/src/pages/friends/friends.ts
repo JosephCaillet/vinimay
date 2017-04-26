@@ -19,24 +19,10 @@ export class FriendsPage {
 
 	StatusEnum = FriendSent.StatusEnum
 	friends: Friends = {
-		"sent": [
-			{ "user": "toto@url.com", "status": FriendSent.StatusEnum.Pending },
-			{ "user": "tatcdvfdva@url.com", "status": FriendSent.StatusEnum.Refused },
-			{ "user": "titio@uvvregegvrl.com", "status": FriendSent.StatusEnum.Pending },
-		],
-		"received": [
-			{ "user": "toto@ugrgrl.com", "description": "Hello i would like to be your friend" },
-			{ "user": "tgergeegata@url.com", "description": "Hello i would like to be your friend" },
-		],
-		"accepted": [
-			{ "user": "tovdvto@url.com", "description": "Hello, you already are my friend." },
-			{ "user": "tata@url.com", "description": "Hello, you already are my friend." },
-			{ "user": "titio@urvevrel.com", "description": "Hello, you already are my friend." },
-		],
-		"following": [
-			{ "user": "toto@ugrgrl.com", "description": "Hello i would like to be your friend" },
-			{ "user": "tgergeegata@url.com", "description": "Hello i would like to be your friend" },
-		]
+		"sent": [],
+		"incoming": [],
+		"accepted": [],
+		"following": []
 	}
 
 	constructor(
@@ -46,6 +32,7 @@ export class FriendsPage {
 	) {
 		api.getV1ClientFriends().subscribe((data) => {
 			this.friends = data
+			console.log(data)
 		}, (err) => {
 			console.error(err)
 		})

@@ -35,11 +35,11 @@
 			</button>
 		</span>
 
-		<span *ngSwitchCase="StatusEnum.Refused">
+		<span *ngSwitchCase="StatusEnum.Declined">
 			{{ 'f.sent.rejected' | translate }}
 		</span>
 
-		<span *ngSwitchCase="StatusEnum.Refused">
+		<span *ngSwitchCase="StatusEnum.Declined">
 			<button ion-button icon-left small margin-horizontal (click)="hideRejectedSentRequest(sent)">
 				<ion-icon name="close"></ion-icon>
 					{{ 'f.sent.hide' | translate}}
@@ -48,8 +48,8 @@
 	</div>
 
 
-	<h1 *ngIf="friends.received.length != 0">{{'f.received.title' | translate}}</h1>
-	<div *ngFor="let received of friends.received" class="vertical-align-content">
+	<h1 *ngIf="friends.incoming.length != 0">{{'f.received.title' | translate}}</h1>
+	<div *ngFor="let received of friends.incoming" class="vertical-align-content">
 		<span margin-horizontal>
 			{{ received.user.split('@')[0] }}<i>@{{ received.user.split('@')[1] }}</i>
 		</span>
