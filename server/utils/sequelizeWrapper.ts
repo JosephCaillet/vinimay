@@ -27,13 +27,33 @@ export class SequelizeWrapper {
 			});
 			
 			// Load and define Sequelize models
-			instance.define('post', require('../models/post'), { freezeTableName: true });
-			instance.define('friend', require('../models/friend'), { freezeTableName: true });
-			instance.define('comment', require('../models/comment'), { freezeTableName: true });
-			instance.define('profile', require('../models/profile'), { freezeTableName: true });
-			instance.define('reaction', require('../models/reaction'), { freezeTableName: true });
-			instance.define('user', require('../models/user'), { freezeTableName: true });
+			instance.define('post', require('../models/sequelize/post'), { freezeTableName: true });
+			instance.define('friend', require('../models/sequelize/friend'), { freezeTableName: true });
+			instance.define('comment', require('../models/sequelize/comment'), { freezeTableName: true });
+			instance.define('profile', require('../models/sequelize/profile'), { freezeTableName: true });
+			instance.define('reaction', require('../models/sequelize/reaction'), { freezeTableName: true });
+			instance.define('user', require('../models/sequelize/user'), { freezeTableName: true });
+
+			// Detail the association between a friend and its local profile
+			instance.model('friend').belongsTo(instance.model('profile'), {
+				foreignKey: 'username',
+				targetKey: 'username'
+			});
+			instance.model('friend').belongsTo(instance.model('profile'), {
+				foreignKey: 'url',
+				targetKey: 'url'
+			});
+			// Detail the association between an user and its profile
+			instance.model('user').belongsTo(instance.model('profile'), {
+				foreignKey: 'username',
+				targetKey: 'username'
+			});
+			instance.model('user').belongsTo(instance.model('profile'), {
+				foreignKey: 'url',
+				targetKey: 'url'
+			});
 			
+
 			this.instances[name] = instance;
 		}
 
@@ -41,18 +61,17 @@ export class SequelizeWrapper {
 	}
 
 	// Will only be called by the sync script
-	public static async syncModels(name: string, params?: s.SyncOptions) {
+	public static syncModels(name: string, params?: s.SyncOptions): Promise<any> {
 		let instance = this.getInstance(name);
 		
-		try{
-			await instance.sync(params)
-		} catch(err) {
-			console.error(err);
-		}
-
-		console.info('Database', name, 'synchronised');
-		this.sync = true;
-		return;
+		return new Promise((ok, ko) => {
+			instance.sync(params).then(() => {
+				this.sync = true;
+				ok(name);
+			}).catch((e) => {
+				ko(e);
+			})
+		});
 	}
 	
 	public static isSync(): boolean {
