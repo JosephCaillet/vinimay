@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
+import { AddProfileModal } from '../../components/add-profile-modal/add-profile-modal';
 
 /**
  * Generated class for the Friends page.
@@ -14,11 +15,15 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class FriendsPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modCtrl: ModalController) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad Friends');
   }
 
+	addProfile() {
+		let itGo = this.modCtrl.create(AddProfileModal, null, {showBackdrop: false, enableBackdropDismiss: false})
+		itGo.present()
+	}
 }

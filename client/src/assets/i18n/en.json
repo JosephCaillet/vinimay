@@ -1,12 +1,27 @@
 {
 	"test": "It works !",
-	"posts": {
+	"p": {
 		"title": "Posts"
 	},
-	"friends": {
-		"title": "Friends"
+	"f": {
+		"title": "Friends",
+		"add": "Add friend",
+		"sent": "Sent friend request",
+		"received": "Received friend request",
+		"friend": "Friends",
+		"following": "Following",
+		"modal": {
+			"title": "Add a friend",
+			"url": "Profile's url",
+			"url_placeholder": "https://usernam@server.com",
+			"type": "Relation type",
+			"friend": "Friend",
+			"follow": "Follower",
+			"submit_follow": "Follow",
+			"submit_friend": "Send friend request"
+		}
 	},
-	"me": {
+	"m": {
 		"title": "Me"
 	}
 }

@@ -1,5 +1,6 @@
 <ion-tabs>
-	<ion-tab root="PostsPage" tabTitle=" {{'posts.title' | translate }}" tabIcon="text"></ion-tab>
-	<ion-tab root="FriendsPage" tabTitle=" {{'friends.title' | translate }}" tabIcon="contacts"></ion-tab>
-	<ion-tab root="MePage" tabTitle=" {{'me.title' | translate }}" tabIcon="information-circle"></ion-tab>
+	<!-- spaces after " in tabTitle atribute are required to display the text in the tab bar. -->
+	<ion-tab root="FriendsPage" tabUrlPath="n" tabTitle=" {{'f.title' | translate }}" tabIcon="contacts"></ion-tab>
+	<ion-tab root="PostsPage" tabUrlPath="n" tabTitle=" {{'p.title' | translate }}" tabIcon="text"></ion-tab>
+	<ion-tab root="MePage" tabUrlPath="n" tabTitle=" {{'m.title' | translate }}" tabIcon="information-circle" selected></ion-tab>
 </ion-tabs>
