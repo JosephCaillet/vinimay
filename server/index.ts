@@ -17,9 +17,7 @@ server.connection({
 	port: port,
 	host: host,
 	routes: {
-		cors: {
-			origin: ['*']
-		}
+		cors: true
 	}
 });
 
