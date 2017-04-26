@@ -37,6 +37,7 @@ export function get(request: h.Request, reply: h.IReply) {
 					break;
 				case Status.incoming:
 					response.addIncoming(new Friend(username, description));
+					break;
 				case Status.pending:
 				case Status.declined:
 					response.addSent(new OutgoingRequests(username, status));
