@@ -5,23 +5,36 @@
 	},
 	"f": {
 		"title": "Friends",
-		"add": "Add friend",
-		"sent": "Sent friend request",
-		"received": "Received friend request",
-		"friend": "Friends",
-		"following": "Following",
-		"modal": {
-			"title": "Add a friend",
-			"url": "Profile's url",
-			"url_placeholder": "https://usernam@server.com",
-			"type": "Relation type",
-			"friend": "Friend",
-			"follow": "Follower",
-			"submit_follow": "Follow",
-			"submit_friend": "Send friend request"
+		"add": {
+			"title": "Add friend",
+			"modal": {
+				"title": "Add a friend",
+				"url": "Profile's url",
+				"url_placeholder": "https://usernam@server.com",
+				"type": "Relation type",
+				"friend": "Friend",
+				"follow": "Follower",
+				"submit_follow": "Follow",
+				"submit_friend": "Send friend request"
+			}
+		},
+		"sent": {
+			"title": "Sent friend requests",
+			"cancel": "Cancel",
+			"rejected": "Your friend request has been rejected.",
+			"hide": "Hide"
+		},
+		"received": {
+			"title": "Received friend requests"
+		},
+		"friend": {
+			"title": "Friends"
+		},
+		"following": {
+			"title": "Following"
 		}
 	},
 	"m": {
-		"title": "Me"
-	}
+			"title": "Me"
+		}
 }

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { UserDAO } from '../../providers/user-dao';
 
-import User from "../../model/user";
+import { V1Service } from '../../providers/apiClient/api/v1.service';
+import { User } from '../../providers/apiClient/model/user';
 
 /**
  * Generated class for the Me page.
@@ -17,12 +17,13 @@ import User from "../../model/user";
 })
 export class MePage {
 
-	public user = new User('','','')
+	public user: User = {username: '', url : '', description: ''}
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private userDAO: UserDAO) {
-		console.log("recup user data");
-		userDAO.get().then((user: User) => {
-			this.user = user
+  constructor(public navCtrl: NavController, public navParams: NavParams, private api: V1Service) {
+		api.getV1ClientMe() .subscribe((data) => {
+			this.user = data
+			}, (err) => {
+			console.error(err)
 		})
   }
 

@@ -1,5 +1,4 @@
 import { AddProfileModal } from './../components/add-profile-modal/add-profile-modal';
-import { UserDAO } from './../providers/user-dao';
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
@@ -12,6 +11,8 @@ import { HttpModule, Http } from '@angular/http';
 
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
+import { V1Service } from '../providers/apiClient/api/v1.service';
+import { BASE_PATH } from '../providers/apiClient/variables';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,7 @@ import { HomePage } from '../pages/home/home';
   providers: [
     StatusBar,
     SplashScreen,
-		UserDAO,
+		[ V1Service, { provide: BASE_PATH, useValue: 'http://127.0.0.1:3000'}],
     {provide: ErrorHandler, useClass: IonicErrorHandler}
   ]
 })
