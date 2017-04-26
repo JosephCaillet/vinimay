@@ -22,7 +22,7 @@ export class MePage {
   constructor(public navCtrl: NavController, public navParams: NavParams, private api: V1Service) {
 		api.getV1ClientMe() .subscribe((data) => {
 			this.user = data
-			}, (err) => {
+		}, (err) => {
 			console.error(err)
 		})
   }
