@@ -36,7 +36,7 @@ export function get(request: h.Request, reply: h.IReply) {
 					response.addFollowing(new Friend(username, description));
 					break;
 				case Status.incoming:
-					response.addReceived(new Friend(username, description));
+					response.addIncoming(new Friend(username, description));
 				case Status.pending:
 				case Status.declined:
 					response.addSent(new OutgoingRequests(username, status));
@@ -57,12 +57,12 @@ export let friendSchema = j.object({
 
 export let friendSentSchema = j.object({
 	user: j.string().required().description('User (formatted as `username@instance-domain.tld`)'),
-	status: j.string().required().valid('pending', 'refused').description('Request status (pending or refused)')
+	status: j.string().required().valid('pending', 'declined').description('Request status (pending or refused)')
 }).label('FriendSent');
 
 export let friendsSchema = j.object({
 	accepted: j.array().required().items(friendSchema).label('FriendsAccepted').description('Accepted friend requests'),
-	received: j.array().required().items(friendSchema).label('FriendsReceived').description('Incoming friend requests'),
+	incoming: j.array().required().items(friendSchema).label('FriendsReceived').description('Incoming friend requests'),
 	sent: j.array().required().items(friendSentSchema).label('FriendsSent').description('Sent (pending) friend requests'),
 	following: j.array().required().items(friendSchema).label('FriendsFollowings').description('People followed by the user'),
 }).label('Friends');
