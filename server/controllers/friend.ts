@@ -2,10 +2,52 @@ import * as h from 'hapi';
 import * as s from 'sequelize';
 import * as j from 'joi';
 
+// Import the models
+import {Friend, OutgoingRequests, Status, Response} from '../models/friends';
+
+// Import the DB wrapper
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
+const username = 'alice'; // TEMPORARY
+
 export function get(request: h.Request, reply: h.IReply) {
-	reply('Friends');
+	let instance = SequelizeWrapper.getInstance(username);
+	instance.model('friend').findAll({
+		include: [{
+			model: instance.model('profile'),
+			attributes: ['description']
+		}]
+	}).then((users: s.Instance<any>[]) => {
+		let response = new Response();
+
+		for(let i in users) {
+			let user = users[i];
+			let status: string = user.get('status');
+			let username: string = user.get('username') + '@' + user.get('url');
+			// Ugly index so TypeScript doesn't yell at us
+			let description: string = user['profile'].get('description');
+			// If a friend request isn't of one of these 5 values, it will
+			// be ignored
+			switch(Status[status]) {
+				case Status.accepted:
+					response.addAccepted(new Friend(username, description));
+					break;
+				case Status.following:
+					response.addFollowing(new Friend(username, description));
+					break;
+				case Status.incoming:
+					response.addReceived(new Friend(username, description));
+				case Status.pending:
+				case Status.declined:
+					response.addSent(new OutgoingRequests(username, status));
+					break;
+			}
+		}
+
+		reply(response);
+	}).catch((e) => {
+		reply(e);
+	});
 }
 
 export let friendSchema = j.object({
@@ -19,7 +61,8 @@ export let friendSentSchema = j.object({
 }).label('FriendSent');
 
 export let friendsSchema = j.object({
-	accepted: j.array().items(friendSchema).label('FriendsAccepted').description('Accepted friend requests'),
-	received: j.array().items(friendSchema).label('FriendsReceived').description('Incoming friend requests'),
-	sent: j.array().items(friendSentSchema).label('FriendsSent').description('Sent (pending) friend requests'),
+	accepted: j.array().required().items(friendSchema).label('FriendsAccepted').description('Accepted friend requests'),
+	received: j.array().required().items(friendSchema).label('FriendsReceived').description('Incoming friend requests'),
+	sent: j.array().required().items(friendSentSchema).label('FriendsSent').description('Sent (pending) friend requests'),
+	following: j.array().required().items(friendSchema).label('FriendsFollowings').description('People followed by the user'),
 }).label('Friends');
