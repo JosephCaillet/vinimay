@@ -1,7 +1,6 @@
 import { IonicPage, ViewController } from 'ionic-angular';
 import { Component, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import UrlRegExp from '../../utils/urlRegExp';
 
 /**
  * Generated class for the AddProfileModal component.
@@ -24,7 +23,7 @@ export class AddProfileModal {
 
 	constructor(private viewCtrl: ViewController) {
 		this.addProfileForm = new FormGroup({
-			"url": new FormControl('', Validators.compose([Validators.pattern(UrlRegExp), Validators.required])),
+			"url": new FormControl('', Validators.compose([Validators.email, Validators.required])),
 			"type": new FormControl(this.relationType, Validators.required)
 		})
 	}

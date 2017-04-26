@@ -1,8 +1,8 @@
 <!--
-  Generated template for the Friends page.
+	Generated template for the Friends page.
 
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
+	See http://ionicframework.com/docs/components/#navigation for more info on
+	Ionic pages and navigation.
 -->
 <ion-header>
 
@@ -14,28 +14,50 @@
 
 
 <ion-content padding>
-	<h1>{{'f.add' | translate}}</h1>
+	<h1>{{'f.add.title' | translate}}</h1>
 	<button ion-button icon-left (click)="addProfile()">
 		<ion-icon name="person-add"></ion-icon>
 		Add
 	</button>
 
-	<h1>{{'f.sent' | translate}}</h1>
+	<h1>{{'f.sent.title' | translate}}</h1>
+	<div *ngFor="let sent of friends.sent" [ngSwitch]="sent.status" class="vertical-align-content">
+		<div>
+			<span margin-horizontal>
+				{{ sent.user.split('@')[0] }}<i>@{{ sent.user.split('@')[1] }}</i>
+			</span>
+
+			<span *ngSwitchCase="StatusEnum.Pending">
+				<button ion-button icon-left small color="danger">
+					<ion-icon name="trash"></ion-icon>
+						{{ 'f.sent.cancel' | translate}}
+				</button>
+			</span>
+
+			<span *ngSwitchCase="StatusEnum.Refused">
+				{{ 'f.sent.rejected' | translate }}
+			</span>
+
+			<span *ngSwitchCase="StatusEnum.Refused">
+				<button ion-button icon-left small margin-horizontal>
+					<ion-icon name="close"></ion-icon>
+						{{ 'f.sent.hide' | translate}}
+				</button>
+			</span>
+		</div>
+	</div>
+
+	<h1>{{'f.received.title' | translate}}</h1>
 	<ion-list>
 		<ion-item></ion-item>
 	</ion-list>
 
-	<h1>{{'f.received' | translate}}</h1>
+	<h1>{{'f.friend.title' | translate}}</h1>
 	<ion-list>
 		<ion-item></ion-item>
 	</ion-list>
 
-	<h1>{{'f.friend' | translate}}</h1>
-	<ion-list>
-		<ion-item></ion-item>
-	</ion-list>
-
-	<h1>{{'f.following' | translate}}</h1>
+	<h1>{{'f.following.title' | translate}}</h1>
 	<ion-list>
 		<ion-item></ion-item>
 	</ion-list>
