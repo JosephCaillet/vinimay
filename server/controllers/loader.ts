@@ -3,7 +3,7 @@ import * as url from 'url';
 
 const routes = require('./routes');
 
-module.exports = (server: Hapi.Server) => {
+export function loadRoutes(server: Hapi.Server) {
 	for(let tag in routes) {
 		let paths = routes[tag];
 

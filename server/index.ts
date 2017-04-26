@@ -1,6 +1,5 @@
 import * as Hapi from 'hapi';
-
-const posts = require('./controllers/loader');
+import * as loader from './controllers/loader'
 
 const pkg = require('../../package.json')
 
@@ -14,7 +13,15 @@ const server = new Hapi.Server({ debug: { request: ['error'] } } as Hapi.IServer
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || '127.0.0.1';
 
-server.connection({ port: port, host: host });
+server.connection({
+	port: port,
+	host: host,
+	routes: {
+		cors: {
+			origin: ['*']
+		}
+	}
+});
 
 // Register the middlewares
 server.register([
@@ -27,14 +34,6 @@ server.register([
 				'description': pkg.description,
 				'version': pkg.version,
 			},
-			grouping: 'tags',
-			'tags': [{
-				name: 'posts',
-				description: 'User-inputed posts'
-			},{
-				name: 'user',
-				description: 'Current user'
-			}]
 		}
 	},
 	require('vision')
@@ -55,8 +54,9 @@ server.register([
 			}
 		}
 	});
-	
-	posts(server);
+
+	// Load the routes from the main router
+	loader.loadRoutes(server);
 });
 
 // Start the server
