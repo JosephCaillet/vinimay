@@ -29,9 +29,10 @@ module.exports = {
 				description: 'Update data on the current user',
 				notes: 'Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).',
 				handler: user.update,
-				validate: { params: {
-					description: Joi.string().required().description('New user description'),
-				}},
+				validate: { payload: Joi.object({
+						description: Joi.string().required().description('New user description')
+					}).label('UserDataInput')
+				},
 				plugins: {
 					'hapi-swagger': {
 						responses: {
@@ -72,10 +73,11 @@ module.exports = {
 				description: 'Create a post',
 				notes: 'Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).',
 				handler: posts.create,
-				validate: { params: {
-					content: Joi.string().required().description('Post content'),
-					privacy: Joi.string().valid('public', 'private', 'friends').required().description('Post privacy setting (private, friends or public)')
-				}},
+				validate: { payload: Joi.object({
+						content: Joi.string().required().description('Post content'),
+						privacy: Joi.string().valid('public', 'private', 'friends').required().description('Post privacy setting (private, friends or public)')
+					}).label('PostInput')
+				},
 				plugins: {
 					'hapi-swagger': {
 						responses: {

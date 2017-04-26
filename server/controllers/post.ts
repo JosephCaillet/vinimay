@@ -2,14 +2,44 @@ import * as h from 'hapi';
 import * as s from 'sequelize';
 import * as j from 'joi';
 
+import {Post, Privacy} from '../models/posts'
+
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
+const username = 'alice'; // TEMPORARY
+
 export function get(request: h.Request, reply: h.IReply) {
-	reply('Get posts');
+	let instance = SequelizeWrapper.getInstance(username);
+	instance.model('post').findAll({ raw: true }).then((posts: Post[]) => {
+		instance.model('user').findOne().then((user: s.Instance<any>) => {
+			for(let i in posts) {
+				let post = posts[i];
+				post.author = username + '@' + user.get('url');
+			}
+			reply(posts);
+		}).catch(reply);
+	}).catch(reply);
 }
 
 export function create(request: h.Request, reply: h.IReply) {
-	reply('Create post');
+	// Javascript's timestamp is in miliseconds. We want it in seconds.
+	let ts = Math.round((new Date()).getTime()/1000);
+	let post: Post = {
+		creationTs: ts,
+		lastModificationTs: ts,
+		content: request.payload.content,
+		privacy: request.payload.privacy,
+		comments: 0,
+		reactions: 0
+	};
+	let instance = SequelizeWrapper.getInstance(username);
+	instance.model('post').create(post).then((res: s.Instance<Post>) => {
+		let created = res.get({ plain: true });
+		instance.model('user').findOne().then((user: s.Instance<any>) => {
+			created.author = username + '@' + user.get('url');
+			reply(created).code(200);
+		}).catch(reply);
+	}).catch(reply);
 }
 
 export let postSchema = j.object({
