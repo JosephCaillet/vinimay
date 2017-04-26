@@ -9,17 +9,22 @@ const log = printit({
 	prefix: 'hapi'
 });
 
-const server = new Hapi.Server({ debug: { request: ['error'] } } as Hapi.IServerOptions);
+const server = new Hapi.Server({ 
+	debug: {
+		log: ['error'],
+		request: ['error']
+	},
+	connections: <Hapi.IConnectionConfigurationServerDefaults>{
+		routes: { cors: {
+			origin: ['*'],
+			credentials: true
+		}}
+	}
+} as Hapi.IServerOptions);
 const port = process.env.PORT || 3000;
 const host = process.env.HOST || '127.0.0.1';
 
-server.connection({
-	port: port,
-	host: host,
-	routes: {
-		cors: true
-	}
-});
+server.connection({ port: port, host: host });
 
 // Register the middlewares
 server.register([
