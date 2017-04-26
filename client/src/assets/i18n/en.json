@@ -1,5 +1,10 @@
 {
 	"test": "It works !",
+	"global": {
+		"yes": "Yes",
+		"no": "No",
+		"ok": "Ok"
+	},
 	"p": {
 		"title": "Posts"
 	},
@@ -10,7 +15,7 @@
 			"modal": {
 				"title": "Add a friend",
 				"url": "Profile's url",
-				"url_placeholder": "https://usernam@server.com",
+				"url_placeholder": "username@server.com",
 				"type": "Relation type",
 				"friend": "Friend",
 				"follow": "Follower",
@@ -22,19 +27,38 @@
 			"title": "Sent friend requests",
 			"cancel": "Cancel",
 			"rejected": "Your friend request has been rejected.",
-			"hide": "Hide"
+			"hide": "Hide",
+			"modal":{
+				"cancel_title": "Cancel friend request",
+				"cancel_message": "Cancel friend request to {{user}} ?"
+			}
 		},
 		"received": {
-			"title": "Received friend requests"
+			"title": "Received friend requests",
+			"details": "Details",
+			"accept": "Accept",
+			"decline": "Decline",
+			"modal":{
+				"decline_title": "Decline friend request",
+				"decline_message": "Decline friend request from {{user}} ?"
+			}
 		},
 		"friend": {
-			"title": "Friends"
+			"title": "Friends",
+			"details": "Details",
+			"remove": "Remove",
+			"modal":{
+				"remove_title": "Remove friend",
+				"remove_message": "Remove friend {{user}} ?"
+			}
 		},
 		"following": {
-			"title": "Following"
+			"title": "Following",
+			"details": "Details",
+			"remove": "Remove"
 		}
 	},
 	"m": {
-			"title": "Me"
-		}
+		"title": "Me"
+	}
 }

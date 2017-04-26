@@ -14,51 +14,89 @@
 
 
 <ion-content padding>
+
 	<h1>{{'f.add.title' | translate}}</h1>
 	<button ion-button icon-left (click)="addProfile()">
 		<ion-icon name="person-add"></ion-icon>
 		Add
 	</button>
 
-	<h1>{{'f.sent.title' | translate}}</h1>
+
+	<h1 *ngIf="friends.sent.length != 0">{{'f.sent.title' | translate}}</h1>
 	<div *ngFor="let sent of friends.sent" [ngSwitch]="sent.status" class="vertical-align-content">
-		<div>
-			<span margin-horizontal>
-				{{ sent.user.split('@')[0] }}<i>@{{ sent.user.split('@')[1] }}</i>
-			</span>
+		<span margin-horizontal>
+			{{ sent.user.split('@')[0] }}<i>@{{ sent.user.split('@')[1] }}</i>
+		</span>
 
-			<span *ngSwitchCase="StatusEnum.Pending">
-				<button ion-button icon-left small color="danger">
-					<ion-icon name="trash"></ion-icon>
-						{{ 'f.sent.cancel' | translate}}
-				</button>
-			</span>
+		<span *ngSwitchCase="StatusEnum.Pending">
+			<button ion-button icon-left small color="danger" (click)="cancelSentRequest(sent)">
+				<ion-icon name="trash"></ion-icon>
+					{{ 'f.sent.cancel' | translate}}
+			</button>
+		</span>
 
-			<span *ngSwitchCase="StatusEnum.Refused">
-				{{ 'f.sent.rejected' | translate }}
-			</span>
+		<span *ngSwitchCase="StatusEnum.Refused">
+			{{ 'f.sent.rejected' | translate }}
+		</span>
 
-			<span *ngSwitchCase="StatusEnum.Refused">
-				<button ion-button icon-left small margin-horizontal>
-					<ion-icon name="close"></ion-icon>
-						{{ 'f.sent.hide' | translate}}
-				</button>
-			</span>
-		</div>
+		<span *ngSwitchCase="StatusEnum.Refused">
+			<button ion-button icon-left small margin-horizontal (click)="hideRejectedSentRequest(sent)">
+				<ion-icon name="close"></ion-icon>
+					{{ 'f.sent.hide' | translate}}
+			</button>
+		</span>
 	</div>
 
-	<h1>{{'f.received.title' | translate}}</h1>
-	<ion-list>
-		<ion-item></ion-item>
-	</ion-list>
 
-	<h1>{{'f.friend.title' | translate}}</h1>
-	<ion-list>
-		<ion-item></ion-item>
-	</ion-list>
+	<h1 *ngIf="friends.received.length != 0">{{'f.received.title' | translate}}</h1>
+	<div *ngFor="let received of friends.received" class="vertical-align-content">
+		<span margin-horizontal>
+			{{ received.user.split('@')[0] }}<i>@{{ received.user.split('@')[1] }}</i>
+		</span>
+		<button ion-button icon-left small (click)="showFriendDetails(received)">
+				<ion-icon name="more"></ion-icon>
+				{{ 'f.received.details' | translate}}
+		</button>
+		<button ion-button icon-left small color="secondary" (click)="acceptFriendRequest(received)">
+			<ion-icon name="person-add"></ion-icon>
+				{{ 'f.received.accept' | translate}}
+		</button>
+		<button ion-button icon-left small color="danger" (click)="declineFriendRequest(received)">
+			<ion-icon name="trash"></ion-icon>
+			{{ 'f.received.decline' | translate}}
+		</button>
+	</div>
 
-	<h1>{{'f.following.title' | translate}}</h1>
-	<ion-list>
-		<ion-item></ion-item>
-	</ion-list>
+
+	<h1 *ngIf="friends.accepted.length != 0">{{'f.friend.title' | translate}}</h1>
+	<div *ngFor="let friend of friends.accepted" class="vertical-align-content">
+		<span margin-horizontal>
+			{{ friend.user.split('@')[0] }}<i>@{{ friend.user.split('@')[1] }}</i>
+		</span>
+		<button ion-button icon-left small (click)="showFriendDetails(friend)">
+				<ion-icon name="more"></ion-icon>
+				{{ 'f.friend.details' | translate}}
+		</button>
+		<button ion-button icon-left small color="danger" (click)="removeFriend(friend)">
+			<ion-icon name="trash"></ion-icon>
+			{{ 'f.friend.remove' | translate}}
+		</button>
+	</div>
+
+
+	<h1 *ngIf="friends.following.length != 0">{{'f.following.title' | translate}}</h1>
+	<div *ngFor="let follow of friends.following" class="vertical-align-content">
+		<span margin-horizontal>
+			{{ follow.user.split('@')[0] }}<i>@{{ follow.user.split('@')[1] }}</i>
+		</span>
+		<button ion-button icon-left small (click)="showFriendDetails(follow)">
+				<ion-icon name="more"></ion-icon>
+				{{ 'f.following.details' | translate}}
+		</button>
+		<button ion-button icon-left small color="danger" (click)="removeFriend(follow)">
+			<ion-icon name="trash"></ion-icon>
+			{{ 'f.following.remove' | translate}}
+		</button>
+	</div>
+
 </ion-content>
