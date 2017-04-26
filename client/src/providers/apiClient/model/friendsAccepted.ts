@@ -10,16 +10,11 @@
  * Do not edit the class manually.
  */
 
-import { FriendsAccepted } from './friendsAccepted';
-import { FriendsReceived } from './friendsReceived';
-import { FriendsSent } from './friendsSent';
+import { Friend } from './friend';
 
 
-export interface Friends {
-    accepted?: FriendsAccepted;
-
-    received?: FriendsReceived;
-
-    sent?: FriendsSent;
-
+/**
+ * Accepted friend requests
+ */
+export interface FriendsAccepted extends models.Array<Friend> {
 }

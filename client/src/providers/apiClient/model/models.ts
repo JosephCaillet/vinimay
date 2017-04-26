@@ -2,6 +2,7 @@ export * from './friend';
 export * from './friendSent';
 export * from './friends';
 export * from './friendsAccepted';
+export * from './friendsFollowings';
 export * from './friendsReceived';
 export * from './friendsSent';
 export * from './post';

@@ -14,7 +14,7 @@ import { Friend } from './friend';
 
 
 /**
- * Accepted friend requests
+ * People followed by the user
  */
-export interface FriendsAccepted extends Array<Friend> {
+export interface FriendsFollowings extends Array<Friend> {
 }
