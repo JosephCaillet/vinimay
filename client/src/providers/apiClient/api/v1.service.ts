@@ -20,8 +20,10 @@ import '../rxjs-operators';
 
 import { Friends } from '../model/friends';
 import { Post } from '../model/post';
+import { PostInput } from '../model/postInput';
 import { PostsResponse } from '../model/postsResponse';
 import { User } from '../model/user';
+import { UserDataInput } from '../model/userDataInput';
 
 import { BASE_PATH, COLLECTION_FORMATS }                     from '../variables';
 import { Configuration }                                     from '../configuration';
@@ -141,10 +143,10 @@ export class V1Service {
     /**
      * Update data on the current user
      * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
-     * @param description New user description
+     * @param body 
      */
-    public postV1ClientMe(description: string, extraHttpRequestParams?: any): Observable<User> {
-        return this.postV1ClientMeWithHttpInfo(description, extraHttpRequestParams)
+    public postV1ClientMe(body?: UserDataInput, extraHttpRequestParams?: any): Observable<User> {
+        return this.postV1ClientMeWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -157,11 +159,10 @@ export class V1Service {
     /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
-     * @param content Post content
-     * @param privacy Post privacy setting (private, friends or public)
+     * @param body 
      */
-    public postV1ClientPosts(content: string, privacy: string, extraHttpRequestParams?: any): Observable<Post> {
-        return this.postV1ClientPostsWithHttpInfo(content, privacy, extraHttpRequestParams)
+    public postV1ClientPosts(body?: PostInput, extraHttpRequestParams?: any): Observable<Post> {
+        return this.postV1ClientPostsWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -349,28 +350,26 @@ export class V1Service {
     /**
      * Update data on the current user
      * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
-     * @param description New user description
+     * @param body 
      */
-    public postV1ClientMeWithHttpInfo(description: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/v1/client/me'
-                    .replace('${' + 'description' + '}', String(description));
+    public postV1ClientMeWithHttpInfo(body?: UserDataInput, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/me';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
-        // verify required parameter 'description' is not null or undefined
-        if (description === null || description === undefined) {
-            throw new Error('Required parameter description was null or undefined when calling postV1ClientMe.');
-        }
 
         // to determine the Accept header
         let produces: string[] = [
         ];
 
             
+        headers.set('Content-Type', 'application/json');
+
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:true
         });
@@ -386,34 +385,26 @@ export class V1Service {
     /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
-     * @param content Post content
-     * @param privacy Post privacy setting (private, friends or public)
+     * @param body 
      */
-    public postV1ClientPostsWithHttpInfo(content: string, privacy: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/v1/client/posts'
-                    .replace('${' + 'content' + '}', String(content))
-                    .replace('${' + 'privacy' + '}', String(privacy));
+    public postV1ClientPostsWithHttpInfo(body?: PostInput, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
-        // verify required parameter 'content' is not null or undefined
-        if (content === null || content === undefined) {
-            throw new Error('Required parameter content was null or undefined when calling postV1ClientPosts.');
-        }
-        // verify required parameter 'privacy' is not null or undefined
-        if (privacy === null || privacy === undefined) {
-            throw new Error('Required parameter privacy was null or undefined when calling postV1ClientPosts.');
-        }
 
         // to determine the Accept header
         let produces: string[] = [
         ];
 
             
+        headers.set('Content-Type', 'application/json');
+
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:true
         });

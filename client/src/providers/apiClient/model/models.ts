@@ -6,6 +6,8 @@ export * from './friendsFollowings';
 export * from './friendsReceived';
 export * from './friendsSent';
 export * from './post';
+export * from './postInput';
 export * from './postsArray';
 export * from './postsResponse';
 export * from './user';
+export * from './userDataInput';
