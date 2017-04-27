@@ -111,8 +111,8 @@ export class V1Service {
      * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
      * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
      * @param nb Number of posts to retrieve
-     * @param from Smallest timestamp for a time frame retrieval
-     * @param to Biggest timestamp for a time frame retrieval
+     * @param from Most recent timestamp for a time frame retrieval
+     * @param to Oldest for a time frame retrieval
      */
     public getV1ClientPosts(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<PostsResponse> {
         return this.getV1ClientPostsWithHttpInfo(start, nb, from, to, extraHttpRequestParams)
@@ -270,8 +270,8 @@ export class V1Service {
      * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
      * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
      * @param nb Number of posts to retrieve
-     * @param from Smallest timestamp for a time frame retrieval
-     * @param to Biggest timestamp for a time frame retrieval
+     * @param from Most recent timestamp for a time frame retrieval
+     * @param to Oldest for a time frame retrieval
      */
     public getV1ClientPostsWithHttpInfo(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/v1/client/posts';

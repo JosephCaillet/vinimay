@@ -10,17 +10,7 @@ const username = 'alice'; // TEMPORARY
 
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
-	let options = <s.FindOptions>{};
-	// Apply filters
-	if(request.query.start) options.offset = request.query.start;
-	if(request.query.nb) options.limit = request.query.nb;
-	// Filter by timestamp require a WHERE clause
-	if(request.query.from || request.query.to) {
-		let timestamp = <s.WhereOptions>{};
-		if(request.query.from) timestamp['$gte'] = request.query.from;
-		if(request.query.to) timestamp['$lte'] = request.query.to;
-		options.where = { creationTs: timestamp };
-	}
+	let options = <s.FindOptions>getOptions(request.query);
 	// We cast directly as post, so we don't need getters and setters
 	options.raw = true;
 
@@ -56,6 +46,10 @@ export function create(request: h.Request, reply: h.IReply) {
 	}).catch(reply);
 }
 
+export function del(request: h.Request, reply: h.IReply) {
+	
+}
+
 export let postSchema = j.object({
 	"creationTs": j.number().min(1).required().description('Post creation timestamp'),
 	"lastEditTs": j.number().min(1).required().description('Last modification timestamp (equals to the creation timestamp if the post has never been edited)'),
@@ -70,3 +64,19 @@ export let responseSchema = j.object({
 	"authenticated": j.bool().required().description('Boolean indicating whether the user is authenticated'),
 	"posts": j.array().items(postSchema).required().label('Posts array')
 }).label('Posts response');
+
+function getOptions(queryParams) {
+	let options = <s.FindOptions>{};
+	// Apply filters
+	if(queryParams.start) options.offset = queryParams.start;
+	if(queryParams.nb) options.limit = queryParams.nb;
+	// Filter by timestamp require a WHERE clause
+	if(queryParams.from || queryParams.to) {
+		let timestamp = <s.WhereOptions>{};
+		if(queryParams.from) timestamp['$lte'] = queryParams.from;
+		if(queryParams.to) timestamp['$gte'] = queryParams.to;
+		options.where = { creationTs: timestamp };
+	}
+	
+	return options;
+}

@@ -55,8 +55,8 @@ module.exports = {
 				validate: { query: {
 					start: Joi.number().optional().min(1).description('Offset to start the retrieval. For example, `start=20` will retrieve all posts from the 20th most recent one, in anti-chronological order.'),
 					nb: Joi.number().optional().min(1).description('Number of posts to retrieve'),
-					from: Joi.number().optional().min(1).description('Smallest timestamp for a time frame retrieval'),
-					to: Joi.number().optional().min(1).description('Biggest timestamp for a time frame retrieval'),
+					from: Joi.number().optional().min(1).description('Most recent timestamp for a time frame retrieval'),
+					to: Joi.number().optional().min(1).description('Oldest for a time frame retrieval'),
 				}},
 				plugins: {
 					'hapi-swagger': {
