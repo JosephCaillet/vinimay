@@ -17,11 +17,13 @@ import { TranslateService } from "@ngx-translate/core";
 export class PostModal {
 
 	@ViewChild('contentInput') contentInput
+	PrivacyEnum = PostInput.PrivacyEnum
 	privacyLevels: Array<{ value: PostInput.PrivacyEnum, text: string }>
 	postForm: FormGroup
+	log = console.log
 
 	constructor(private viewCtrl: ViewController, public tr: TranslateService) {
-
+		console.log("val added: " +PostInput.PrivacyEnum[PostInput.PrivacyEnum.Friends].toLowerCase())
 		this.postForm = new FormGroup({
 			"privacy": new FormControl(PostInput.PrivacyEnum[PostInput.PrivacyEnum.Friends].toLowerCase(), Validators.required),
 			"content": new FormControl('', Validators.required)

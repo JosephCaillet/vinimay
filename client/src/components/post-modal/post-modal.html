@@ -17,7 +17,7 @@
 			<ion-item>
 				<ion-label>{{ 'p.modal.privacy' | translate }}</ion-label>
 				<ion-select interface="popover" formControlName="privacy">
-					<ion-option *ngFor="let privacyLevel of privacyLevels" [value]="privacyLevel.value">
+					<ion-option *ngFor="let privacyLevel of privacyLevels" [value]="privacyLevel.value" [selected]="privacyLevel.value == PrivacyEnum[PrivacyEnum.Friends].toLowerCase()">
 						{{ privacyLevel.text }}
 					</ion-option>
 				</ion-select>
