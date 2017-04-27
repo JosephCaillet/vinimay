@@ -46,3 +46,6 @@ jspm_packages
 
 # Databases
 *.db
+
+# Internal scripts
+build_client.sh
