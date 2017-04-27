@@ -92,6 +92,40 @@ module.exports = {
 				}
 			}
 		},
+		'/client/posts/{user}/{timestamp}': {
+			get: {
+				description: 'Retrieve a single post',
+				notes: 'Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieve-one-post).',
+				handler: posts.getSingle,
+				validate: { params: {
+					user: Joi.string().email().required().description('The post\'s author, identified as `username@instance-domain.tld`'),
+					timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+				}},
+				plugins: { 'hapi-swagger': { responses: {
+					'200': {
+						description: 'A list of posts with an information on authentication',
+						schema: posts.postSchema
+					}
+				}}}
+			},
+			delete: {
+				description: 'Delete a single post',
+				notes: 'Delete a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#deletion).',
+				handler: posts.del,
+				validate: { params: {
+					user: Joi.string().email().required().description('The post\'s author, identified as `username@instance-domain.tld`'),
+					timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+				}},
+				plugins: { 'hapi-swagger': { responses: {
+					'204': {
+						description: 'The deletion occured without any issue'
+					},
+					'401': {
+						description: 'The user trying to perform the deletion isn\'t the post\' author'
+					}
+				}}}
+			}
+		},
 		'/client/friends': {
 			get: {
 				description: 'Retrieve all friend requests',

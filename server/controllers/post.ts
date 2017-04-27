@@ -1,6 +1,7 @@
 import * as h from 'hapi';
 import * as s from 'sequelize';
 import * as j from 'joi';
+import * as b from 'boom';
 
 import {Post, Privacy} from '../models/posts'
 
@@ -21,6 +22,26 @@ export function get(request: h.Request, reply: h.IReply) {
 				post.author = username + '@' + user.get('url');
 			}
 			reply(posts);
+		}).catch(reply);
+	}).catch(reply);
+}
+
+export function getSingle(request: h.Request, reply: h.IReply) {
+	let instance = SequelizeWrapper.getInstance(username);
+	let user = request.params.user.split('@');
+
+	try {
+		instance = SequelizeWrapper.getInstance(user[0]);
+	} catch(e) {
+		// If the user doesn't exist, we return an error
+		return reply(e);
+	}
+
+	instance.model('post').findById(request.params.timestamp).then((res: s.Instance<Post>) => {
+		let post = res.get({plain: true});
+		instance.model('user').findOne().then((user: s.Instance<any>) => {
+			post.author = username + '@' + user.get('url');
+			reply(post);
 		}).catch(reply);
 	}).catch(reply);
 }
@@ -47,7 +68,29 @@ export function create(request: h.Request, reply: h.IReply) {
 }
 
 export function del(request: h.Request, reply: h.IReply) {
-	
+	let user = request.params.user.split('@');
+
+	let instance: s.Sequelize;
+
+	try {
+		instance = SequelizeWrapper.getInstance(user[0]);
+	} catch(e) {
+		// If the user doesn't exist, we return an error
+		return reply(e);
+	}
+
+	instance.model('user').findOne().then((res: s.Instance<any>) => {
+		// Check if instance domain matches
+		if(res.get('url').localeCompare(user[1])) {
+			return reply(b.unauthorized);
+		}
+		// Run the query
+		instance.model('post').destroy({ where: {
+			creationTs: request.params.timestamp
+		}}).then(() => {
+			reply(null).code(204);
+		}).catch(reply);
+	}).catch(reply);
 }
 
 export let postSchema = j.object({
