@@ -19,7 +19,6 @@ export class AddProfileModal {
 	url = '';
 	relationType = 'friend'
 	addProfileForm: FormGroup
-	urlRegex: RegExp
 
 	constructor(private viewCtrl: ViewController) {
 		this.addProfileForm = new FormGroup({
@@ -27,8 +26,6 @@ export class AddProfileModal {
 			"type": new FormControl(this.relationType, Validators.required)
 		})
 	}
-
-	initUrlRegex
 
 	ionViewDidLoad() {
 		this.urlInput.setFocus()

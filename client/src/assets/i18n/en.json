@@ -6,7 +6,19 @@
 		"ok": "Ok"
 	},
 	"p": {
-		"title": "Posts"
+		"title": "Posts",
+		"creation": "Create post",
+		"privacy": {
+			"me": "Me",
+			"friends": "Friends",
+			"public": "Public"
+		},
+		"modal": {
+			"title": "Post creation",
+			"privacy": "Privacy",
+			"placeholder": "Say something nice here",
+			"submit_post": "Post"
+		}
 	},
 	"f": {
 		"title": "Friends",
@@ -28,7 +40,7 @@
 			"cancel": "Cancel",
 			"rejected": "Your friend request has been rejected.",
 			"hide": "Hide",
-			"modal":{
+			"modal": {
 				"cancel_title": "Cancel friend request",
 				"cancel_message": "Cancel friend request to {{user}} ?"
 			}
@@ -38,7 +50,7 @@
 			"details": "Details",
 			"accept": "Accept",
 			"decline": "Decline",
-			"modal":{
+			"modal": {
 				"decline_title": "Decline friend request",
 				"decline_message": "Decline friend request from {{user}} ?"
 			}
@@ -47,7 +59,7 @@
 			"title": "Friends",
 			"details": "Details",
 			"remove": "Remove",
-			"modal":{
+			"modal": {
 				"remove_title": "Remove friend",
 				"remove_message": "Remove friend {{user}} ?"
 			}
