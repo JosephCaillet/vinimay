@@ -3,12 +3,19 @@ import * as s from 'sequelize';
 import * as j from 'joi';
 import * as b from 'boom';
 
-import {Post, Privacy} from '../models/posts'
+import {User} from '../models/users';
+import {Post, Privacy} from '../models/posts';
+import {Status} from '../models/friends';
 
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
-const username = 'alice'; // TEMPORARY
+import * as utils from '../utils/serverUtils';
 
+const username = 'alice'; // TEMPORARY
+//const friend = 'francis@localhost:3005';
+const friend = 'bob@localhost:3001';
+
+// TODO: Retrieve posts from friends too
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
 	let options = <s.FindOptions>getOptions(request.query);
@@ -16,10 +23,11 @@ export function get(request: h.Request, reply: h.IReply) {
 	options.raw = true;
 
 	instance.model('post').findAll(options).then((posts: Post[]) => {
-		instance.model('user').findOne().then((user: s.Instance<any>) => {
+		instance.model('user').findOne().then(async (user: s.Instance<any>) => {
 			for(let i in posts) {
-				let post = posts[i];
-				post.author = username + '@' + user.get('url');
+				let post: Post = posts[i];
+				let author = new User(username, user.get('url'));
+				post.author = author.toString();
 			}
 			reply(posts);
 		}).catch(reply);
@@ -28,19 +36,20 @@ export function get(request: h.Request, reply: h.IReply) {
 
 export function getSingle(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
-	let user = request.params.user.split('@');
+	let user = new User(request.params.user);
 
 	try {
 		instance = SequelizeWrapper.getInstance(user[0]);
 	} catch(e) {
 		// If the user doesn't exist, we return an error
-		return reply(e);
+		return reply(b.badRequest(e));
 	}
 
 	instance.model('post').findById(request.params.timestamp).then((res: s.Instance<Post>) => {
 		let post = res.get({plain: true});
 		instance.model('user').findOne().then((user: s.Instance<any>) => {
-			post.author = username + '@' + user.get('url');
+			let author = new User(username, user.get('url'));
+			post.author = author.toString();
 			reply(post);
 		}).catch(reply);
 	}).catch(reply);
@@ -48,7 +57,7 @@ export function getSingle(request: h.Request, reply: h.IReply) {
 
 export function create(request: h.Request, reply: h.IReply) {
 	// Javascript's timestamp is in miliseconds. We want it in seconds.
-	let ts = Math.round((new Date()).getTime()/1000);
+	let ts = (new Date()).getTime();
 	let post: Post = {
 		creationTs: ts,
 		lastModificationTs: ts,
@@ -68,21 +77,21 @@ export function create(request: h.Request, reply: h.IReply) {
 }
 
 export function del(request: h.Request, reply: h.IReply) {
-	let user = request.params.user.split('@');
+	let user = new User(request.params.user);
 
 	let instance: s.Sequelize;
 
 	try {
-		instance = SequelizeWrapper.getInstance(user[0]);
+		instance = SequelizeWrapper.getInstance(user.username);
 	} catch(e) {
 		// If the user doesn't exist, we return an error
-		return reply(e);
+		return reply(b.badRequest(e));
 	}
 
 	instance.model('user').findOne().then((res: s.Instance<any>) => {
 		// Check if instance domain matches
 		if(res.get('url').localeCompare(user[1])) {
-			return reply(b.unauthorized);
+			return reply(b.unauthorized());
 		}
 		// Run the query
 		instance.model('post').destroy({ where: {
@@ -90,6 +99,100 @@ export function del(request: h.Request, reply: h.IReply) {
 		}}).then(() => {
 			reply(null).code(204);
 		}).catch(reply);
+	}).catch(reply);
+}
+
+export function serverGet(request: h.Request, reply: h.IReply) {
+	let username = utils.getUsername(request);
+	let instance: s.Sequelize;
+
+	// Check if the user exists (the wrapper will return an error if not)
+	try { instance = SequelizeWrapper.getInstance(username); } 
+	catch(e) { return reply(b.notFound(e)); }
+
+	let options = <s.FindOptions>getOptions(request.query);
+	// We cast directly as post, so we don't need getters and setters
+	options.raw = true;
+
+	instance.model('post').findAll(options).then(async (posts: Post[]) => {
+		if(request.query.idToken) {
+			instance.model('friend').findOne({
+				where: { id_token: request.query.idToken }
+			}).then(async (friendInstance: s.Instance<any>) => {
+				if(!friendInstance) return reply(b.unauthorized('UNKNOWN_TOKEN'))
+				let user = (await utils.getUser(username)).toString();
+				let url = user + request.path;
+				let token = friendInstance.get('signature_token')
+				let signature = utils.computeSignature(request.method, url, request.query, token);
+				if(!utils.checkSignature(request.query.signature, signature)) {
+					return reply(b.badRequest('WRONG_SIGNATURE'))
+				}
+				let res: Post[] = new Array<Post>();
+				for(let i in posts) {
+					let post: Post = posts[i];
+					post.author = user.toString();
+					let friend = new User(friendInstance.get('username'), friendInstance.get('url'));
+					if(await canReadPost(username, Privacy[post.privacy], friend)) res.push(post);
+				}
+				reply(res);
+			}).catch(reply);
+		} else {
+			let res: Post[] = new Array<Post>();
+			for(let i in posts) {
+				let post: Post = posts[i];
+				let author: User;
+				try { post.author = (await utils.getUser(username)).toString(); }
+				catch(e) { return reply(b.wrap(e)); }
+				if(await canReadPost(username, Privacy[post.privacy])) res.push(post);
+			}
+			reply(res);
+		}
+	}).catch(reply);
+}
+
+// TODO: This function is really similar to serverGet: Factorise it
+export function serverGetSingle(request: h.Request, reply: h.IReply) {
+	let username = utils.getUsername(request);
+	let instance: s.Sequelize;
+
+	// Check if the user exists (the wrapper will return an error if not)
+	try { instance = SequelizeWrapper.getInstance(username); } 
+	catch(e) { return reply(b.notFound(e)); }
+
+	instance.model('post').findById(request.params.timestamp, {
+		raw: true
+	}).then(async (post: Post) => {
+		if(request.query.idToken) {
+			instance.model('friend').findOne({
+				where: { id_token: request.query.idToken }
+			}).then(async (friendInstance: s.Instance<any>) => {
+				if(!friendInstance) return reply(b.unauthorized('UNKNOWN_TOKEN'));
+				let user = (await utils.getUser(username)).toString();
+				let url = user + request.path;
+				let token = friendInstance.get('signature_token');
+				let params = utils.mergeObjects(request.query, request.params);
+				let signature = utils.computeSignature(request.method, url, params, token);
+				if(!utils.checkSignature(request.query.signature, signature)) {
+					return reply(b.badRequest('WRONG_SIGNATURE'))
+				}
+				post.author = user.toString();
+				let friend = new User(friendInstance.get('username'), friendInstance.get('url'));
+				if(await canReadPost(username, Privacy[post.privacy], friend)) {
+					return reply(post);
+				} else {
+					return reply(b.unauthorized());
+				}
+			}).catch(reply);
+		} else {
+			let author: User;
+			try { post.author = (await utils.getUser(username)).toString(); }
+			catch(e) { return reply(b.wrap(e)); }
+			if(await canReadPost(username, Privacy[post.privacy])) {
+				return reply(post);
+			} else {
+				reply(b.unauthorized());
+			}
+		}
 	}).catch(reply);
 }
 
@@ -122,4 +225,44 @@ function getOptions(queryParams) {
 	}
 	
 	return options;
+}
+
+function isFriend(username: string, friend: string | User): Promise<boolean> {
+	return new Promise((ok, ko) => {
+		let user: User;
+		if(typeof friend === 'string') {
+			user = new User(friend);
+		} else {
+			user = friend;
+		}
+		SequelizeWrapper.getInstance(username).model('friend').findOne({
+			where: {
+				username: user.username,
+				url: user.instance
+			}
+		}).then((friend: s.Instance<any>) => {
+			let status: string = friend.get('status');
+			if(Status[status] === Status.accepted) {
+				ok(true);
+			}
+			ok(false);
+		}).catch(ko);
+	});
+}
+
+function canReadPost(username: string, privacy: Privacy, friend?: User): Promise<boolean> {
+	return new Promise<boolean>((ok, ko) => {
+		switch(privacy) {
+			case Privacy.public:
+				return ok(true);
+			case Privacy.friends:
+				if(!friend) return ok(false);
+				return isFriend(username, friend).then((isfriend) => {
+					if(isfriend) return ok(true);
+					else return ok(false);
+				}).catch(ko);
+			default:
+				return ok(false);
+		}
+	});
 }

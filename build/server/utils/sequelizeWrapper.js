@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const fs = require("fs");
+const path = require("path");
 // Load Sequelize module
 const Sequelize = require('sequelize');
 // Wrapper to singleton-ise Sequelize
@@ -9,13 +11,19 @@ class SequelizeWrapper {
             this.instances = new Object();
         }
         if (!this.instances[name]) {
+            let dbRoot = path.resolve('./db');
+            let files = fs.readdirSync(dbRoot);
+            files = files.filter(file => file.match(/\.db$/));
+            if (files.indexOf(name + '.db') < 0) {
+                throw new Error('UNKNOWN_USER');
+            }
             let instance = new Sequelize(name, '', '', {
                 dialect: 'sqlite',
                 logging: false,
                 define: {
                     timestamps: false
                 },
-                storage: __dirname + '/../../../db/' + name + '.db'
+                storage: path.join(__dirname, '/../../../db/', name + '.db')
             });
             // Load and define Sequelize models
             instance.define('post', require('../models/sequelize/post'), { freezeTableName: true });
