@@ -77,6 +77,23 @@ export class V1Service {
     }
 
     /**
+     * Delete a single post
+     * Delete a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#deletion).
+     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public deleteV1ClientPostsUserTimestamp(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteV1ClientPostsUserTimestampWithHttpInfo(user, timestamp, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Retrieve all friend requests
      * Retrieve all friend requests (accepted, incoming and sent). Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-4).
      */
@@ -111,11 +128,28 @@ export class V1Service {
      * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
      * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
      * @param nb Number of posts to retrieve
-     * @param from Smallest timestamp for a time frame retrieval
-     * @param to Biggest timestamp for a time frame retrieval
+     * @param from Most recent timestamp for a time frame retrieval
+     * @param to Oldest for a time frame retrieval
      */
     public getV1ClientPosts(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<PostsResponse> {
         return this.getV1ClientPostsWithHttpInfo(start, nb, from, to, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Retrieve a single post
+     * Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieve-one-post).
+     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public getV1ClientPostsUserTimestamp(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Post> {
+        return this.getV1ClientPostsUserTimestampWithHttpInfo(user, timestamp, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -204,6 +238,49 @@ export class V1Service {
 
 
     /**
+     * Delete a single post
+     * Delete a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#deletion).
+     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public deleteV1ClientPostsUserTimestampWithHttpInfo(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts/${user}/${timestamp}'
+                    .replace('${' + 'user' + '}', String(user))
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling deleteV1ClientPostsUserTimestamp.');
+        }
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling deleteV1ClientPostsUserTimestamp.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
      * Retrieve all friend requests
      * Retrieve all friend requests (accepted, incoming and sent). Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-4).
      */
@@ -270,8 +347,8 @@ export class V1Service {
      * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
      * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
      * @param nb Number of posts to retrieve
-     * @param from Smallest timestamp for a time frame retrieval
-     * @param to Biggest timestamp for a time frame retrieval
+     * @param from Most recent timestamp for a time frame retrieval
+     * @param to Oldest for a time frame retrieval
      */
     public getV1ClientPostsWithHttpInfo(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/v1/client/posts';
@@ -295,6 +372,49 @@ export class V1Service {
             queryParameters.set('to', <any>to);
         }
 
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Retrieve a single post
+     * Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieve-one-post).
+     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public getV1ClientPostsUserTimestampWithHttpInfo(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts/${user}/${timestamp}'
+                    .replace('${' + 'user' + '}', String(user))
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling getV1ClientPostsUserTimestamp.');
+        }
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling getV1ClientPostsUserTimestamp.');
+        }
 
         // to determine the Accept header
         let produces: string[] = [

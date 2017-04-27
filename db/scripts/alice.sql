@@ -14,24 +14,24 @@ INSERT INTO profile(username, url, description)
 VALUES('caroline', 'localhost:3002', 'Hello, I''m Caroline');
 
 INSERT INTO friend(username, url, id_token, signature_token, status)
-VALUES('caroline', 'localhost:3002', 'idtoken', 'sigtoken', 'accepted');
+VALUES('caroline', 'localhost:3002', 'idtoken2', 'sigtoken2', 'accepted');
 
 INSERT INTO profile(username, url, description)
 VALUES('david', 'localhost:3003', 'Hello, I''m David');
 
 INSERT INTO friend(username, url, id_token, signature_token, status)
-VALUES('david', 'localhost:3003', 'idtoken', 'sigtoken', 'pending');
+VALUES('david', 'localhost:3003', 'idtoken3', 'sigtoken3', 'pending');
 
 INSERT INTO profile(username, url, description)
 VALUES('eric', 'localhost:3004', 'Hello, I''m Eric');
 
 INSERT INTO friend(username, url, id_token, signature_token, status)
-VALUES('eric', 'localhost:3004', 'idtoken', 'sigtoken', 'declined');
+VALUES('eric', 'localhost:3004', 'idtoken4', 'sigtoken4', 'declined');
 
 INSERT INTO profile(username, url, description)
 VALUES('francis', 'localhost:3005', 'Hello, I''m Francis');
 
 INSERT INTO friend(username, url, id_token, signature_token, status)
-VALUES('francis', 'localhost:3005', 'idtoken', 'sigtoken', 'incoming');
+VALUES('francis', 'localhost:3005', 'idtoken5', 'sigtoken5', 'incoming');
 
 --export enum Status {pending, declined, incoming, accepted, following}
