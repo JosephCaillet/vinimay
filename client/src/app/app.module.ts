@@ -13,12 +13,16 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { V1Service } from '../providers/apiClient/api/v1.service';
 import { BASE_PATH } from '../providers/apiClient/variables';
+import { PostModal } from "../components/post-modal/post-modal";
+import { Autoresize } from "../components/autoresize/autoresize";
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-		AddProfileModal
+		AddProfileModal,
+		PostModal,
+		Autoresize
   ],
   imports: [
     BrowserModule,
@@ -42,7 +46,8 @@ import { BASE_PATH } from '../providers/apiClient/variables';
   entryComponents: [
     MyApp,
     HomePage,
-		AddProfileModal
+		AddProfileModal,
+		PostModal
   ],
   providers: [
     StatusBar,

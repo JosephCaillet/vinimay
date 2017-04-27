@@ -1,0 +1,35 @@
+<!-- Generated template for the PostModal component -->
+<ion-header>
+	<ion-navbar>
+		<ion-buttons start>
+			<button ion-button icon-only (click)="dismiss(false)">
+        <ion-icon name="close"></ion-icon>
+      </button>
+		</ion-buttons>
+		<ion-title>{{ 'p.modal.title' | translate }}</ion-title>
+	</ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<form [formGroup]="postForm" (submit)="dismiss(true)">
+
+		<div padding>
+			<ion-item>
+				<ion-label>{{ 'p.modal.privacy' | translate }}</ion-label>
+				<ion-select interface="popover" formControlName="privacy">
+					<ion-option *ngFor="let privacyLevel of privacyLevels" [value]="privacyLevel.value">
+						{{ privacyLevel.text }}
+					</ion-option>
+				</ion-select>
+			</ion-item>
+		</div>
+
+		<div padding>
+			<ion-item>
+				<ion-textarea autoresize #contentInput type="text" [placeholder]="'p.modal.placeholder' | translate" formControlName="content"></ion-textarea>
+			</ion-item>
+		</div>
+
+		<button ion-button full type="submit" [disabled]="!postForm.valid">{{ 'p.modal.submit_post' | translate }}</button>
+	</form>
+</ion-content>

@@ -6,13 +6,19 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-    <ion-title>{{ 'p.title' | translate }}</ion-title>
-  </ion-navbar>
+	<ion-navbar>
+		<ion-title>{{ 'p.title' | translate }}</ion-title>
+	</ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+	<button ion-button icon-left (click)="createPost()" center>
+		<ion-icon name="create"></ion-icon>
+		{{ 'p.creation' | translate }}
+	</button>
+	<post-component *ngFor="let post of posts" [post]="post">
 
+	</post-component>
 </ion-content>

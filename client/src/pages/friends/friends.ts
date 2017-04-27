@@ -69,7 +69,7 @@ export class FriendsPage {
 
 	showFriendDetails(friend: Friend) {
 		let alert = this.alertCtrl.create({
-			title: `${friend.user}`,
+			subTitle: `${friend.user}`,
 			message: `${friend.description}`,
 			buttons: [this.tr.instant('global.ok')]
 		})
