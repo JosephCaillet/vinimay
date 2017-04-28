@@ -3,6 +3,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const crypto = require("crypto");
 const users_1 = require("../models/users");
 const sequelizeWrapper_1 = require("./sequelizeWrapper");
+const log = require('printit')({
+    date: true
+});
 function getUsername(request) {
     // Isolate the base64-encoded part
     let basic = request.headers.authorization.split(' ')[1];
@@ -33,7 +36,7 @@ function computeSignature(method, url, parameters, token) {
     let signature = crypto.createHmac("sha256", token)
         .update(toSign)
         .digest("hex");
-    console.log(signature);
+    log.debug('Signature for ' + method.toUpperCase() + ' ' + url + ': ' + signature);
     return signature;
 }
 exports.computeSignature = computeSignature;

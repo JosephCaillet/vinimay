@@ -6,6 +6,10 @@ import * as crypto from 'crypto';
 import {User} from '../models/users';
 import {SequelizeWrapper} from './sequelizeWrapper';
 
+const log = require('printit')({
+	date: true
+});
+
 export function getUsername(request: h.Request): string {
 	// Isolate the base64-encoded part
 	let basic = request.headers.authorization.split(' ')[1];
@@ -39,7 +43,7 @@ export function computeSignature(method: string, url: string, parameters, token:
 	.update(toSign)
 	.digest("hex");
 
-	console.log(signature)
+	log.debug('Signature for ' + method.toUpperCase() + ' ' + url + ': ' +signature);
 
 	return signature;
 }

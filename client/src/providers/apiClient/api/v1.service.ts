@@ -198,13 +198,12 @@ export class V1Service {
     /**
      * Retrieve a single post
      * Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-one-post).
-     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
      * @param timestamp The post&#39;s creation timestamp
      * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
      * @param signature 
      */
-    public getV1ServerPostsUserTimestamp(user: string, timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Post> {
-        return this.getV1ServerPostsUserTimestampWithHttpInfo(user, timestamp, idToken, signature, extraHttpRequestParams)
+    public getV1ServerPostsTimestamp(timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Post> {
+        return this.getV1ServerPostsTimestampWithHttpInfo(timestamp, idToken, signature, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -571,26 +570,20 @@ export class V1Service {
     /**
      * Retrieve a single post
      * Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-one-post).
-     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
      * @param timestamp The post&#39;s creation timestamp
      * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
      * @param signature 
      */
-    public getV1ServerPostsUserTimestampWithHttpInfo(user: string, timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/v1/server/posts/${user}/${timestamp}'
-                    .replace('${' + 'user' + '}', String(user))
+    public getV1ServerPostsTimestampWithHttpInfo(timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/posts/${timestamp}'
                     .replace('${' + 'timestamp' + '}', String(timestamp));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
-        // verify required parameter 'user' is not null or undefined
-        if (user === null || user === undefined) {
-            throw new Error('Required parameter user was null or undefined when calling getV1ServerPostsUserTimestamp.');
-        }
         // verify required parameter 'timestamp' is not null or undefined
         if (timestamp === null || timestamp === undefined) {
-            throw new Error('Required parameter timestamp was null or undefined when calling getV1ServerPostsUserTimestamp.');
+            throw new Error('Required parameter timestamp was null or undefined when calling getV1ServerPostsTimestamp.');
         }
         if (idToken !== undefined) {
             queryParameters.set('idToken', <any>idToken);

@@ -3,10 +3,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const j = require("joi");
 const b = require("boom");
 const users_1 = require("../models/users");
-const posts_1 = require("../models/posts");
-const friends_1 = require("../models/friends");
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
+const vinimayError_1 = require("../utils/vinimayError");
 const utils = require("../utils/serverUtils");
+const postUtils = require("../utils/postUtils");
 const username = 'alice'; // TEMPORARY
 //const friend = 'francis@localhost:3005';
 const friend = 'bob@localhost:3001';
@@ -23,7 +23,10 @@ function get(request, reply) {
                 let author = new users_1.User(username, user.get('url'));
                 post.author = author.toString();
             }
-            reply(posts);
+            reply({
+                authenticated: true,
+                posts: posts
+            });
         }).catch(reply);
     }).catch(reply);
 }
@@ -107,50 +110,23 @@ function serverGet(request, reply) {
     // We cast directly as post, so we don't need getters and setters
     options.raw = true;
     instance.model('post').findAll(options).then(async (posts) => {
-        if (request.query.idToken) {
-            instance.model('friend').findOne({
-                where: { id_token: request.query.idToken }
-            }).then(async (friendInstance) => {
-                if (!friendInstance)
-                    return reply(b.unauthorized('UNKNOWN_TOKEN'));
-                let user = (await utils.getUser(username)).toString();
-                let url = user + request.path;
-                let token = friendInstance.get('signature_token');
-                let signature = utils.computeSignature(request.method, url, request.query, token);
-                if (!utils.checkSignature(request.query.signature, signature)) {
-                    return reply(b.badRequest('WRONG_SIGNATURE'));
-                }
-                let res = new Array();
-                for (let i in posts) {
-                    let post = posts[i];
-                    post.author = user.toString();
-                    let friend = new users_1.User(friendInstance.get('username'), friendInstance.get('url'));
-                    if (await canReadPost(username, posts_1.Privacy[post.privacy], friend))
-                        res.push(post);
-                }
-                reply(res);
-            }).catch(reply);
+        let res;
+        try {
+            res = await postUtils.processPost(posts, request, username);
         }
-        else {
-            let res = new Array();
-            for (let i in posts) {
-                let post = posts[i];
-                let author;
-                try {
-                    post.author = (await utils.getUser(username)).toString();
-                }
-                catch (e) {
-                    return reply(b.wrap(e));
-                }
-                if (await canReadPost(username, posts_1.Privacy[post.privacy]))
-                    res.push(post);
+        catch (e) {
+            if (e instanceof vinimayError_1.VinimayError) {
+                return reply(b.unauthorized(e.message));
             }
-            reply(res);
+            return reply(b.wrap(e));
         }
+        if (res)
+            return reply(res);
+        else
+            return reply(b.unauthorized());
     }).catch(reply);
 }
 exports.serverGet = serverGet;
-// TODO: This function is really similar to serverGet: Factorise it
 function serverGetSingle(request, reply) {
     let username = utils.getUsername(request);
     let instance;
@@ -164,45 +140,20 @@ function serverGetSingle(request, reply) {
     instance.model('post').findById(request.params.timestamp, {
         raw: true
     }).then(async (post) => {
-        if (request.query.idToken) {
-            instance.model('friend').findOne({
-                where: { id_token: request.query.idToken }
-            }).then(async (friendInstance) => {
-                if (!friendInstance)
-                    return reply(b.unauthorized('UNKNOWN_TOKEN'));
-                let user = (await utils.getUser(username)).toString();
-                let url = user + request.path;
-                let token = friendInstance.get('signature_token');
-                let params = utils.mergeObjects(request.query, request.params);
-                let signature = utils.computeSignature(request.method, url, params, token);
-                if (!utils.checkSignature(request.query.signature, signature)) {
-                    return reply(b.badRequest('WRONG_SIGNATURE'));
-                }
-                post.author = user.toString();
-                let friend = new users_1.User(friendInstance.get('username'), friendInstance.get('url'));
-                if (await canReadPost(username, posts_1.Privacy[post.privacy], friend)) {
-                    return reply(post);
-                }
-                else {
-                    return reply(b.unauthorized());
-                }
-            }).catch(reply);
+        let res;
+        try {
+            res = await postUtils.processPost(post, request, username);
         }
-        else {
-            let author;
-            try {
-                post.author = (await utils.getUser(username)).toString();
+        catch (e) {
+            if (e instanceof vinimayError_1.VinimayError) {
+                return reply(b.unauthorized(e.message));
             }
-            catch (e) {
-                return reply(b.wrap(e));
-            }
-            if (await canReadPost(username, posts_1.Privacy[post.privacy])) {
-                return reply(post);
-            }
-            else {
-                reply(b.unauthorized());
-            }
+            return reply(b.wrap(e));
         }
+        if (res)
+            return reply(res);
+        else
+            reply(b.unauthorized());
     }).catch(reply);
 }
 exports.serverGetSingle = serverGetSingle;
@@ -236,46 +187,4 @@ function getOptions(queryParams) {
         options.where = { creationTs: timestamp };
     }
     return options;
-}
-function isFriend(username, friend) {
-    return new Promise((ok, ko) => {
-        let user;
-        if (typeof friend === 'string') {
-            user = new users_1.User(friend);
-        }
-        else {
-            user = friend;
-        }
-        sequelizeWrapper_1.SequelizeWrapper.getInstance(username).model('friend').findOne({
-            where: {
-                username: user.username,
-                url: user.instance
-            }
-        }).then((friend) => {
-            let status = friend.get('status');
-            if (friends_1.Status[status] === friends_1.Status.accepted) {
-                ok(true);
-            }
-            ok(false);
-        }).catch(ko);
-    });
-}
-function canReadPost(username, privacy, friend) {
-    return new Promise((ok, ko) => {
-        switch (privacy) {
-            case posts_1.Privacy.public:
-                return ok(true);
-            case posts_1.Privacy.friends:
-                if (!friend)
-                    return ok(false);
-                return isFriend(username, friend).then((isfriend) => {
-                    if (isfriend)
-                        return ok(true);
-                    else
-                        return ok(false);
-                }).catch(ko);
-            default:
-                return ok(false);
-        }
-    });
 }

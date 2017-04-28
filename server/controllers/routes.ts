@@ -168,14 +168,13 @@ module.exports = {
 				}
 			}
 		},
-		'/server/posts/{user}/{timestamp}': {
+		'/server/posts/{timestamp}': {
 			get: {
 				description: 'Retrieve a single post',
 				notes: 'Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-one-post).',
 				handler: posts.serverGetSingle,
 				validate: { 
 					params: {
-						user: Joi.string().email().required().description('The post\'s author, identified as `username@instance-domain.tld`'),
 						timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
 					},
 					query: {
