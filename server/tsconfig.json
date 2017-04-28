@@ -11,6 +11,7 @@
             "hapi",
             "joi",
             "node",
+            "request",
             "sequelize"
         ]
     },

@@ -1,6 +1,8 @@
 import * as h from 'hapi';
 import * as s from 'sequelize';
 
+import * as request from 'request';
+
 import * as utils from './serverUtils';
 import {SequelizeWrapper} from './sequelizeWrapper';
 
@@ -149,4 +151,8 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 			}
 		}
 	});
+}
+
+function retrieveRemotePosts(source: User) {
+	
 }

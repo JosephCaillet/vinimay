@@ -5,9 +5,9 @@ const j = require("joi");
 const friends_1 = require("../models/friends");
 // Import the DB wrapper
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
-const username = 'alice'; // TEMPORARY
+const username_1 = require("../utils/username");
 function get(request, reply) {
-    let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
+    let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     instance.model('friend').findAll({
         include: [{
                 model: instance.model('profile'),

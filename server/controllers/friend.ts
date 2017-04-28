@@ -8,7 +8,7 @@ import {Friend, OutgoingRequests, Status, Response} from '../models/friends';
 // Import the DB wrapper
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
-const username = 'alice'; // TEMPORARY
+import {username} from '../utils/username';
 
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);

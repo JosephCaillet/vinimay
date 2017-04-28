@@ -4,7 +4,7 @@ import * as j from 'joi';
 
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
-const username = 'alice'; // TEMPORARY
+import {username} from '../utils/username';
 
 export function get(request: h.Request, reply: h.IReply) {
 	SequelizeWrapper.getInstance(username).model('profile').findOne({
