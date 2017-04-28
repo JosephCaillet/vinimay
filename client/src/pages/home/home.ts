@@ -8,11 +8,11 @@ import { User, V1Service } from "../../providers/apiClient/index";
 })
 export class HomePage {
 
-	user: User
+	user: User = {username: '', url : '', description: ''}
 
 	constructor(public navCtrl: NavController, private api: V1Service) {
 		api.getV1ClientMe().subscribe((user) => {
-			this.user = user
+			Object.assign(this.user, user)
 		}, (err) => {
 			this.user = {username: '', url : '', description: ''}
 		})
