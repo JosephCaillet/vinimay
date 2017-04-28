@@ -5,6 +5,8 @@ const b = require("boom");
 const users_1 = require("../models/users");
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
 const vinimayError_1 = require("../utils/vinimayError");
+const comments = require("./comment");
+const reactions = require("./reaction");
 const utils = require("../utils/serverUtils");
 const postUtils = require("../utils/postUtils");
 const username = 'alice'; // TEMPORARY
@@ -22,6 +24,13 @@ function get(request, reply) {
                 let post = posts[i];
                 let author = new users_1.User(username, user.get('url'));
                 post.author = author.toString();
+                try {
+                    post.comments = await comments.count(post.creationTs, username);
+                    post.reactions = await reactions.count(post.creationTs, username);
+                }
+                catch (e) {
+                    return reply(b.wrap(e));
+                }
             }
             reply({
                 authenticated: true,
@@ -31,21 +40,27 @@ function get(request, reply) {
     }).catch(reply);
 }
 exports.get = get;
-function getSingle(request, reply) {
-    let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
-    let user = new users_1.User(request.params.user);
+async function getSingle(request, reply) {
+    let instance;
     try {
-        instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(user[0]);
+        let user = await utils.getUser(username);
+        instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
     }
     catch (e) {
-        // If the user doesn't exist, we return an error
-        return reply(b.badRequest(e));
+        return reply(b.wrap(e));
     }
     instance.model('post').findById(request.params.timestamp).then((res) => {
         let post = res.get({ plain: true });
-        instance.model('user').findOne().then((user) => {
+        instance.model('user').findOne().then(async (user) => {
             let author = new users_1.User(username, user.get('url'));
             post.author = author.toString();
+            try {
+                post.comments = await comments.count(post.creationTs, username);
+                post.reactions = await reactions.count(post.creationTs, username);
+            }
+            catch (e) {
+                return reply(b.wrap(e));
+            }
             reply(post);
         }).catch(reply);
     }).catch(reply);
@@ -66,16 +81,17 @@ function create(request, reply) {
     instance.model('post').create(post).then((res) => {
         let created = res.get({ plain: true });
         instance.model('user').findOne().then((user) => {
-            created.author = username + '@' + user.get('url');
+            created.author = new users_1.User(username, user.get('url')).toString();
             reply(created).code(200);
         }).catch(reply);
     }).catch(reply);
 }
 exports.create = create;
-function del(request, reply) {
-    let user = new users_1.User(request.params.user);
+async function del(request, reply) {
     let instance;
+    let user;
     try {
+        user = await utils.getUser(username);
         instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(user.username);
     }
     catch (e) {
@@ -84,7 +100,7 @@ function del(request, reply) {
     }
     instance.model('user').findOne().then((res) => {
         // Check if instance domain matches
-        if (res.get('url').localeCompare(user[1])) {
+        if (res.get('url').localeCompare(user.instance)) {
             return reply(b.unauthorized());
         }
         // Run the query

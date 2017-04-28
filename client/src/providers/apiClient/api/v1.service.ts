@@ -79,11 +79,10 @@ export class V1Service {
     /**
      * Delete a single post
      * Delete a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#deletion).
-     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
      * @param timestamp The post&#39;s creation timestamp
      */
-    public deleteV1ClientPostsUserTimestamp(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<{}> {
-        return this.deleteV1ClientPostsUserTimestampWithHttpInfo(user, timestamp, extraHttpRequestParams)
+    public deleteV1ClientPostsTimestamp(timestamp: number, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteV1ClientPostsTimestampWithHttpInfo(timestamp, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -279,24 +278,18 @@ export class V1Service {
     /**
      * Delete a single post
      * Delete a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#deletion).
-     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
      * @param timestamp The post&#39;s creation timestamp
      */
-    public deleteV1ClientPostsUserTimestampWithHttpInfo(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/v1/client/posts/${user}/${timestamp}'
-                    .replace('${' + 'user' + '}', String(user))
+    public deleteV1ClientPostsTimestampWithHttpInfo(timestamp: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts/${timestamp}'
                     .replace('${' + 'timestamp' + '}', String(timestamp));
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
-        // verify required parameter 'user' is not null or undefined
-        if (user === null || user === undefined) {
-            throw new Error('Required parameter user was null or undefined when calling deleteV1ClientPostsUserTimestamp.');
-        }
         // verify required parameter 'timestamp' is not null or undefined
         if (timestamp === null || timestamp === undefined) {
-            throw new Error('Required parameter timestamp was null or undefined when calling deleteV1ClientPostsUserTimestamp.');
+            throw new Error('Required parameter timestamp was null or undefined when calling deleteV1ClientPostsTimestamp.');
         }
 
         // to determine the Accept header
