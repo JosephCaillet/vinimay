@@ -1,4 +1,6 @@
 import * as s from 'sequelize';
+import * as fs from 'fs';
+import * as path from 'path';
 
 // Load Sequelize module
 const Sequelize: s.SequelizeStatic	= require('sequelize');
@@ -17,13 +19,21 @@ export class SequelizeWrapper {
 			this.instances = new Object() as Instances;
 		}
 		if(!this.instances[name]) {
+			let dbRoot = path.resolve('./db');
+			let files = fs.readdirSync(dbRoot);
+			files = files.filter(file => file.match(/\.db$/))
+
+			if(files.indexOf(name + '.db') < 0) {
+				throw new Error('UNKNOWN_USER');
+			}
+
 			let instance: s.Sequelize = new Sequelize(name, '', '', <s.Options>{
 				dialect: 'sqlite',
 				logging: false,
 				define: <s.DefineOptions<any>>{
 					timestamps: false
 				},
-				storage: __dirname + '/../../../db/' + name + '.db'
+				storage: path.join(__dirname, '/../../../db/', name + '.db')
 			});
 			
 			// Load and define Sequelize models

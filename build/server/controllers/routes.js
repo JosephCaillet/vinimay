@@ -142,6 +142,53 @@ module.exports = {
                 }
             }
         },
+        '/server/posts': {
+            get: {
+                description: 'Retrieve posts',
+                notes: 'Retrieve all posts or using filters. Use either with both `start` and `nb` parameters, or both `from` and `to` parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).',
+                handler: posts.serverGet,
+                validate: { query: {
+                        start: Joi.number().min(1).description('Offset to start the retrieval. For example, `start=20` will retrieve all posts from the 20th most recent one, in anti-chronological order.'),
+                        nb: Joi.number().min(1).description('Number of posts to retrieve'),
+                        from: Joi.number().min(1).description('Most recent timestamp for a time frame retrieval'),
+                        to: Joi.number().min(1).description('Oldest for a time frame retrieval'),
+                        idToken: Joi.string().description('Identification token bound to a friend. If not provided, only public posts will be sent'),
+                        signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
+                    } },
+                plugins: {
+                    'hapi-swagger': {
+                        responses: {
+                            '200': {
+                                description: 'A list of posts with an information on authentication',
+                                schema: posts.responseSchema
+                            }, '401': { description: 'The idToken is unknown' }
+                        }
+                    }
+                }
+            }
+        },
+        '/server/posts/{timestamp}': {
+            get: {
+                description: 'Retrieve a single post',
+                notes: 'Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-one-post).',
+                handler: posts.serverGetSingle,
+                validate: {
+                    params: {
+                        timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+                    },
+                    query: {
+                        idToken: Joi.string().description('Identification token bound to a friend. If not provided, only public posts will be sent'),
+                        signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
+                    }
+                },
+                plugins: { 'hapi-swagger': { responses: {
+                            '200': {
+                                description: 'A list of posts with an information on authentication',
+                                schema: posts.postSchema
+                            }
+                        } } }
+            }
+        },
         '/dummy': {
             get: {
                 description: 'Ping',

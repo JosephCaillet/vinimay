@@ -3,12 +3,21 @@ import * as s from 'sequelize';
 import * as j from 'joi';
 import * as b from 'boom';
 
-import {Post, Privacy} from '../models/posts'
+import {User} from '../models/users';
+import {Post, Privacy} from '../models/posts';
+import {Status} from '../models/friends';
 
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
+import {VinimayError} from '../utils/vinimayError';
+
+import * as utils from '../utils/serverUtils';
+import * as postUtils from '../utils/postUtils';
 
 const username = 'alice'; // TEMPORARY
+//const friend = 'francis@localhost:3005';
+const friend = 'bob@localhost:3001';
 
+// TODO: Retrieve posts from friends too
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
 	let options = <s.FindOptions>getOptions(request.query);
@@ -16,31 +25,36 @@ export function get(request: h.Request, reply: h.IReply) {
 	options.raw = true;
 
 	instance.model('post').findAll(options).then((posts: Post[]) => {
-		instance.model('user').findOne().then((user: s.Instance<any>) => {
+		instance.model('user').findOne().then(async (user: s.Instance<any>) => {
 			for(let i in posts) {
-				let post = posts[i];
-				post.author = username + '@' + user.get('url');
+				let post: Post = posts[i];
+				let author = new User(username, user.get('url'));
+				post.author = author.toString();
 			}
-			reply(posts);
+			reply({
+				authenticated: true, // Temporary hardcoded value
+				posts: posts
+			});
 		}).catch(reply);
 	}).catch(reply);
 }
 
 export function getSingle(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
-	let user = request.params.user.split('@');
+	let user = new User(request.params.user);
 
 	try {
 		instance = SequelizeWrapper.getInstance(user[0]);
 	} catch(e) {
 		// If the user doesn't exist, we return an error
-		return reply(e);
+		return reply(b.badRequest(e));
 	}
 
 	instance.model('post').findById(request.params.timestamp).then((res: s.Instance<Post>) => {
 		let post = res.get({plain: true});
 		instance.model('user').findOne().then((user: s.Instance<any>) => {
-			post.author = username + '@' + user.get('url');
+			let author = new User(username, user.get('url'));
+			post.author = author.toString();
 			reply(post);
 		}).catch(reply);
 	}).catch(reply);
@@ -48,7 +62,7 @@ export function getSingle(request: h.Request, reply: h.IReply) {
 
 export function create(request: h.Request, reply: h.IReply) {
 	// Javascript's timestamp is in miliseconds. We want it in seconds.
-	let ts = Math.round((new Date()).getTime()/1000);
+	let ts = (new Date()).getTime();
 	let post: Post = {
 		creationTs: ts,
 		lastModificationTs: ts,
@@ -68,21 +82,21 @@ export function create(request: h.Request, reply: h.IReply) {
 }
 
 export function del(request: h.Request, reply: h.IReply) {
-	let user = request.params.user.split('@');
+	let user = new User(request.params.user);
 
 	let instance: s.Sequelize;
 
 	try {
-		instance = SequelizeWrapper.getInstance(user[0]);
+		instance = SequelizeWrapper.getInstance(user.username);
 	} catch(e) {
 		// If the user doesn't exist, we return an error
-		return reply(e);
+		return reply(b.badRequest(e));
 	}
 
 	instance.model('user').findOne().then((res: s.Instance<any>) => {
 		// Check if instance domain matches
 		if(res.get('url').localeCompare(user[1])) {
-			return reply(b.unauthorized);
+			return reply(b.unauthorized());
 		}
 		// Run the query
 		instance.model('post').destroy({ where: {
@@ -90,6 +104,57 @@ export function del(request: h.Request, reply: h.IReply) {
 		}}).then(() => {
 			reply(null).code(204);
 		}).catch(reply);
+	}).catch(reply);
+}
+
+export function serverGet(request: h.Request, reply: h.IReply) {
+	let username = utils.getUsername(request);
+	let instance: s.Sequelize;
+
+	// Check if the user exists (the wrapper will return an error if not)
+	try { instance = SequelizeWrapper.getInstance(username); } 
+	catch(e) { return reply(b.notFound(e)); }
+
+	let options = <s.FindOptions>getOptions(request.query);
+	// We cast directly as post, so we don't need getters and setters
+	options.raw = true;
+
+
+	instance.model('post').findAll(options).then(async (posts: Post[]) => {
+		let res: Post | Post[] | undefined;
+		try { res = await postUtils.processPost(posts, request, username); }
+		catch(e) {
+			if(e instanceof VinimayError) {
+				return reply(b.unauthorized(e.message));
+			}
+			return reply(b.wrap(e))
+		}
+		if(res) return reply(res);
+		else return reply(b.unauthorized());
+	}).catch(reply);
+}
+
+export function serverGetSingle(request: h.Request, reply: h.IReply) {
+	let username = utils.getUsername(request);
+	let instance: s.Sequelize;
+
+	// Check if the user exists (the wrapper will return an error if not)
+	try { instance = SequelizeWrapper.getInstance(username); } 
+	catch(e) { return reply(b.notFound(e)); }
+
+	instance.model('post').findById(request.params.timestamp, {
+		raw: true
+	}).then(async (post: Post) => {
+		let res: Post | Post[] | undefined;
+		try { res = await postUtils.processPost(post, request, username); }
+		catch(e) {
+			if(e instanceof VinimayError) {
+				return reply(b.unauthorized(e.message));
+			}
+			return reply(b.wrap(e))
+		}
+		if(res) return reply(res);
+		else reply(b.unauthorized());
 	}).catch(reply);
 }
 

@@ -175,6 +175,45 @@ export class V1Service {
     }
 
     /**
+     * Retrieve posts
+     * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
+     * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
+     * @param nb Number of posts to retrieve
+     * @param from Most recent timestamp for a time frame retrieval
+     * @param to Oldest for a time frame retrieval
+     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param signature 
+     */
+    public getV1ServerPosts(start?: number, nb?: number, from?: number, to?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<PostsResponse> {
+        return this.getV1ServerPostsWithHttpInfo(start, nb, from, to, idToken, signature, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Retrieve a single post
+     * Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-one-post).
+     * @param timestamp The post&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param signature 
+     */
+    public getV1ServerPostsTimestamp(timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Post> {
+        return this.getV1ServerPostsTimestampWithHttpInfo(timestamp, idToken, signature, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Update data on the current user
      * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
      * @param body 
@@ -445,6 +484,114 @@ export class V1Service {
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Retrieve posts
+     * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
+     * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
+     * @param nb Number of posts to retrieve
+     * @param from Most recent timestamp for a time frame retrieval
+     * @param to Oldest for a time frame retrieval
+     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param signature 
+     */
+    public getV1ServerPostsWithHttpInfo(start?: number, nb?: number, from?: number, to?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/posts';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        if (start !== undefined) {
+            queryParameters.set('start', <any>start);
+        }
+
+        if (nb !== undefined) {
+            queryParameters.set('nb', <any>nb);
+        }
+
+        if (from !== undefined) {
+            queryParameters.set('from', <any>from);
+        }
+
+        if (to !== undefined) {
+            queryParameters.set('to', <any>to);
+        }
+
+        if (idToken !== undefined) {
+            queryParameters.set('idToken', <any>idToken);
+        }
+
+        if (signature !== undefined) {
+            queryParameters.set('signature', <any>signature);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Retrieve a single post
+     * Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-one-post).
+     * @param timestamp The post&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param signature 
+     */
+    public getV1ServerPostsTimestampWithHttpInfo(timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/posts/${timestamp}'
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling getV1ServerPostsTimestamp.');
+        }
+        if (idToken !== undefined) {
+            queryParameters.set('idToken', <any>idToken);
+        }
+
+        if (signature !== undefined) {
+            queryParameters.set('signature', <any>signature);
+        }
 
 
         // to determine the Accept header

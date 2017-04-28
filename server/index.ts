@@ -1,5 +1,5 @@
 import * as Hapi from 'hapi';
-import * as loader from './controllers/loader'
+import * as loader from './controllers/loader';
 
 const pkg = require('../../package.json')
 
