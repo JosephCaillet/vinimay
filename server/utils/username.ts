@@ -1,0 +1,1 @@
+export let username = process.env.VINIMAY_USER;

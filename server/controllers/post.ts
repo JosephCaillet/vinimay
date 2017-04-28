@@ -16,9 +16,7 @@ import * as reactions from './reaction';
 import * as utils from '../utils/serverUtils';
 import * as postUtils from '../utils/postUtils';
 
-const username = 'alice'; // TEMPORARY
-//const friend = 'francis@localhost:3005';
-const friend = 'bob@localhost:3001';
+import {username} from '../utils/username';
 
 // TODO: Retrieve posts from friends too
 export function get(request: h.Request, reply: h.IReply) {
@@ -34,8 +32,8 @@ export function get(request: h.Request, reply: h.IReply) {
 				let author = new User(username, user.get('url'));
 				post.author = author.toString();
 				try {
-					post.comments = await comments.count(post.creationTs, username);
-					post.reactions = await reactions.count(post.creationTs, username);
+					post.comments = await comments.count(post.creationTs,);
+					post.reactions = await reactions.count(post.creationTs);
 				} catch(e) {
 					return reply(b.wrap(e));
 				}
@@ -59,13 +57,14 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 	}
 
 	instance.model('post').findById(request.params.timestamp).then((res: s.Instance<Post>) => {
+		if(!res) return reply(b.notFound());
 		let post = res.get({plain: true});
 		instance.model('user').findOne().then(async (user: s.Instance<any>) => {
 			let author = new User(username, user.get('url'));
 			post.author = author.toString();
 			try {
-				post.comments = await comments.count(post.creationTs, username);
-				post.reactions = await reactions.count(post.creationTs, username);
+				post.comments = await comments.count(post.creationTs);
+				post.reactions = await reactions.count(post.creationTs);
 			} catch(e) {
 				return reply(b.wrap(e));
 			}
@@ -189,6 +188,8 @@ export let responseSchema = j.object({
 
 function getOptions(queryParams) {
 	let options = <s.FindOptions>{};
+	// Set the order
+	options.order = [['creationTs', 'DESC']]
 	// Apply filters
 	if(queryParams.start) options.offset = queryParams.start;
 	if(queryParams.nb) options.limit = queryParams.nb;

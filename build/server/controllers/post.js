@@ -9,12 +9,10 @@ const comments = require("./comment");
 const reactions = require("./reaction");
 const utils = require("../utils/serverUtils");
 const postUtils = require("../utils/postUtils");
-const username = 'alice'; // TEMPORARY
-//const friend = 'francis@localhost:3005';
-const friend = 'bob@localhost:3001';
+const username_1 = require("../utils/username");
 // TODO: Retrieve posts from friends too
 function get(request, reply) {
-    let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
+    let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     let options = getOptions(request.query);
     // We cast directly as post, so we don't need getters and setters
     options.raw = true;
@@ -22,11 +20,11 @@ function get(request, reply) {
         instance.model('user').findOne().then(async (user) => {
             for (let i in posts) {
                 let post = posts[i];
-                let author = new users_1.User(username, user.get('url'));
+                let author = new users_1.User(username_1.username, user.get('url'));
                 post.author = author.toString();
                 try {
-                    post.comments = await comments.count(post.creationTs, username);
-                    post.reactions = await reactions.count(post.creationTs, username);
+                    post.comments = await comments.count(post.creationTs);
+                    post.reactions = await reactions.count(post.creationTs);
                 }
                 catch (e) {
                     return reply(b.wrap(e));
@@ -43,20 +41,22 @@ exports.get = get;
 async function getSingle(request, reply) {
     let instance;
     try {
-        let user = await utils.getUser(username);
-        instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
+        let user = await utils.getUser(username_1.username);
+        instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     }
     catch (e) {
         return reply(b.wrap(e));
     }
     instance.model('post').findById(request.params.timestamp).then((res) => {
+        if (!res)
+            return reply(b.notFound());
         let post = res.get({ plain: true });
         instance.model('user').findOne().then(async (user) => {
-            let author = new users_1.User(username, user.get('url'));
+            let author = new users_1.User(username_1.username, user.get('url'));
             post.author = author.toString();
             try {
-                post.comments = await comments.count(post.creationTs, username);
-                post.reactions = await reactions.count(post.creationTs, username);
+                post.comments = await comments.count(post.creationTs);
+                post.reactions = await reactions.count(post.creationTs);
             }
             catch (e) {
                 return reply(b.wrap(e));
@@ -77,11 +77,11 @@ function create(request, reply) {
         comments: 0,
         reactions: 0
     };
-    let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
+    let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     instance.model('post').create(post).then((res) => {
         let created = res.get({ plain: true });
         instance.model('user').findOne().then((user) => {
-            created.author = new users_1.User(username, user.get('url')).toString();
+            created.author = new users_1.User(username_1.username, user.get('url')).toString();
             reply(created).code(200);
         }).catch(reply);
     }).catch(reply);
@@ -91,7 +91,7 @@ async function del(request, reply) {
     let instance;
     let user;
     try {
-        user = await utils.getUser(username);
+        user = await utils.getUser(username_1.username);
         instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(user.username);
     }
     catch (e) {
@@ -188,6 +188,8 @@ exports.responseSchema = j.object({
 }).label('Posts response');
 function getOptions(queryParams) {
     let options = {};
+    // Set the order
+    options.order = [['creationTs', 'DESC']];
     // Apply filters
     if (queryParams.start)
         options.offset = queryParams.start;

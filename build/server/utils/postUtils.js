@@ -178,3 +178,5 @@ function processPostAnon(arg, request, username) {
         }
     });
 }
+function retrieveRemotePosts(source) {
+}

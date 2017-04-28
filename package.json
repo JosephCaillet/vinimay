@@ -35,6 +35,8 @@
   },
   "scripts": {
     "start": "node build/server/index.js",
+    "start:alice": "VINIMAY_USER=alice node build/server/index.js",
+    "start:bob": "VINIMAY_USER=bob node build/server/index.js",
     "watch:server": "tsc -p server -w",
     "watch:client": "cd client && ionic serve",
     "build:server": "tsc -p server",

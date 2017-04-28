@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const j = require("joi");
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
-const username = 'alice'; // TEMPORARY
+const username_1 = require("../utils/username");
 function get(request, reply) {
-    sequelizeWrapper_1.SequelizeWrapper.getInstance(username).model('profile').findOne({
+    sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username).model('profile').findOne({
         where: {
-            username: username,
+            username: username_1.username,
             url: 'localhost'
         }
     }).then((user) => {
