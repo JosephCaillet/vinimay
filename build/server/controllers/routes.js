@@ -91,6 +91,24 @@ module.exports = {
                 }
             }
         },
+        '/client/posts/{timestamp}': {
+            delete: {
+                description: 'Delete a single post',
+                notes: 'Delete a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#deletion).',
+                handler: posts.del,
+                validate: { params: {
+                        timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+                    } },
+                plugins: { 'hapi-swagger': { responses: {
+                            '204': {
+                                description: 'The deletion occured without any issue'
+                            },
+                            '401': {
+                                description: 'The user trying to perform the deletion isn\'t the post\' author'
+                            }
+                        } } }
+            }
+        },
         '/client/posts/{user}/{timestamp}': {
             get: {
                 description: 'Retrieve a single post',
@@ -107,23 +125,6 @@ module.exports = {
                             }
                         } } }
             },
-            delete: {
-                description: 'Delete a single post',
-                notes: 'Delete a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#deletion).',
-                handler: posts.del,
-                validate: { params: {
-                        user: Joi.string().email().required().description('The post\'s author, identified as `username@instance-domain.tld`'),
-                        timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
-                    } },
-                plugins: { 'hapi-swagger': { responses: {
-                            '204': {
-                                description: 'The deletion occured without any issue'
-                            },
-                            '401': {
-                                description: 'The user trying to perform the deletion isn\'t the post\' author'
-                            }
-                        } } }
-            }
         },
         '/client/friends': {
             get: {
