@@ -85,7 +85,7 @@ function processPostAuth(arg: Post | Post[], request: h.Request, username: strin
 		catch(e) { return ko(e) }
 		let url = user + request.path;
 		let token = friendInstance.get('signature_token');
-		let params = utils.mergeObjects(request.query, request.params);
+		let params = Object.assign(request.query, request.params);
 		let signature = utils.computeSignature(request.method, url, params, token);
 		if(!utils.checkSignature(request.query.signature, signature)) {
 			ko(new VinimayError('WRONG_SIGNATURE'));
@@ -153,6 +153,21 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 	});
 }
 
-function retrieveRemotePosts(source: User) {
-	
+function getRequestUrl(domain: string, path: string, params: Object): string {
+	let url = domain + path
+	if(Object.keys(params).length) url += '?'
+	for(let key in params) {
+		url += key + '=' + params[key] + '&';
+	}
+	return url.substr(0, url.length-1);
+}
+
+export function retrieveRemotePosts(source: User, idtoken?: string, sigtoken?: string): Promise<Post[]> {
+	return new Promise<Post[]>((ok, ko) => {
+		let params = { idToken: idtoken }
+		let url = getRequestUrl(source.toString(), '/v1/server/post', params);
+		
+		console.log(url)
+		//request.get(source.toString() + '/v1/server/posts')
+	})
 }

@@ -32,16 +32,28 @@ export function get(request: h.Request, reply: h.IReply) {
 				let author = new User(username, user.get('url'));
 				post.author = author.toString();
 				try {
-					post.comments = await comments.count(post.creationTs,);
+					post.comments = await comments.count(post.creationTs);
 					post.reactions = await reactions.count(post.creationTs);
 				} catch(e) {
 					return reply(b.wrap(e));
 				}
 			}
-			reply({
-				authenticated: true, // Temporary hardcoded value
-				posts: posts
-			});
+			instance.model('friend').findAll({ where: {
+				$or: [
+					{status: Status[Status.accepted]},
+					{status: Status[Status.following]}
+				]
+			}}).then((friends: s.Instance<any>[]) => {
+				for(let i in friends) {
+					let friend = new User(friends[i].get('username'), friends[i].get('url'));
+					postUtils.retrieveRemotePosts(friend, friends[i].get('id_token'), friends[i].get('id_token'))
+					.then()
+				}
+				reply({
+					authenticated: true, // Temporary hardcoded value
+					posts: posts
+				});
+			}).catch(reply);
 		}).catch(reply);
 	}).catch(reply);
 }
