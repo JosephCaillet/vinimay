@@ -51,11 +51,3 @@ export function computeSignature(method: string, url: string, parameters, token:
 export function checkSignature(received: string, computed: string): boolean {
 	return !computed.localeCompare(received);
 }
-
-export function mergeObjects(original, toBeMerged) {
-	for(let p in original) {
-		toBeMerged[p] = original[p];
-	}
-	
-	return toBeMerged;
-}

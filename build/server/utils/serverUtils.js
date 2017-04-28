@@ -44,10 +44,3 @@ function checkSignature(received, computed) {
     return !computed.localeCompare(received);
 }
 exports.checkSignature = checkSignature;
-function mergeObjects(original, toBeMerged) {
-    for (let p in original) {
-        toBeMerged[p] = original[p];
-    }
-    return toBeMerged;
-}
-exports.mergeObjects = mergeObjects;

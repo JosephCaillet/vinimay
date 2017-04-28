@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const j = require("joi");
 const b = require("boom");
 const users_1 = require("../models/users");
+const friends_1 = require("../models/friends");
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
 const vinimayError_1 = require("../utils/vinimayError");
 const comments = require("./comment");
@@ -30,10 +31,22 @@ function get(request, reply) {
                     return reply(b.wrap(e));
                 }
             }
-            reply({
-                authenticated: true,
-                posts: posts
-            });
+            instance.model('friend').findAll({ where: {
+                    $or: [
+                        { status: friends_1.Status[friends_1.Status.accepted] },
+                        { status: friends_1.Status[friends_1.Status.following] }
+                    ]
+                } }).then((friends) => {
+                for (let i in friends) {
+                    let friend = new users_1.User(friends[i].get('username'), friends[i].get('url'));
+                    postUtils.retrieveRemotePosts(friend, friends[i].get('id_token'), friends[i].get('id_token'))
+                        .then();
+                }
+                reply({
+                    authenticated: true,
+                    posts: posts
+                });
+            }).catch(reply);
         }).catch(reply);
     }).catch(reply);
 }
