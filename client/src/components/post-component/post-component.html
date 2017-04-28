@@ -1,11 +1,59 @@
 <!-- Generated template for the PostComponent component -->
 <ion-card>
-	<ion-card-header>
-		<ion-card-title>
-			{{ post.author.split('@')[0] }}<i>@{{ post.author.split('@')[1] }}</i>
-		</ion-card-title>
+	<ion-card-header [ngSwitch]="post.privacy">
+		<ion-row>
+			<ion-col col-11>
+				<ion-card-title no-margin no-padding>
+					{{ post.author.split('@')[0] }}<i>@{{ post.author.split('@')[1] }}</i>
+				</ion-card-title>
+			</ion-col>
+			<ion-col col-1>
+				<span *ngSwitchCase="PrivacyEnum.Public">
+					<ion-icon padding-right name="globe"></ion-icon>
+				</span>
+				<span *ngSwitchCase="PrivacyEnum.Friends">
+					<ion-icon padding-right name="people"></ion-icon>
+				</span>
+				<span *ngSwitchCase="PrivacyEnum.Private">
+					<ion-icon padding-right name="lock"></ion-icon>
+				</span>
+			</ion-col>
+		</ion-row>
 	</ion-card-header>
 	<ion-card-content>
-		{{post.author}}
+		<ion-row>
+			{{post.content}}
+		</ion-row>
+		<ion-row>
+			<ion-col center text-center>
+				<button ion-button icon-left clear small>
+				<ion-icon name="thumbs-up"></ion-icon>
+				<div>{{ post.reactions }} {{ post.reactions == 1 ? ('p.reaction' | translate) : ('p.reactions' | translate) }}</div>
+			</button>
+			</ion-col>
+			<ion-col center text-center>
+				<button ion-button icon-left clear small>
+				<ion-icon name="text"></ion-icon>
+				<div>{{ post.comments }} {{ post.comments == 1 ? ('p.comment' | translate) : ('p.comments' | translate) }}</div>
+			</button>
+			</ion-col>
+
+			<ion-col center text-center col-12 col-sm-3>
+				<ion-note>
+					<ion-icon name="calendar">&nbsp;&nbsp;</ion-icon>
+					<!--todo: replace non breakable space with css-->
+					{{ creationDate }}
+				</ion-note>
+			</ion-col>
+
+			<ion-col center text-center col-12 col-sm-3>
+				<ion-note>
+					<div *ngIf="editionDate">
+						<ion-icon name="create">&nbsp;&nbsp;</ion-icon>
+						{{ editionDate }}
+					</div>
+				</ion-note>
+			</ion-col>
+		</ion-row>
 	</ion-card-content>
 </ion-card>

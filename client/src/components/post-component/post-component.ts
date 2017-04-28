@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Post } from "../../providers/apiClient/index";
+import { TranslateService } from "@ngx-translate/core";
+import dateFormatter from "../../utils/dateFormater";
 
 /**
  * Generated class for the PostComponent component.
@@ -14,9 +16,19 @@ import { Post } from "../../providers/apiClient/index";
 export class PostComponent {
 
   @Input() post: Post
+	PrivacyEnum = Post.PrivacyEnum
+	creationDate: string
+	editionDate: string
 
-  constructor() {
+  constructor(public tr: TranslateService) {
     console.log('Hello PostComponent Component');
   }
+
+	ngOnInit() {
+		this.creationDate = dateFormatter(this.post.creationTs, this.tr,)
+		if(this.post.creationTs != this.post.lastEditTs) {
+			this.editionDate = dateFormatter(this.post.lastEditTs, this.tr)
+		}
+	}
 
 }

@@ -17,14 +17,10 @@ import { User } from '../../providers/apiClient/model/user';
 })
 export class MePage {
 
-	public user: User = {username: '', url : '', description: ''}
+	public user: User
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, private api: V1Service) {
-		api.getV1ClientMe() .subscribe((data) => {
-			this.user = data
-		}, (err) => {
-			console.error(err)
-		})
+  constructor(public navCtrl: NavController, public navParams: NavParams,private api: V1Service) {
+		this.user = navParams.data
   }
 
 }

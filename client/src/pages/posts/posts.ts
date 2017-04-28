@@ -1,7 +1,7 @@
 import { V1Service } from '../../providers/apiClient/api/v1.service';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
-import { PostsArray, Post } from "../../providers/apiClient/index";
+import { PostsArray, Post, User } from "../../providers/apiClient/index";
 import { PostModal } from "../../components/post-modal/post-modal";
 
 /**
@@ -12,58 +12,37 @@ import { PostModal } from "../../components/post-modal/post-modal";
  */
 @IonicPage()
 @Component({
-  selector: 'page-posts',
-  templateUrl: 'posts.html',
+	selector: 'page-posts',
+	templateUrl: 'posts.html',
 })
 export class PostsPage {
 
-	posts: PostsArray = [
-		{
-			"author": "titi@toto.fr",
-			"creationTs": 5,
-			"lastEditTs": 6,
-			"privacy": Post.PrivacyEnum.Public,
-			"content": "Oh un cyclamen!",
-			"comments": 0,
-			"reactions": 0
-		},
-		{
-			"author": "tutu@tdvrrfoto.fr",
-			"creationTs": 8,
-			"lastEditTs": 8,
-			"privacy": Post.PrivacyEnum.Private,
-			"content": "This is a secret... 300 rupies... pala pa paa !",
-			"comments": 5,
-			"reactions": 0
-		},
-		{
-			"author": "tigrgrgrgegti@toto.fr",
-			"creationTs": 8000,
-			"lastEditTs": 9000,
-			"privacy": Post.PrivacyEnum.Friends,
-			"content": "Oh un cyclamen!",
-			"comments": 0,
-			"reactions": 9
-		}
-	]
+	user: User
+	posts: PostsArray
 
-  constructor(
+	constructor(
 		public navCtrl: NavController, public navParams: NavParams,
 		public api: V1Service, public modCtrl: ModalController
 	) {
 		api.getV1ClientPosts().subscribe((data) => {
-			console.log(data)
+			this.posts = data.posts
 		}, (err) => {
 			console.error(err)
 		})
-  }
+		this.user = navParams.data
+	}
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad Posts');
-  }
+	ionViewDidLoad() {
+		console.log('ionViewDidLoad Posts');
+	}
 
 	createPost() {
 		let modal = this.modCtrl.create(PostModal, null, { showBackdrop: false, enableBackdropDismiss: false })
+		modal.onDidDismiss((post) => {
+			if (post) {
+				this.posts.splice(0, 0, post)
+			}
+		})
 		modal.present()
 	}
 

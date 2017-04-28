@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { PostInput } from "../../providers/apiClient/index";
+import { PostInput, V1Service } from "../../providers/apiClient/index";
 import { FormGroup, FormControl, Validators } from "@angular/forms";
 import { ViewController } from "ionic-angular";
 import { TranslateService } from "@ngx-translate/core";
@@ -20,10 +20,8 @@ export class PostModal {
 	PrivacyEnum = PostInput.PrivacyEnum
 	privacyLevels: Array<{ value: PostInput.PrivacyEnum, text: string }>
 	postForm: FormGroup
-	log = console.log
 
-	constructor(private viewCtrl: ViewController, public tr: TranslateService) {
-		console.log("val added: " +PostInput.PrivacyEnum[PostInput.PrivacyEnum.Friends].toLowerCase())
+	constructor(private viewCtrl: ViewController, public tr: TranslateService, private api: V1Service) {
 		this.postForm = new FormGroup({
 			"privacy": new FormControl(PostInput.PrivacyEnum[PostInput.PrivacyEnum.Friends].toLowerCase(), Validators.required),
 			"content": new FormControl('', Validators.required)
@@ -39,11 +37,15 @@ export class PostModal {
 		this.contentInput.setFocus()
 	}
 
-	dismiss(cancel: boolean) {
-		if (cancel) {
-			this.viewCtrl.dismiss(false);
+	dismiss(postPosted: boolean) {
+		if (postPosted) {
+			this.api.postV1ClientPosts(this.postForm.value).subscribe((post) => {
+				this.viewCtrl.dismiss(post)
+			}, (err) => {
+				console.error(err)
+			})
 		} else {
-			this.viewCtrl.dismiss()
+			this.viewCtrl.dismiss(null);
 		}
 	}
 }

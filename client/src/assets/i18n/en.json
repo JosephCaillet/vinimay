@@ -8,6 +8,10 @@
 	"p": {
 		"title": "Posts",
 		"creation": "Create post",
+		"reaction": "Like",
+		"reactions": "Likes",
+		"comment": "Comment",
+		"comments": "Comments",
 		"privacy": {
 			"me": "Me",
 			"friends": "Friends",
