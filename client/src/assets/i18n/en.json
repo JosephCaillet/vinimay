@@ -8,16 +8,28 @@
 	"p": {
 		"title": "Posts",
 		"creation": "Create post",
+		"edit": "Edit",
+		"delete": "Delete",
+		"reaction": "Like",
+		"reactions": "Likes",
+		"comment": "Comment",
+		"comments": "Comments",
 		"privacy": {
 			"me": "Me",
 			"friends": "Friends",
 			"public": "Public"
 		},
 		"modal": {
-			"title": "Post creation",
-			"privacy": "Privacy",
-			"placeholder": "Say something nice here",
-			"submit_post": "Post"
+			"create" :{
+				"title": "Post creation",
+				"privacy": "Privacy",
+				"placeholder": "Say something nice here",
+				"submit_post": "Post"
+			},
+			"delete": {
+				"title": "Post deletion",
+				"message": "Delelt this post?"
+			}
 		}
 	},
 	"f": {

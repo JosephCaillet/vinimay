@@ -49,14 +49,15 @@ export class FriendsPage {
 	cancelSentRequest(friend: FriendSent) {
 		let alert = this.alertCtrl.create({
 			title: this.tr.instant('f.sent.modal.cancel_title'),
-			message: this.tr.instant('f.sent.modal.cancel_message', {user: friend.user}),
+			message: this.tr.instant('f.sent.modal.cancel_message', { user: friend.user }),
 			buttons: [
 				{
 					text: this.tr.instant('global.yes'),
-					role: 'cancel'
+					handler: () => {}
 				},
 				{
 					text: this.tr.instant('global.no'),
+					role: 'cancel',
 					handler: () => {}
 				}
 			]
@@ -82,7 +83,7 @@ export class FriendsPage {
 	declineFriendRequest(friend: Friend) {
 		let alert = this.alertCtrl.create({
 			title: this.tr.instant('f.received.modal.decline_title'),
-			message: this.tr.instant('f.received.modal.decline_message', {user: friend.user}),
+			message: this.tr.instant('f.received.modal.decline_message', { user: friend.user }),
 			buttons: [
 				{
 					text: this.tr.instant('global.yes'),
@@ -100,7 +101,7 @@ export class FriendsPage {
 	removeFriend(friend: Friend) {
 		let alert = this.alertCtrl.create({
 			title: this.tr.instant('f.friend.modal.remove_title'),
-			message: this.tr.instant('f.friend.modal.remove_message', {user: friend.user}),
+			message: this.tr.instant('f.friend.modal.remove_message', { user: friend.user }),
 			buttons: [
 				{
 					text: this.tr.instant('global.yes'),
