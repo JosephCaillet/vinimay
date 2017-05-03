@@ -4,6 +4,7 @@ import * as j from 'joi';
 
 // Import the models
 import {Friend, OutgoingRequests, Status, Response} from '../models/friends';
+import {User} from '../models/users'
 
 // Import the DB wrapper
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
@@ -23,7 +24,7 @@ export function get(request: h.Request, reply: h.IReply) {
 		for(let i in users) {
 			let user = users[i];
 			let status: string = user.get('status');
-			let username: string = user.get('username') + '@' + user.get('url');
+			let username: string = new User(user.get('username'), user.get('url')).toString();
 			// Ugly index so TypeScript doesn't yell at us
 			let description: string = user['profile'].get('description');
 			// If a friend request isn't of one of these 5 values, it will

@@ -1,11 +1,15 @@
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
 (async () => {
-	try {
-		let name = await SequelizeWrapper.syncModels('alice', {force: true});
-		console.log('Database', name, 'synchronised');
-		process.exit(0);
-	} catch(e) {
-		throw e;
+	let users = process.argv.slice(2, process.argv.length);
+	for(let i in users) {
+		let user = users[i];
+		try {
+			let name = await SequelizeWrapper.syncModels(user, {force: true});
+			console.log('Database', name, 'synchronised');
+			process.exit(0);
+		} catch(e) {
+			throw e;
+		}
 	}
 })();
