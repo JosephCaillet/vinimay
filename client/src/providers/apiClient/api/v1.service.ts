@@ -124,14 +124,12 @@ export class V1Service {
 
     /**
      * Retrieve posts
-     * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
-     * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
+     * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
+     * @param from Most recent timestamp
      * @param nb Number of posts to retrieve
-     * @param from Most recent timestamp for a time frame retrieval
-     * @param to Oldest for a time frame retrieval
      */
-    public getV1ClientPosts(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<PostsResponse> {
-        return this.getV1ClientPostsWithHttpInfo(start, nb, from, to, extraHttpRequestParams)
+    public getV1ClientPosts(from?: number, nb?: number, extraHttpRequestParams?: any): Observable<PostsResponse> {
+        return this.getV1ClientPostsWithHttpInfo(from, nb, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -175,16 +173,14 @@ export class V1Service {
 
     /**
      * Retrieve posts
-     * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
-     * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
-     * @param nb Number of posts to retrieve
+     * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
      * @param from Most recent timestamp for a time frame retrieval
-     * @param to Oldest for a time frame retrieval
+     * @param nb Number of posts to retrieve
      * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
      * @param signature 
      */
-    public getV1ServerPosts(start?: number, nb?: number, from?: number, to?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<PostsResponse> {
-        return this.getV1ServerPostsWithHttpInfo(start, nb, from, to, idToken, signature, extraHttpRequestParams)
+    public getV1ServerPosts(from?: number, nb?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<PostsResponse> {
+        return this.getV1ServerPostsWithHttpInfo(from, nb, idToken, signature, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -376,32 +372,22 @@ export class V1Service {
 
     /**
      * Retrieve posts
-     * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
-     * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
+     * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
+     * @param from Most recent timestamp
      * @param nb Number of posts to retrieve
-     * @param from Most recent timestamp for a time frame retrieval
-     * @param to Oldest for a time frame retrieval
      */
-    public getV1ClientPostsWithHttpInfo(start?: number, nb?: number, from?: number, to?: number, extraHttpRequestParams?: any): Observable<Response> {
+    public getV1ClientPostsWithHttpInfo(from?: number, nb?: number, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/v1/client/posts';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
-        if (start !== undefined) {
-            queryParameters.set('start', <any>start);
-        }
-
-        if (nb !== undefined) {
-            queryParameters.set('nb', <any>nb);
-        }
-
         if (from !== undefined) {
             queryParameters.set('from', <any>from);
         }
 
-        if (to !== undefined) {
-            queryParameters.set('to', <any>to);
+        if (nb !== undefined) {
+            queryParameters.set('nb', <any>nb);
         }
 
 
@@ -501,34 +487,24 @@ export class V1Service {
 
     /**
      * Retrieve posts
-     * Retrieve all posts or using filters. Use either with both &#x60;start&#x60; and &#x60;nb&#x60; parameters, or both &#x60;from&#x60; and &#x60;to&#x60; parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
-     * @param start Offset to start the retrieval. For example, &#x60;start&#x3D;20&#x60; will retrieve all posts from the 20th most recent one, in anti-chronological order.
-     * @param nb Number of posts to retrieve
+     * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
      * @param from Most recent timestamp for a time frame retrieval
-     * @param to Oldest for a time frame retrieval
+     * @param nb Number of posts to retrieve
      * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
      * @param signature 
      */
-    public getV1ServerPostsWithHttpInfo(start?: number, nb?: number, from?: number, to?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
+    public getV1ServerPostsWithHttpInfo(from?: number, nb?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/v1/server/posts';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
-        if (start !== undefined) {
-            queryParameters.set('start', <any>start);
-        }
-
-        if (nb !== undefined) {
-            queryParameters.set('nb', <any>nb);
-        }
-
         if (from !== undefined) {
             queryParameters.set('from', <any>from);
         }
 
-        if (to !== undefined) {
-            queryParameters.set('to', <any>to);
+        if (nb !== undefined) {
+            queryParameters.set('nb', <any>nb);
         }
 
         if (idToken !== undefined) {

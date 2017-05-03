@@ -49,13 +49,11 @@ module.exports = {
         '/client/posts': {
             get: {
                 description: 'Retrieve posts',
-                notes: 'Retrieve all posts or using filters. Use either with both `start` and `nb` parameters, or both `from` and `to` parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).',
+                notes: 'Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).',
                 handler: posts.get,
                 validate: { query: {
-                        start: Joi.number().optional().min(1).description('Offset to start the retrieval. For example, `start=20` will retrieve all posts from the 20th most recent one, in anti-chronological order.'),
-                        nb: Joi.number().optional().min(1).description('Number of posts to retrieve'),
-                        from: Joi.number().optional().min(1).description('Most recent timestamp for a time frame retrieval'),
-                        to: Joi.number().optional().min(1).description('Oldest for a time frame retrieval'),
+                        from: Joi.number().optional().min(1).description('Most recent timestamp'),
+                        nb: Joi.number().optional().min(1).description('Number of posts to retrieve')
                     } },
                 plugins: {
                     'hapi-swagger': {
@@ -146,13 +144,11 @@ module.exports = {
         '/server/posts': {
             get: {
                 description: 'Retrieve posts',
-                notes: 'Retrieve all posts or using filters. Use either with both `start` and `nb` parameters, or both `from` and `to` parameters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).',
+                notes: 'Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).',
                 handler: posts.serverGet,
                 validate: { query: {
-                        start: Joi.number().min(1).description('Offset to start the retrieval. For example, `start=20` will retrieve all posts from the 20th most recent one, in anti-chronological order.'),
-                        nb: Joi.number().min(1).description('Number of posts to retrieve'),
                         from: Joi.number().min(1).description('Most recent timestamp for a time frame retrieval'),
-                        to: Joi.number().min(1).description('Oldest for a time frame retrieval'),
+                        nb: Joi.number().min(1).description('Number of posts to retrieve'),
                         idToken: Joi.string().description('Identification token bound to a friend. If not provided, only public posts will be sent'),
                         signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
                     } },

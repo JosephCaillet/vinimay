@@ -36,12 +36,20 @@ function get(request, reply) {
                         { status: friends_1.Status[friends_1.Status.accepted] },
                         { status: friends_1.Status[friends_1.Status.following] }
                     ]
-                } }).then((friends) => {
+                } }).then(async (friends) => {
                 for (let i in friends) {
                     let friend = new users_1.User(friends[i].get('username'), friends[i].get('url'));
-                    postUtils.retrieveRemotePosts(friend, friends[i].get('id_token'), friends[i].get('id_token'))
-                        .then();
+                    // We need a copy of the object, and not a referece to it
+                    let params = Object.assign({}, request.query);
+                    let fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
+                    for (let j in fPosts) {
+                        fPosts[j].author = friend.toString();
+                    }
+                    posts = posts.concat(fPosts);
                 }
+                posts.sort((a, b) => b.creationTs - a.creationTs);
+                // We'll have more posts than requested, so we truncate the array
+                posts.slice(0, request.query.nb);
                 reply({
                     authenticated: true,
                     posts: posts

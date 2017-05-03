@@ -20,11 +20,11 @@ module.exports = {
     },
     id_token: {
         type: s.TEXT,
-        allowNull: false
+        allowNull: true
     },
     signature_token: {
         type: s.TEXT,
-        allowNull: false
+        allowNull: true
     },
     status: {
         type: s.ENUM('pending', 'declined', 'incoming', 'accepted', 'following'),

@@ -1,7 +1,10 @@
 import * as h from 'hapi';
 import * as s from 'sequelize';
 
-import * as request from 'request';
+import * as request from 'request-promise-native';
+
+import * as comments from '../controllers/comment';
+import * as reactions from '../controllers/reaction';
 
 import * as utils from './serverUtils';
 import {SequelizeWrapper} from './sequelizeWrapper';
@@ -78,44 +81,39 @@ function processPostAuth(arg: Post | Post[], request: h.Request, username: strin
 				id_token: request.query.idToken,
 				status: Status[Status.accepted]
 			}});
-		} catch(e) { return ko(e) }
-		if(!friendInstance) return ko(new VinimayError('UNKNOWN_TOKEN'));
-		let user: string;
-		try { user = (await utils.getUser(username)).toString(); }
-		catch(e) { return ko(e) }
-		let url = user + request.path;
-		let token = friendInstance.get('signature_token');
-		let params = Object.assign(request.query, request.params);
-		let signature = utils.computeSignature(request.method, url, params, token);
-		if(!utils.checkSignature(request.query.signature, signature)) {
-			ko(new VinimayError('WRONG_SIGNATURE'));
-		}
-		let friend = new User(friendInstance.get('username'), friendInstance.get('url'));
-		if(arg instanceof Array) {
-			let res: Array<Post> = new Array<Post>();
-			for(let i in arg) {
-				let post = arg[i];
-				post.author = user.toString();
-				if(await canReadPost(username, Privacy[post.privacy], friend)) {
-					res.push(post);
-				}
+			if(!friendInstance) return ko(new VinimayError('UNKNOWN_TOKEN'));
+			let user: User = await utils.getUser(username);
+			let url = user + request.path;
+			let token = friendInstance.get('signature_token');
+			let params = Object.assign(request.query, request.params);
+			let signature = utils.computeSignature(request.method, url, params, token);
+			if(!utils.checkSignature(request.query.signature, signature)) {
+				ko(new VinimayError('WRONG_SIGNATURE'));
 			}
-			ok(res);
-		} else {
-			let post = arg;
-			let author: User;
-			try { post.author = (await utils.getUser(username)).toString() }
-			catch(e) { return ko(e) }
-			try {
+			let friend = new User(friendInstance.get('username'), friendInstance.get('url'));
+			if(arg instanceof Array) {
+				let res: Array<Post> = new Array<Post>();
+				for(let i in arg) {
+					let post = arg[i];
+					post.author = user.toString();
+					post.comments = await comments.count(post.creationTs);
+					post.reactions = await reactions.count(post.creationTs);
+					if(await canReadPost(username, Privacy[post.privacy], friend)) {
+						res.push(post);
+					}
+				}
+				ok(res);
+			} else {
+				let post = arg;
+				let author: User;
+				post.author = (await utils.getUser(username)).toString();
 				if(await canReadPost(username, Privacy[post.privacy]), friend) {
 					ok(post);
 				} else {
 					ok();
 				}
-			} catch(e) {
-				ko(e);
 			}
-		}
+		} catch(e) { return ko(e) }
 	});
 }
 
@@ -153,21 +151,33 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 	});
 }
 
-function getRequestUrl(domain: string, path: string, params: Object): string {
-	let url = domain + path
-	if(Object.keys(params).length) url += '?'
+function getRequestUrl(method: string, user: User, path: string, params: any, sigtoken?: string): string {
+	let url = user + path;
+	let hasParams: boolean = !!(Object.keys(params).length || (params.idToken && sigtoken));
+	if(hasParams) url += '?'
 	for(let key in params) {
 		url += key + '=' + params[key] + '&';
 	}
-	return url.substr(0, url.length-1);
+	if(params.idToken && sigtoken) {
+		url += 'signature=' + utils.computeSignature(method, user + path, params, sigtoken);
+	} else if(hasParams) {
+		url = url.substr(0, url.length-1);
+	}
+	return url;
 }
 
-export function retrieveRemotePosts(source: User, idtoken?: string, sigtoken?: string): Promise<Post[]> {
+export function retrieveRemotePosts(source: User, params: any, idtoken?: string, sigtoken?: string): Promise<Post[]> {
 	return new Promise<Post[]>((ok, ko) => {
-		let params = { idToken: idtoken }
-		let url = getRequestUrl(source.toString(), '/v1/server/post', params);
-		
-		console.log(url)
-		//request.get(source.toString() + '/v1/server/posts')
+		if(idtoken) params.idToken = idtoken;
+		let url = getRequestUrl('GET', source, '/v1/server/posts', params, sigtoken);
+
+		// We'll use HTTP only for localhost
+		if(url.indexOf('localhost') < 0) url = 'https://' + url;
+		else url = 'http://' + url
+
+		request.get(url)
+		.then((response) => {
+			ok(JSON.parse(response));
+		}).catch(ko);
 	})
 }

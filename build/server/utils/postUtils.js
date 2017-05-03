@@ -1,5 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const request = require("request-promise-native");
+const comments = require("../controllers/comment");
+const reactions = require("../controllers/reaction");
 const utils = require("./serverUtils");
 const sequelizeWrapper_1 = require("./sequelizeWrapper");
 const users_1 = require("../models/users");
@@ -76,48 +79,34 @@ function processPostAuth(arg, request, username) {
                     id_token: request.query.idToken,
                     status: friends_1.Status[friends_1.Status.accepted]
                 } });
-        }
-        catch (e) {
-            return ko(e);
-        }
-        if (!friendInstance)
-            return ko(new vinimayError_1.VinimayError('UNKNOWN_TOKEN'));
-        let user;
-        try {
-            user = (await utils.getUser(username)).toString();
-        }
-        catch (e) {
-            return ko(e);
-        }
-        let url = user + request.path;
-        let token = friendInstance.get('signature_token');
-        let params = Object.assign(request.query, request.params);
-        let signature = utils.computeSignature(request.method, url, params, token);
-        if (!utils.checkSignature(request.query.signature, signature)) {
-            ko(new vinimayError_1.VinimayError('WRONG_SIGNATURE'));
-        }
-        let friend = new users_1.User(friendInstance.get('username'), friendInstance.get('url'));
-        if (arg instanceof Array) {
-            let res = new Array();
-            for (let i in arg) {
-                let post = arg[i];
-                post.author = user.toString();
-                if (await canReadPost(username, posts_1.Privacy[post.privacy], friend)) {
-                    res.push(post);
+            if (!friendInstance)
+                return ko(new vinimayError_1.VinimayError('UNKNOWN_TOKEN'));
+            let user = await utils.getUser(username);
+            let url = user + request.path;
+            let token = friendInstance.get('signature_token');
+            let params = Object.assign(request.query, request.params);
+            let signature = utils.computeSignature(request.method, url, params, token);
+            if (!utils.checkSignature(request.query.signature, signature)) {
+                ko(new vinimayError_1.VinimayError('WRONG_SIGNATURE'));
+            }
+            let friend = new users_1.User(friendInstance.get('username'), friendInstance.get('url'));
+            if (arg instanceof Array) {
+                let res = new Array();
+                for (let i in arg) {
+                    let post = arg[i];
+                    post.author = user.toString();
+                    post.comments = await comments.count(post.creationTs);
+                    post.reactions = await reactions.count(post.creationTs);
+                    if (await canReadPost(username, posts_1.Privacy[post.privacy], friend)) {
+                        res.push(post);
+                    }
                 }
+                ok(res);
             }
-            ok(res);
-        }
-        else {
-            let post = arg;
-            let author;
-            try {
+            else {
+                let post = arg;
+                let author;
                 post.author = (await utils.getUser(username)).toString();
-            }
-            catch (e) {
-                return ko(e);
-            }
-            try {
                 if (await canReadPost(username, posts_1.Privacy[post.privacy]), friend) {
                     ok(post);
                 }
@@ -125,9 +114,9 @@ function processPostAuth(arg, request, username) {
                     ok();
                 }
             }
-            catch (e) {
-                ko(e);
-            }
+        }
+        catch (e) {
+            return ko(e);
         }
     });
 }
@@ -178,21 +167,36 @@ function processPostAnon(arg, request, username) {
         }
     });
 }
-function getRequestUrl(domain, path, params) {
-    let url = domain + path;
-    if (Object.keys(params).length)
+function getRequestUrl(method, user, path, params, sigtoken) {
+    let url = user + path;
+    let hasParams = !!(Object.keys(params).length || (params.idToken && sigtoken));
+    if (hasParams)
         url += '?';
     for (let key in params) {
         url += key + '=' + params[key] + '&';
     }
-    return url.substr(0, url.length - 1);
+    if (params.idToken && sigtoken) {
+        url += 'signature=' + utils.computeSignature(method, user + path, params, sigtoken);
+    }
+    else if (hasParams) {
+        url = url.substr(0, url.length - 1);
+    }
+    return url;
 }
-function retrieveRemotePosts(source, idtoken, sigtoken) {
+function retrieveRemotePosts(source, params, idtoken, sigtoken) {
     return new Promise((ok, ko) => {
-        let params = { idToken: idtoken };
-        let url = getRequestUrl(source.toString(), '/v1/server/post', params);
-        console.log(url);
-        //request.get(source.toString() + '/v1/server/posts')
+        if (idtoken)
+            params.idToken = idtoken;
+        let url = getRequestUrl('GET', source, '/v1/server/posts', params, sigtoken);
+        // We'll use HTTP only for localhost
+        if (url.indexOf('localhost') < 0)
+            url = 'https://' + url;
+        else
+            url = 'http://' + url;
+        request.get(url)
+            .then((response) => {
+            ok(JSON.parse(response));
+        }).catch(ko);
     });
 }
 exports.retrieveRemotePosts = retrieveRemotePosts;

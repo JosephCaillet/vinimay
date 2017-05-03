@@ -19,11 +19,11 @@ module.exports = <s.DefineAttributes>{
 	},
 	id_token: <s.DefineAttributeColumnOptions>{
 		type: s.TEXT,
-		allowNull: false
+		allowNull: true
 	},
 	signature_token: <s.DefineAttributeColumnOptions>{
 		type: s.TEXT,
-		allowNull: false
+		allowNull: true
 	},
 	status: <s.DefineAttributeColumnOptions>{
 		type: s.ENUM('pending', 'declined', 'incoming', 'accepted', 'following'),

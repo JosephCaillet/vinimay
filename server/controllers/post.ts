@@ -43,12 +43,20 @@ export function get(request: h.Request, reply: h.IReply) {
 					{status: Status[Status.accepted]},
 					{status: Status[Status.following]}
 				]
-			}}).then((friends: s.Instance<any>[]) => {
+			}}).then(async (friends: s.Instance<any>[]) => {
 				for(let i in friends) {
 					let friend = new User(friends[i].get('username'), friends[i].get('url'));
-					postUtils.retrieveRemotePosts(friend, friends[i].get('id_token'), friends[i].get('id_token'))
-					.then()
+					// We need a copy of the object, and not a referece to it
+					let params = Object.assign({}, request.query);
+					let fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
+					for(let j in fPosts) {
+						fPosts[j].author = friend.toString();
+					}
+					posts = posts.concat(fPosts);
 				}
+				posts.sort((a, b) => b.creationTs - a.creationTs);
+				// We'll have more posts than requested, so we truncate the array
+				posts.slice(0, request.query.nb);
 				reply({
 					authenticated: true, // Temporary hardcoded value
 					posts: posts
@@ -143,7 +151,6 @@ export function serverGet(request: h.Request, reply: h.IReply) {
 	let options = <s.FindOptions>getOptions(request.query);
 	// We cast directly as post, so we don't need getters and setters
 	options.raw = true;
-
 
 	instance.model('post').findAll(options).then(async (posts: Post[]) => {
 		let res: Post | Post[] | undefined;
