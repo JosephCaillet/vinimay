@@ -1,5 +1,5 @@
 INSERT INTO profile(username, description, url)
-VALUES('bob', 'Hello, I''m Bob', 'localhost');
+VALUES('bob', 'Hello, I''m Bob', 'localhost:3001');
 
 INSERT INTO user(username, url, password, salt)
 VALUES('bob', 'localhost:3001', 'hash', 'salt');
