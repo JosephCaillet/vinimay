@@ -56,7 +56,7 @@ export function get(request: h.Request, reply: h.IReply) {
 				}
 				posts.sort((a, b) => b.creationTs - a.creationTs);
 				// We'll have more posts than requested, so we truncate the array
-				posts.slice(0, request.query.nb);
+				posts = posts.slice(0, request.query.nb);
 				reply({
 					authenticated: true, // Temporary hardcoded value
 					posts: posts
