@@ -6,7 +6,7 @@ const path = require("path");
 const Sequelize = require('sequelize');
 // Wrapper to singleton-ise Sequelize
 class SequelizeWrapper {
-    static getInstance(name) {
+    static getInstance(name, force) {
         if (!this.instances) {
             this.instances = new Object();
         }
@@ -14,7 +14,7 @@ class SequelizeWrapper {
             let dbRoot = path.resolve('./db');
             let files = fs.readdirSync(dbRoot);
             files = files.filter(file => file.match(/\.db$/));
-            if (files.indexOf(name + '.db') < 0) {
+            if (files.indexOf(name + '.db') < 0 && !force) {
                 throw new Error('UNKNOWN_USER');
             }
             let instance = new Sequelize(name, '', '', {
@@ -56,7 +56,7 @@ class SequelizeWrapper {
     }
     // Will only be called by the sync script
     static syncModels(name, params) {
-        let instance = this.getInstance(name);
+        let instance = this.getInstance(name, true);
         return new Promise((ok, ko) => {
             instance.sync(params).then(() => {
                 this.sync = true;

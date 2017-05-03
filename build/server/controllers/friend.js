@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const j = require("joi");
 // Import the models
 const friends_1 = require("../models/friends");
+const users_1 = require("../models/users");
 // Import the DB wrapper
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
 const username_1 = require("../utils/username");
@@ -18,7 +19,7 @@ function get(request, reply) {
         for (let i in users) {
             let user = users[i];
             let status = user.get('status');
-            let username = user.get('username') + '@' + user.get('url');
+            let username = new users_1.User(user.get('username'), user.get('url')).toString();
             // Ugly index so TypeScript doesn't yell at us
             let description = user['profile'].get('description');
             // If a friend request isn't of one of these 5 values, it will

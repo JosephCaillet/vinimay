@@ -14,7 +14,7 @@ export class SequelizeWrapper {
 	private static instances: Instances;
 	private static sync: boolean = false;
 
-	public static getInstance(name: string): s.Sequelize {
+	public static getInstance(name: string, force?: boolean): s.Sequelize {
 		if(!this.instances) {
 			this.instances = new Object() as Instances;
 		}
@@ -23,7 +23,7 @@ export class SequelizeWrapper {
 			let files = fs.readdirSync(dbRoot);
 			files = files.filter(file => file.match(/\.db$/))
 
-			if(files.indexOf(name + '.db') < 0) {
+			if(files.indexOf(name + '.db') < 0 && !force) {
 				throw new Error('UNKNOWN_USER');
 			}
 
@@ -72,7 +72,7 @@ export class SequelizeWrapper {
 
 	// Will only be called by the sync script
 	public static syncModels(name: string, params?: s.SyncOptions): Promise<any> {
-		let instance = this.getInstance(name);
+		let instance = this.getInstance(name, true);
 		
 		return new Promise((ok, ko) => {
 			instance.sync(params).then(() => {
