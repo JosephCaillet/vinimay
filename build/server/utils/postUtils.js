@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const path = require("path");
 const request = require("request-promise-native");
 const comments = require("../controllers/comment");
 const reactions = require("../controllers/reaction");
@@ -9,6 +10,10 @@ const users_1 = require("../models/users");
 const posts_1 = require("../models/posts");
 const friends_1 = require("../models/friends");
 const vinimayError_1 = require("./vinimayError");
+const log = require('printit')({
+    date: true,
+    prefix: 'posts utils'
+});
 function processPost(arg, request, username) {
     return new Promise(async (ok, ko) => {
         let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
@@ -193,10 +198,39 @@ function retrieveRemotePosts(source, params, idtoken, sigtoken) {
             url = 'https://' + url;
         else
             url = 'http://' + url;
+        log.debug('Requesting GET ' + url);
         request.get(url)
             .then((response) => {
+            log.debug('Received ' + JSON.parse(response).length + ' posts from ' + source);
             ok(JSON.parse(response));
         }).catch(ko);
     });
 }
 exports.retrieveRemotePosts = retrieveRemotePosts;
+function retrieveRemotePost(source, timestamp, idtoken, sigtoken) {
+    return new Promise((ok, ko) => {
+        let params = {
+            user: source.toString(),
+            timestamp: timestamp
+        };
+        let reqPath = path.join('/v1/server/posts', timestamp.toString());
+        let url = source + reqPath;
+        if (idtoken && sigtoken) {
+            params.idToken = idtoken;
+            url += '?idToken=' + idtoken;
+            url += '&signature=' + utils.computeSignature('GET', url, params, sigtoken);
+        }
+        // We'll use HTTP only for localhost
+        if (url.indexOf('localhost') < 0)
+            url = 'https://' + url;
+        else
+            url = 'http://' + url;
+        log.debug('Requesting GET ' + url);
+        request.get(url)
+            .then((response) => {
+            log.debug('Received a post from ' + source);
+            ok(JSON.parse(response));
+        }).catch(ko);
+    });
+}
+exports.retrieveRemotePost = retrieveRemotePost;

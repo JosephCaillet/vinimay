@@ -113,17 +113,22 @@ module.exports = {
                 notes: 'Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieve-one-post).',
                 handler: posts.getSingle,
                 validate: { params: {
-                        user: Joi.string().email().required().description('The post\'s author, identified as `username@instance-domain.tld`'),
+                        user: Joi.string().regex(/.+@.+/).required().description('The post\'s author, identified as `username@instance-domain.tld`'),
                         timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
                     } },
                 plugins: { 'hapi-swagger': { responses: {
                             '200': {
                                 description: 'A list of posts with an information on authentication',
                                 schema: posts.postSchema
+                            }, '404': {
+                                description: 'The requested post cannot be found'
+                            }, '503': {
+                                description: 'The remote instance could not be reached'
                             }
                         } } }
             },
         },
+        '/client/posts/{user}/{timestamp}/comments': {},
         '/client/friends': {
             get: {
                 description: 'Retrieve all friend requests',
