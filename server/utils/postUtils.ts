@@ -1,6 +1,8 @@
 import * as h from 'hapi';
 import * as s from 'sequelize';
 
+import * as path from 'path';
+
 import * as request from 'request-promise-native';
 
 import * as comments from '../controllers/comment';
@@ -14,6 +16,11 @@ import {Post, Privacy} from '../models/posts';
 import {Status} from '../models/friends';
 
 import {VinimayError} from './vinimayError';
+
+const log = require('printit')({
+	date: true,
+	prefix: 'posts utils'
+});
 
 export function processPost(arg: Post | Post[], request: h.Request, username: string): Promise<Post | Post[] | undefined> {
 	return new Promise<Post | Post[] | undefined>(async (ok, ko) => {
@@ -175,8 +182,40 @@ export function retrieveRemotePosts(source: User, params: any, idtoken?: string,
 		if(url.indexOf('localhost') < 0) url = 'https://' + url;
 		else url = 'http://' + url
 
+		log.debug('Requesting GET ' + url);
+
 		request.get(url)
 		.then((response) => {
+			log.debug('Received ' + JSON.parse(response).length + ' posts from ' + source);
+			ok(JSON.parse(response));
+		}).catch(ko);
+	})
+}
+
+export function retrieveRemotePost(source: User, timestamp: any, idtoken?: string, sigtoken?: string): Promise<Post[]> {
+	return new Promise<Post[]>((ok, ko) => {
+		let params: any = {
+			user: source.toString(),
+			timestamp: timestamp
+		};
+		let reqPath = path.join('/v1/server/posts', timestamp.toString());
+		let url = source + reqPath;
+
+		if(idtoken && sigtoken) {
+			params.idToken = idtoken;
+			url += '?idToken=' + idtoken
+			url += '&signature=' + utils.computeSignature('GET', url, params, sigtoken);
+		}
+
+		// We'll use HTTP only for localhost
+		if(url.indexOf('localhost') < 0) url = 'https://' + url;
+		else url = 'http://' + url
+
+		log.debug('Requesting GET ' + url);
+
+		request.get(url)
+		.then((response) => {
+			log.debug('Received a post from ' + source);
 			ok(JSON.parse(response));
 		}).catch(ko);
 	})

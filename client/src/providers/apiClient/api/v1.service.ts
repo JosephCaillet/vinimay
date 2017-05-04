@@ -18,6 +18,9 @@ import { Response, ResponseContentType }                     from '@angular/http
 import { Observable }                                        from 'rxjs/Observable';
 import '../rxjs-operators';
 
+import { Comment } from '../model/comment';
+import { CommentInput } from '../model/commentInput';
+import { CommentsResponse } from '../model/commentsResponse';
 import { Friends } from '../model/friends';
 import { Post } from '../model/post';
 import { PostInput } from '../model/postInput';
@@ -157,6 +160,23 @@ export class V1Service {
     }
 
     /**
+     * Retrieve comments for a post
+     * Retrieve comments for a given post based on its user and timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-2).
+     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public getV1ClientPostsUserTimestampComments(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<CommentsResponse> {
+        return this.getV1ClientPostsUserTimestampCommentsWithHttpInfo(user, timestamp, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Ping
      * 
      */
@@ -231,6 +251,24 @@ export class V1Service {
      */
     public postV1ClientPosts(body?: PostInput, extraHttpRequestParams?: any): Observable<Post> {
         return this.postV1ClientPostsWithHttpInfo(body, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Create a new comment to a post
+     * Create a comment on a givent post. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation-1).
+     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
+     * @param timestamp The post&#39;s creation timestamp
+     * @param body 
+     */
+    public postV1ClientPostsUserTimestampComments(user: string, timestamp: number, body?: CommentInput, extraHttpRequestParams?: any): Observable<Comment> {
+        return this.postV1ClientPostsUserTimestampCommentsWithHttpInfo(user, timestamp, body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -455,6 +493,49 @@ export class V1Service {
     }
 
     /**
+     * Retrieve comments for a post
+     * Retrieve comments for a given post based on its user and timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-2).
+     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public getV1ClientPostsUserTimestampCommentsWithHttpInfo(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts/${user}/${timestamp}/comments'
+                    .replace('${' + 'user' + '}', String(user))
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling getV1ClientPostsUserTimestampComments.');
+        }
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling getV1ClientPostsUserTimestampComments.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
      * Ping
      * 
      */
@@ -629,6 +710,53 @@ export class V1Service {
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
 
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Create a new comment to a post
+     * Create a comment on a givent post. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation-1).
+     * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
+     * @param timestamp The post&#39;s creation timestamp
+     * @param body 
+     */
+    public postV1ClientPostsUserTimestampCommentsWithHttpInfo(user: string, timestamp: number, body?: CommentInput, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts/${user}/${timestamp}/comments'
+                    .replace('${' + 'user' + '}', String(user))
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling postV1ClientPostsUserTimestampComments.');
+        }
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling postV1ClientPostsUserTimestampComments.');
+        }
 
         // to determine the Accept header
         let produces: string[] = [

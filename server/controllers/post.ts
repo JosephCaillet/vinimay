@@ -50,6 +50,7 @@ export function get(request: h.Request, reply: h.IReply) {
 					{status: Status[Status.following]}
 				]
 			}}).then(async (friends: s.Instance<any>[]) => {
+				let failures: Array<string> = new Array<string>();
 				for(let i in friends) {
 					let friend = new User(friends[i].get('username'), friends[i].get('url'));
 					// We need a copy of the object, and not a referece to it
@@ -60,6 +61,7 @@ export function get(request: h.Request, reply: h.IReply) {
 					} catch(e) {
 						if(e instanceof r.RequestError) {
 							log.warn(e.error.code + ' when querying ' + friend);
+							failures.push(friend.toString());
 						} else if(e instanceof r.StatusCodeError && e.statusCode === 400) {
 							log.warn('Got a 400 error when querying ' + friend + '. This usually means the API was wrongly implemented either on the current instance or on the friend\'s.');
 						} else {
@@ -77,7 +79,8 @@ export function get(request: h.Request, reply: h.IReply) {
 				posts = posts.slice(0, request.query.nb);
 				reply({
 					authenticated: true, // Temporary hardcoded value
-					posts: posts
+					posts: posts,
+					failures: failures
 				});
 			}).catch(e => reply(b.wrap(e)));
 		}).catch(e => reply(b.wrap(e)));
@@ -94,20 +97,55 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 		return reply(b.wrap(e));
 	}
 
-	instance.model('post').findById(request.params.timestamp).then((res: s.Instance<Post>) => {
-		if(!res) return reply(b.notFound());
-		let post = res.get({plain: true});
-		instance.model('user').findOne().then(async (user: s.Instance<any>) => {
-			let author = new User(username, user.get('url'));
-			post.author = author.toString();
-			try {
-				post.comments = await comments.count(post.creationTs);
-				post.reactions = await reactions.count(post.creationTs);
-			} catch(e) {
-				return reply(b.wrap(e));
-			}
-			reply(post);
-		}).catch(e => reply(b.wrap(e)));
+	let author = new User(request.params.user);
+
+	instance.model('user').findOne().then((user: s.Instance<any>) => {
+		// Check if the post is local or not
+		if(!user.get('url').localeCompare(author.instance)) {
+			// We don't support multi-user instances yet
+			instance.model('post').findById(request.params.timestamp).then(async (res: s.Instance<Post>) => {
+				if(!res) return reply(b.notFound());
+				let post = res.get({plain: true});
+				post.author = author.toString();
+				try {
+					post.comments = await comments.count(post.creationTs);
+					post.reactions = await reactions.count(post.creationTs);
+				} catch(e) {
+					return reply(b.wrap(e));
+				}
+				reply(post);
+			}).catch(e => reply(b.wrap(e)));
+		} else {
+			instance.model('friend').findOne({ where: {
+				username: author.username,
+				url: author.instance
+			}}).then((friend: s.Instance<any>) => {
+				let idtoken, sigtoken;
+				// Set the token if the post author is known
+				// Note: if the author isn't a friend (following doesn't count),
+				// tokens will still be null/undefined
+				if(friend) {
+					idtoken = friend.get('id_token');
+					sigtoken = friend.get('signature_token');
+				}
+				// We want to retrieve only one post at a given timestamp
+				postUtils.retrieveRemotePost(author, request.params.timestamp, idtoken, sigtoken).then((posts: Post[]) => {
+					return reply(posts[0]); // We only have one element
+				}).catch(e => {
+					if(e instanceof r.RequestError) {
+						log.warn(e.error.code + ' when querying ' + friend);
+						return reply(b.serverUnavailable());
+					} else if(e instanceof r.StatusCodeError && e.statusCode === 400) {
+						log.warn('Got a 400 error when querying ' + friend + '. This usually means the API was wrongly implemented either on the current instance or on the friend\'s.');
+					} else if(e instanceof r.StatusCodeError && e.statusCode === 404) {
+						return reply(b.notFound());
+					} else {
+						log.error(e);
+						return reply(b.wrap(e));
+					}
+				});
+			}).catch(e => reply(b.wrap(e)));
+		}
 	}).catch(e => reply(b.wrap(e)));
 }
 
@@ -123,10 +161,17 @@ export function create(request: h.Request, reply: h.IReply) {
 		reactions: 0
 	};
 	let instance = SequelizeWrapper.getInstance(username);
-	instance.model('post').create(post).then((res: s.Instance<Post>) => {
+	instance.model('post').create(post).then(async (res: s.Instance<Post>) => {
 		let created = res.get({ plain: true });
-		instance.model('user').findOne().then((user: s.Instance<any>) => {
+		instance.model('user').findOne().then(async (user: s.Instance<any>) => {
 			created.author = new User(username, user.get('url')).toString();
+			try {
+				created.comments = await comments.count(created.creationTs);
+				created.reactions = await reactions.count(created.creationTs);
+			} catch(e) {
+				return reply(b.wrap(e));
+			}
+
 			reply(created).code(200);
 		}).catch(e => reply(b.wrap(e)));
 	}).catch(e => reply(b.wrap(e)));
@@ -195,6 +240,10 @@ export function serverGetSingle(request: h.Request, reply: h.IReply) {
 	instance.model('post').findById(request.params.timestamp, {
 		raw: true
 	}).then(async (post: Post) => {
+		// We don't want people to be able to locate existing protected posts,
+		// so we send the same error whether the post doesn't exist or the caller
+		// isn't authorised to display it
+		if(!post) return reply(b.notFound());
 		let res: Post | Post[] | undefined;
 		try { res = await postUtils.processPost(post, request, username); }
 		catch(e) {
@@ -204,14 +253,14 @@ export function serverGetSingle(request: h.Request, reply: h.IReply) {
 			return reply(b.wrap(e))
 		}
 		if(res) return reply(res);
-		else reply(b.unauthorized());
+		else reply(b.notFound());
 	}).catch(e => reply(b.wrap(e)));
 }
 
 export let postSchema = j.object({
 	"creationTs": j.number().min(1).required().description('Post creation timestamp'),
 	"lastEditTs": j.number().min(1).required().description('Last modification timestamp (equals to the creation timestamp if the post has never been edited)'),
-	"author": j.string().email().required().description('Post author (using the `username@instance-domain.tld` format)'),
+	"author": j.string().regex(/.+@.+/).required().description('Post author (using the `username@instance-domain.tld` format)'),
 	"content": j.string().required().description('Post content'),
 	"privacy": j.string().valid('public', 'private', 'friends').required().description('Post privacy setting (private, friends or public)'),
 	"comments": j.number().min(0).required().description('Number of comments on the post'),
