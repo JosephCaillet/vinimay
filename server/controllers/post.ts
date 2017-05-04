@@ -228,13 +228,11 @@ function getOptions(queryParams) {
 	// Set the order
 	options.order = [['creationTs', 'DESC']]
 	// Apply filters
-	if(queryParams.start) options.offset = queryParams.start;
 	if(queryParams.nb) options.limit = queryParams.nb;
 	// Filter by timestamp require a WHERE clause
-	if(queryParams.from || queryParams.to) {
+	if(queryParams.from) {
 		let timestamp = <s.WhereOptions>{};
 		if(queryParams.from) timestamp['$lte'] = queryParams.from;
-		if(queryParams.to) timestamp['$gte'] = queryParams.to;
 		options.where = { creationTs: timestamp };
 	}
 	
