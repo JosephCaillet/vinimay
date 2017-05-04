@@ -1,22 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const b = require("boom");
 const j = require("joi");
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
 const username_1 = require("../utils/username");
 function get(request, reply) {
-    sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username).model('profile').findOne({
-        where: {
-            username: username_1.username,
-            url: 'localhost'
-        }
+    let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
+    instance.model('user').findOne({
+        include: [{
+                model: instance.model('profile'),
+                attributes: ['description']
+            }]
     }).then((user) => {
         reply({
             username: user.get('username'),
             url: user.get('url'),
-            description: user.get('description')
+            description: user['profile'].get('description')
         });
     }).catch((e) => {
-        reply(e);
+        reply(b.wrap(e));
     });
 }
 exports.get = get;

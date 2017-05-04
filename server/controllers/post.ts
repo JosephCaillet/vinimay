@@ -2,6 +2,7 @@ import * as h from 'hapi';
 import * as s from 'sequelize';
 import * as j from 'joi';
 import * as b from 'boom';
+import * as r from 'request-promise-native/errors';
 
 import {User} from '../models/users';
 import {Post, Privacy} from '../models/posts';
@@ -48,7 +49,15 @@ export function get(request: h.Request, reply: h.IReply) {
 					let friend = new User(friends[i].get('username'), friends[i].get('url'));
 					// We need a copy of the object, and not a referece to it
 					let params = Object.assign({}, request.query);
-					let fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
+					let fPosts: Post[];
+					try {
+						fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
+					} catch(e) {
+						if(!(e instanceof r.RequestError)) {
+							return reply(b.wrap(e))
+						}
+						continue;
+					}
 					for(let j in fPosts) {
 						fPosts[j].author = friend.toString();
 					}
@@ -61,9 +70,9 @@ export function get(request: h.Request, reply: h.IReply) {
 					authenticated: true, // Temporary hardcoded value
 					posts: posts
 				});
-			}).catch(reply);
-		}).catch(reply);
-	}).catch(reply);
+			}).catch(e => reply(b.wrap(e)));
+		}).catch(e => reply(b.wrap(e)));
+	}).catch(e => reply(b.wrap(e)));
 }
 
 export async function getSingle(request: h.Request, reply: h.IReply) {
@@ -89,8 +98,8 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 				return reply(b.wrap(e));
 			}
 			reply(post);
-		}).catch(reply);
-	}).catch(reply);
+		}).catch(e => reply(b.wrap(e)));
+	}).catch(e => reply(b.wrap(e)));
 }
 
 export function create(request: h.Request, reply: h.IReply) {
@@ -110,8 +119,8 @@ export function create(request: h.Request, reply: h.IReply) {
 		instance.model('user').findOne().then((user: s.Instance<any>) => {
 			created.author = new User(username, user.get('url')).toString();
 			reply(created).code(200);
-		}).catch(reply);
-	}).catch(reply);
+		}).catch(e => reply(b.wrap(e)));
+	}).catch(e => reply(b.wrap(e)));
 }
 
 export async function del(request: h.Request, reply: h.IReply) {
@@ -136,8 +145,8 @@ export async function del(request: h.Request, reply: h.IReply) {
 			creationTs: request.params.timestamp
 		}}).then(() => {
 			reply(null).code(204);
-		}).catch(reply);
-	}).catch(reply);
+		}).catch(e => reply(b.wrap(e)));
+	}).catch(e => reply(b.wrap(e)));
 }
 
 export function serverGet(request: h.Request, reply: h.IReply) {
@@ -163,7 +172,7 @@ export function serverGet(request: h.Request, reply: h.IReply) {
 		}
 		if(res) return reply(res);
 		else return reply(b.unauthorized());
-	}).catch(reply);
+	}).catch(e => reply(b.wrap(e)));
 }
 
 export function serverGetSingle(request: h.Request, reply: h.IReply) {
@@ -187,7 +196,7 @@ export function serverGetSingle(request: h.Request, reply: h.IReply) {
 		}
 		if(res) return reply(res);
 		else reply(b.unauthorized());
-	}).catch(reply);
+	}).catch(e => reply(b.wrap(e)));
 }
 
 export let postSchema = j.object({

@@ -1,4 +1,5 @@
 import * as h from 'hapi';
+import * as b from 'boom';
 import * as s from 'sequelize';
 import * as j from 'joi';
 
@@ -7,19 +8,21 @@ import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 import {username} from '../utils/username';
 
 export function get(request: h.Request, reply: h.IReply) {
-	SequelizeWrapper.getInstance(username).model('profile').findOne({
-		where: {
-			username: username,
-			url: 'localhost'
-		}
+	let instance = SequelizeWrapper.getInstance(username);
+	
+	instance.model('user').findOne({
+		include: [{
+			model: instance.model('profile'),
+			attributes: ['description']
+		}]
 	}).then((user: s.Instance<any>) => {
 		reply({
 			username: user.get('username'),
 			url: user.get('url'),
-			description: user.get('description')
+			description: user['profile'].get('description')
 		})
 	}).catch((e) => {
-		reply(e);
+		reply(b.wrap(e));
 	});
 };
 

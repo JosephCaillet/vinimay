@@ -19,5 +19,5 @@ exports.commentSchema = j.object({
     creationTs: j.number().description('The comment\'s creation timestamp'),
     lastEditTs: j.number().description('The comment\'s last modification timestamp'),
     author: j.string().email().description('The author of the comment'),
-    coment: j.string().description('The comment\'s content')
+    content: j.string().description('The comment\'s content')
 });

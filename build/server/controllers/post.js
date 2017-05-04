@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const j = require("joi");
 const b = require("boom");
+const r = require("request-promise-native/errors");
 const users_1 = require("../models/users");
 const friends_1 = require("../models/friends");
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
@@ -41,7 +42,16 @@ function get(request, reply) {
                     let friend = new users_1.User(friends[i].get('username'), friends[i].get('url'));
                     // We need a copy of the object, and not a referece to it
                     let params = Object.assign({}, request.query);
-                    let fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
+                    let fPosts;
+                    try {
+                        fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
+                    }
+                    catch (e) {
+                        if (!(e instanceof r.RequestError)) {
+                            return reply(b.wrap(e));
+                        }
+                        continue;
+                    }
                     for (let j in fPosts) {
                         fPosts[j].author = friend.toString();
                     }
@@ -54,9 +64,9 @@ function get(request, reply) {
                     authenticated: true,
                     posts: posts
                 });
-            }).catch(reply);
-        }).catch(reply);
-    }).catch(reply);
+            }).catch(e => reply(b.wrap(e)));
+        }).catch(e => reply(b.wrap(e)));
+    }).catch(e => reply(b.wrap(e)));
 }
 exports.get = get;
 async function getSingle(request, reply) {
@@ -83,8 +93,8 @@ async function getSingle(request, reply) {
                 return reply(b.wrap(e));
             }
             reply(post);
-        }).catch(reply);
-    }).catch(reply);
+        }).catch(e => reply(b.wrap(e)));
+    }).catch(e => reply(b.wrap(e)));
 }
 exports.getSingle = getSingle;
 function create(request, reply) {
@@ -104,8 +114,8 @@ function create(request, reply) {
         instance.model('user').findOne().then((user) => {
             created.author = new users_1.User(username_1.username, user.get('url')).toString();
             reply(created).code(200);
-        }).catch(reply);
-    }).catch(reply);
+        }).catch(e => reply(b.wrap(e)));
+    }).catch(e => reply(b.wrap(e)));
 }
 exports.create = create;
 async function del(request, reply) {
@@ -129,8 +139,8 @@ async function del(request, reply) {
                 creationTs: request.params.timestamp
             } }).then(() => {
             reply(null).code(204);
-        }).catch(reply);
-    }).catch(reply);
+        }).catch(e => reply(b.wrap(e)));
+    }).catch(e => reply(b.wrap(e)));
 }
 exports.del = del;
 function serverGet(request, reply) {
@@ -161,7 +171,7 @@ function serverGet(request, reply) {
             return reply(res);
         else
             return reply(b.unauthorized());
-    }).catch(reply);
+    }).catch(e => reply(b.wrap(e)));
 }
 exports.serverGet = serverGet;
 function serverGetSingle(request, reply) {
@@ -191,7 +201,7 @@ function serverGetSingle(request, reply) {
             return reply(res);
         else
             reply(b.unauthorized());
-    }).catch(reply);
+    }).catch(e => reply(b.wrap(e)));
 }
 exports.serverGetSingle = serverGetSingle;
 exports.postSchema = j.object({
