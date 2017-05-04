@@ -21,6 +21,7 @@ export class PostComponent {
 	PrivacyEnum = Post.PrivacyEnum
 	creationDate: string
 	editionDate: string
+	deleted = false
 
   constructor(public tr: TranslateService) {
   }

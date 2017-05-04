@@ -4,6 +4,7 @@ import { IonicPage, NavController, NavParams, ModalController, AlertController }
 import { PostsArray, Post, User } from "../../providers/apiClient/index";
 import { PostModal } from "../../components/post-modal/post-modal";
 import { TranslateService } from "@ngx-translate/core";
+import { PostComponent } from "../../components/post-component/post-component";
 
 /**
  * Generated class for the Posts page.
@@ -44,7 +45,7 @@ export class PostsPage {
 		modal.present()
 	}
 
-	deletePost(deletedPost: Post) {
+	deletePost(deletedPost: Post, postComponent: PostComponent) {
 		let alert = this.alertCtrl.create({
 			title: this.tr.instant('p.modal.delete.title'),
 			message: this.tr.instant('p.modal.delete.message'),
@@ -53,10 +54,13 @@ export class PostsPage {
 					text: this.tr.instant('global.yes'),
 					handler: () => {
 						this.api.deleteV1ClientPostsTimestamp(deletedPost.creationTs).subscribe(() => {
-							console.log(this.posts)
-							this.posts = this.posts.filter((post) => {
-								return post.creationTs != deletedPost.creationTs
-							})
+							postComponent.deleted = true
+							setTimeout(() => {
+								console.log(this.posts)
+								this.posts = this.posts.filter((post) => {
+									return post.creationTs != deletedPost.creationTs
+								})
+							}, 1100)
 						}, (err) => {
 							console.error(err)
 						})

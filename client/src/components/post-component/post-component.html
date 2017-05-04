@@ -1,5 +1,5 @@
 <!-- Generated template for the PostComponent component -->
-<ion-card>
+<ion-card [class.deletedPost]="deleted">
 	<ion-card-header [ngSwitch]="post.privacy">
 		<ion-row>
 			<ion-col col-11>
@@ -63,7 +63,7 @@
 						</button>
 					</ion-col>
 					<ion-col col-6>
-						<button ion-button small icon-left outline (click)="postDeleted.emit(post)">
+						<button ion-button small icon-left outline (click)="postDeleted.emit(post)" color="danger">
 							<ion-icon name="trash"></ion-icon>
 							{{ 'p.delete' | translate }}
 						</button>

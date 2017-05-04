@@ -18,7 +18,8 @@
 		<ion-icon name="create"></ion-icon>
 		{{ 'p.creation' | translate }}
 	</button>
-	<post-component *ngFor="let post of posts" [post]="post" [editable]="post.author == user.username + '@' + user.url" (postDeleted)="deletePost($event)">
-
+	<post-component #postComponent *ngFor="let post of posts"
+		[post]="post" [editable]="post.author == user.username + '@' + user.url"
+		(postDeleted)="deletePost($event, postComponent)">
 	</post-component>
 </ion-content>
