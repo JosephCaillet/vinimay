@@ -19,6 +19,11 @@ import * as postUtils from '../utils/postUtils';
 
 import {username} from '../utils/username';
 
+const log = require('printit')({
+	date: true,
+	prefix: 'posts'
+});
+
 // TODO: Retrieve posts from friends too
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
@@ -53,8 +58,12 @@ export function get(request: h.Request, reply: h.IReply) {
 					try {
 						fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
 					} catch(e) {
-						if(!(e instanceof r.RequestError)) {
-							return reply(b.wrap(e))
+						if(e instanceof r.RequestError) {
+							log.warn(e.error.code + ' when querying ' + friend);
+						} else if(e instanceof r.StatusCodeError && e.statusCode === 400) {
+							log.warn('Got a 400 error when querying ' + friend + '. This usually means the API was wrongly implemented either on the current instance or on the friend\'s.');
+						} else {
+							log.error(e)
 						}
 						continue;
 					}
@@ -219,13 +228,11 @@ function getOptions(queryParams) {
 	// Set the order
 	options.order = [['creationTs', 'DESC']]
 	// Apply filters
-	if(queryParams.start) options.offset = queryParams.start;
 	if(queryParams.nb) options.limit = queryParams.nb;
 	// Filter by timestamp require a WHERE clause
-	if(queryParams.from || queryParams.to) {
+	if(queryParams.from) {
 		let timestamp = <s.WhereOptions>{};
 		if(queryParams.from) timestamp['$lte'] = queryParams.from;
-		if(queryParams.to) timestamp['$gte'] = queryParams.to;
 		options.where = { creationTs: timestamp };
 	}
 	
