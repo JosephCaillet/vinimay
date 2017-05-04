@@ -129,6 +129,7 @@ module.exports = {
 				}}}
 			},
 		},
+		'/client/posts/{user}/{timestamp}/comments': {},
 		'/client/friends': {
 			get: {
 				description: 'Retrieve all friend requests',
