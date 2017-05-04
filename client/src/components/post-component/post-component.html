@@ -20,6 +20,7 @@
 			</ion-col>
 		</ion-row>
 	</ion-card-header>
+
 	<ion-card-content>
 		<ion-row [innerHtml]="post.content">
 		</ion-row>
@@ -71,5 +72,9 @@
 				</ion-row>
 			</ion-col>
 		</ion-row>
+
+		<comments-component [post]="post">
+
+		</comments-component>
 	</ion-card-content>
 </ion-card>

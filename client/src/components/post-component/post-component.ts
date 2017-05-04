@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Post } from "../../providers/apiClient/index";
-import { TranslateService } from "@ngx-translate/core";
-import dateFormatter from "../../utils/dateFormater";
+import DateFormaterService from "../../providers/date-formater";
 
 /**
  * Generated class for the PostComponent component.
@@ -23,15 +22,15 @@ export class PostComponent {
 	editionDate: string
 	deleted = false
 
-  constructor(public tr: TranslateService) {
+  constructor(public dateFormatter: DateFormaterService) {
   }
 
 	ngOnInit() {
 		this.post.content =	this.post.content.replace(/\n/g, '<br>')
 
-		this.creationDate = dateFormatter(this.post.creationTs, this.tr,)
+		this.creationDate = this.dateFormatter.fullDate(this.post.creationTs)
 		if(this.post.lastEditTs && this.post.creationTs !== this.post.lastEditTs) {
-			this.editionDate = dateFormatter(this.post.lastEditTs, this.tr)
+			this.editionDate = this.dateFormatter.fullDate(this.post.lastEditTs)
 		}
 	}
 

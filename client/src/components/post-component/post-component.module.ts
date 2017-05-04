@@ -4,7 +4,7 @@ import { PostComponent } from './post-component';
 
 @NgModule({
   declarations: [
-    PostComponent,
+    PostComponent
   ],
   imports: [
     IonicPageModule.forChild(PostComponent),
