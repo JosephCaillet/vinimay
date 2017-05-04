@@ -2,8 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Joi = require("joi");
 const posts = require("./post");
+const comments = require("./comment");
 const user = require("./user");
 const friend = require("./friend");
+const postUrlSchema = Joi.object({
+    user: Joi.string().regex(/.+@.+/).required().description('The post\'s author, identified as `username@instance-domain.tld`'),
+    timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+}).label('PostParams');
 module.exports = {
     v1: {
         '/client/me': {
@@ -112,10 +117,7 @@ module.exports = {
                 description: 'Retrieve a single post',
                 notes: 'Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieve-one-post).',
                 handler: posts.getSingle,
-                validate: { params: {
-                        user: Joi.string().regex(/.+@.+/).required().description('The post\'s author, identified as `username@instance-domain.tld`'),
-                        timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
-                    } },
+                validate: { params: postUrlSchema },
                 plugins: { 'hapi-swagger': { responses: {
                             '200': {
                                 description: 'A list of posts with an information on authentication',
@@ -128,21 +130,54 @@ module.exports = {
                         } } }
             },
         },
-        '/client/posts/{user}/{timestamp}/comments': {},
+        '/client/posts/{user}/{timestamp}/comments': {
+            get: {
+                description: 'Retrieve comments for a post',
+                notes: 'Retrieve comments for a given post based on its user and timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-2).',
+                handler: comments.get,
+                validate: { params: postUrlSchema },
+                plugins: { 'hapi-swagger': { responses: {
+                            '200': {
+                                description: 'Comments associated to the given post',
+                                schema: comments.commentsSchema
+                            }, '404': {
+                                description: 'The referred post cannot be found'
+                            }, '503': {
+                                description: 'The instance hosting the post could not be reached'
+                            }
+                        } } }
+            },
+            post: {
+                description: 'Create a new comment to a post',
+                notes: 'Create a comment on a givent post. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation-1).',
+                handler: comments.add,
+                validate: {
+                    params: postUrlSchema,
+                    payload: Joi.object({
+                        content: Joi.string().required().description('Comment content')
+                    }).label('CommentInput')
+                },
+                plugins: { 'hapi-swagger': { responses: {
+                            '200': {
+                                description: 'The created comment',
+                                schema: comments.commentSchema,
+                            }, '401': {
+                                description: 'The user is not authorized to create a comment on this post'
+                            }
+                        } } }
+            }
+        },
         '/client/friends': {
             get: {
                 description: 'Retrieve all friend requests',
                 notes: 'Retrieve all friend requests (accepted, incoming and sent). Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-4).',
                 handler: friend.get,
-                plugins: {
-                    'hapi-swagger': {
-                        responses: {
+                plugins: { 'hapi-swagger': { responses: {
                             '200': {
                                 description: 'A list of friend requests',
                                 schema: friend.friendsSchema
                             }
-                        }
-                    }
+                        } }
                 }
             }
         },

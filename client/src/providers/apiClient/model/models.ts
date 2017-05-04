@@ -1,3 +1,7 @@
+export * from './comment';
+export * from './commentInput';
+export * from './commentsArray';
+export * from './commentsResponse';
 export * from './friend';
 export * from './friendSent';
 export * from './friends';
