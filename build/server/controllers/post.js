@@ -12,6 +12,10 @@ const reactions = require("./reaction");
 const utils = require("../utils/serverUtils");
 const postUtils = require("../utils/postUtils");
 const username_1 = require("../utils/username");
+const log = require('printit')({
+    date: true,
+    prefix: 'posts'
+});
 // TODO: Retrieve posts from friends too
 function get(request, reply) {
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
@@ -47,8 +51,14 @@ function get(request, reply) {
                         fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
                     }
                     catch (e) {
-                        if (!(e instanceof r.RequestError)) {
-                            return reply(b.wrap(e));
+                        if (e instanceof r.RequestError) {
+                            log.warn(e.error.code + ' when querying ' + friend);
+                        }
+                        else if (e instanceof r.StatusCodeError && e.statusCode === 400) {
+                            log.warn('Got a 400 error when querying ' + friend + '. This usually means the API was wrongly implemented either on the current instance or on the friend\'s.');
+                        }
+                        else {
+                            log.error(e);
                         }
                         continue;
                     }
