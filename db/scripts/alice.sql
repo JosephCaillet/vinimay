@@ -35,3 +35,7 @@ INSERT INTO friend(username, url, id_token, signature_token, status)
 VALUES('frank', 'localhost:3006', NULL, NULL, 'following');
 
 --export enum Status {pending, declined, incoming, accepted, following}
+
+INSERT INTO post VALUES(1493825857425,1493825857425,'Hello friends :-)','friends');
+INSERT INTO post VALUES(1493825872348,1493825872348,'Hello there :-)','public');
+INSERT INTO post VALUES(1493825874248,1493825874248,'Hello there :-)','public');
