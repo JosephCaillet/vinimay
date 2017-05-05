@@ -14,6 +14,8 @@
 		"reactions": "Likes",
 		"comment": "Comment",
 		"comments": "Comments",
+		"comment_send": "Send",
+		"comment_placeholder": "Say something nice here",
 		"privacy": {
 			"me": "Me",
 			"friends": "Friends",
@@ -23,7 +25,7 @@
 			"create" :{
 				"title": "Post creation",
 				"privacy": "Privacy",
-				"placeholder": "Say something nice here",
+				"placeholder": "My flowers are beautiful",
 				"submit_post": "Post"
 			},
 			"delete": {

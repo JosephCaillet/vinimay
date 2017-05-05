@@ -15,6 +15,7 @@ import { V1Service } from '../providers/apiClient/api/v1.service';
 import { BASE_PATH } from '../providers/apiClient/variables';
 import { PostModal } from "../components/post-modal/post-modal";
 import { Autoresize } from "../components/autoresize/autoresize";
+import DateFormaterService from "../providers/date-formater";
 
 @NgModule({
 	declarations: [
@@ -54,7 +55,8 @@ import { Autoresize } from "../components/autoresize/autoresize";
 		SplashScreen,
 		[V1Service, { provide: BASE_PATH, useValue: 'http://127.0.0.1:3000' }],
 		// { provide: LOCALE_ID, useValue: 'en-EN' },
-		{ provide: ErrorHandler, useClass: IonicErrorHandler }
+		{ provide: ErrorHandler, useClass: IonicErrorHandler },
+		DateFormaterService
 	]
 })
 export class AppModule { }

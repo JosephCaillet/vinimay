@@ -3,11 +3,13 @@ import { IonicPageModule } from 'ionic-angular';
 import { PostsPage } from './posts';
 import { TranslateModule } from '@ngx-translate/core';
 import { PostComponent } from "../../components/post-component/post-component";
+import { CommentsComponent } from "../../components/comments-component/comments-component";
 
 @NgModule({
   declarations: [
     PostsPage,
-		PostComponent
+		PostComponent,
+		CommentsComponent
   ],
   imports: [
     IonicPageModule.forChild(PostsPage),
