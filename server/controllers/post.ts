@@ -40,7 +40,7 @@ export let postsArray = j.array().items(postSchema).required().label('Posts arra
 export let responseSchema = j.object({
 	"authenticated": j.bool().required().description('Boolean indicating whether the user is authenticated'),
 	"posts": postsArray,
-	"failures": j.array().items(commons.user).optional().label('Requests failures')
+	"failures": j.array().items(commons.user).required().label('Requests failures')
 }).label('Posts response');
 
 
@@ -94,7 +94,8 @@ export function get(request: h.Request, reply: h.IReply) {
 				posts = posts.slice(0, request.query.nb);
 				let rep: any = {
 					authenticated: true, // Temporary hardcoded value
-					posts: posts
+					posts: posts,
+					failures: failures
 				};
 				if(failures.length) rep.failures = failures;
 				return commons.checkAndSendSchema(rep, responseSchema, log, reply);

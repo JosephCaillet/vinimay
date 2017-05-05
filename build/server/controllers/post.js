@@ -29,7 +29,7 @@ exports.postsArray = j.array().items(exports.postSchema).required().label('Posts
 exports.responseSchema = j.object({
     "authenticated": j.bool().required().description('Boolean indicating whether the user is authenticated'),
     "posts": exports.postsArray,
-    "failures": j.array().items(commons.user).optional().label('Requests failures')
+    "failures": j.array().items(commons.user).required().label('Requests failures')
 }).label('Posts response');
 function get(request, reply) {
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
@@ -82,7 +82,8 @@ function get(request, reply) {
                 posts = posts.slice(0, request.query.nb);
                 let rep = {
                     authenticated: true,
-                    posts: posts
+                    posts: posts,
+                    failures: failures
                 };
                 if (failures.length)
                     rep.failures = failures;

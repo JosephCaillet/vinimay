@@ -9,7 +9,7 @@ import * as friend from './friend';
 import * as commons from '../utils/commons';
 
 const postUrlSchema = Joi.object({
-	user: commons.user.description('The post\'s author, identified as `username@instance-domain.tld`'),
+	user: commons.user.required().description('The post\'s author, identified as `username@instance-domain.tld`'),
 	timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
 }).label('PostParams');
 

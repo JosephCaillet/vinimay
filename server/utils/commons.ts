@@ -2,7 +2,7 @@ import * as h from 'hapi';
 import * as j from 'joi';
 import * as b from 'boom';
 
-export let user = j.string().regex(/.+@.+/).required();
+export let user = j.string().regex(/.+@.+/);
 
 export function checkAndSendSchema(object: any, schema: j.AnySchema<any>, log: any, reply: h.IReply) {
 	let err;

@@ -22,6 +22,6 @@ export interface PostsResponse {
 
     posts: PostsArray;
 
-    failures?: RequestsFailures;
+    failures: RequestsFailures;
 
 }
