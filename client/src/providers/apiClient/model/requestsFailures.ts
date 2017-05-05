@@ -10,18 +10,7 @@
  * Do not edit the class manually.
  */
 
-import { PostsArray } from './postsArray';
-import { RequestsFailures } from './requestsFailures';
 
 
-export interface PostsResponse {
-    /**
-     * Boolean indicating whether the user is authenticated
-     */
-    authenticated: boolean;
-
-    posts: PostsArray;
-
-    failures?: RequestsFailures;
-
+export interface RequestsFailures extends Array<string> {
 }

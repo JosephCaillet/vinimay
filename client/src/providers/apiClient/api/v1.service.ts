@@ -20,10 +20,12 @@ import '../rxjs-operators';
 
 import { Comment } from '../model/comment';
 import { CommentInput } from '../model/commentInput';
+import { CommentsArray } from '../model/commentsArray';
 import { CommentsResponse } from '../model/commentsResponse';
 import { Friends } from '../model/friends';
 import { Post } from '../model/post';
 import { PostInput } from '../model/postInput';
+import { PostsArray } from '../model/postsArray';
 import { PostsResponse } from '../model/postsResponse';
 import { User } from '../model/user';
 import { UserDataInput } from '../model/userDataInput';
@@ -164,9 +166,11 @@ export class V1Service {
      * Retrieve comments for a given post based on its user and timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-2).
      * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
      * @param timestamp The post&#39;s creation timestamp
+     * @param from Most recent timestamp
+     * @param nb Number of comments to retrieve
      */
-    public getV1ClientPostsUserTimestampComments(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<CommentsResponse> {
-        return this.getV1ClientPostsUserTimestampCommentsWithHttpInfo(user, timestamp, extraHttpRequestParams)
+    public getV1ClientPostsUserTimestampComments(user: string, timestamp: number, from?: number, nb?: number, extraHttpRequestParams?: any): Observable<CommentsResponse> {
+        return this.getV1ClientPostsUserTimestampCommentsWithHttpInfo(user, timestamp, from, nb, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -194,12 +198,12 @@ export class V1Service {
     /**
      * Retrieve posts
      * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
-     * @param from Most recent timestamp for a time frame retrieval
+     * @param from Most recent timestamp
      * @param nb Number of posts to retrieve
      * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
      * @param signature 
      */
-    public getV1ServerPosts(from?: number, nb?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<PostsResponse> {
+    public getV1ServerPosts(from?: number, nb?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<PostsArray> {
         return this.getV1ServerPostsWithHttpInfo(from, nb, idToken, signature, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -219,6 +223,26 @@ export class V1Service {
      */
     public getV1ServerPostsTimestamp(timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Post> {
         return this.getV1ServerPostsTimestampWithHttpInfo(timestamp, idToken, signature, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Retrieve comments from a post
+     * Retrieve comments from a post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieving-comments-on-a-post).
+     * @param timestamp The post&#39;s creation timestamp
+     * @param from Most recent timestamp
+     * @param nb Number of comments to retrieve
+     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param signature 
+     */
+    public getV1ServerPostsTimestampComments(timestamp: number, from?: number, nb?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<CommentsArray> {
+        return this.getV1ServerPostsTimestampCommentsWithHttpInfo(timestamp, from, nb, idToken, signature, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -497,8 +521,10 @@ export class V1Service {
      * Retrieve comments for a given post based on its user and timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-2).
      * @param user The post&#39;s author, identified as &#x60;username@instance-domain.tld&#x60;
      * @param timestamp The post&#39;s creation timestamp
+     * @param from Most recent timestamp
+     * @param nb Number of comments to retrieve
      */
-    public getV1ClientPostsUserTimestampCommentsWithHttpInfo(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Response> {
+    public getV1ClientPostsUserTimestampCommentsWithHttpInfo(user: string, timestamp: number, from?: number, nb?: number, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/v1/client/posts/${user}/${timestamp}/comments'
                     .replace('${' + 'user' + '}', String(user))
                     .replace('${' + 'timestamp' + '}', String(timestamp));
@@ -514,6 +540,14 @@ export class V1Service {
         if (timestamp === null || timestamp === undefined) {
             throw new Error('Required parameter timestamp was null or undefined when calling getV1ClientPostsUserTimestampComments.');
         }
+        if (from !== undefined) {
+            queryParameters.set('from', <any>from);
+        }
+
+        if (nb !== undefined) {
+            queryParameters.set('nb', <any>nb);
+        }
+
 
         // to determine the Accept header
         let produces: string[] = [
@@ -569,7 +603,7 @@ export class V1Service {
     /**
      * Retrieve posts
      * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
-     * @param from Most recent timestamp for a time frame retrieval
+     * @param from Most recent timestamp
      * @param nb Number of posts to retrieve
      * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
      * @param signature 
@@ -635,6 +669,63 @@ export class V1Service {
         if (timestamp === null || timestamp === undefined) {
             throw new Error('Required parameter timestamp was null or undefined when calling getV1ServerPostsTimestamp.');
         }
+        if (idToken !== undefined) {
+            queryParameters.set('idToken', <any>idToken);
+        }
+
+        if (signature !== undefined) {
+            queryParameters.set('signature', <any>signature);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Retrieve comments from a post
+     * Retrieve comments from a post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieving-comments-on-a-post).
+     * @param timestamp The post&#39;s creation timestamp
+     * @param from Most recent timestamp
+     * @param nb Number of comments to retrieve
+     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param signature 
+     */
+    public getV1ServerPostsTimestampCommentsWithHttpInfo(timestamp: number, from?: number, nb?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/posts/${timestamp}/comments'
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling getV1ServerPostsTimestampComments.');
+        }
+        if (from !== undefined) {
+            queryParameters.set('from', <any>from);
+        }
+
+        if (nb !== undefined) {
+            queryParameters.set('nb', <any>nb);
+        }
+
         if (idToken !== undefined) {
             queryParameters.set('idToken', <any>idToken);
         }

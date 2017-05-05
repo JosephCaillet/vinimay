@@ -6,8 +6,10 @@ import * as comments from './comment';
 import * as user from './user';
 import * as friend from './friend';
 
+import * as commons from '../utils/commons';
+
 const postUrlSchema = Joi.object({
-	user: Joi.string().regex(/.+@.+/).required().description('The post\'s author, identified as `username@instance-domain.tld`'),
+	user: commons.user.description('The post\'s author, identified as `username@instance-domain.tld`'),
 	timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
 }).label('PostParams');
 
@@ -127,7 +129,7 @@ module.exports = {
 					}, '404': {
 						description: 'The requested post cannot be found'
 					}, '503': {
-						description: 'The remote instance could not be reached'
+						description: 'The remote instance could not be reached, or an API implementation issue prevented the connexion'
 					}
 				}}}
 			},
@@ -137,7 +139,13 @@ module.exports = {
 				description: 'Retrieve comments for a post',
 				notes: 'Retrieve comments for a given post based on its user and timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-2).',
 				handler: comments.get,
-				validate: { params: postUrlSchema },
+				validate: { 
+					params: postUrlSchema,
+					query: {
+						from: Joi.number().min(1).description('Most recent timestamp'),
+						nb: Joi.number().min(1).description('Number of comments to retrieve')
+					}
+				},
 				plugins: { 'hapi-swagger': { responses: {
 					'200': {
 						description: 'Comments associated to the given post',
@@ -145,7 +153,7 @@ module.exports = {
 					}, '404': {
 						description: 'The referred post cannot be found'
 					}, '503': {
-						description: 'The instance hosting the post could not be reached'
+						description: 'The instance hosting the post could not be reached, or an API implementation issue prevented the connexion'
 					}
 				}}}
 			},
@@ -188,7 +196,7 @@ module.exports = {
 				notes: 'Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).',
 				handler: posts.serverGet,
 				validate: { query: {
-					from: Joi.number().min(1).description('Most recent timestamp for a time frame retrieval'),
+					from: Joi.number().min(1).description('Most recent timestamp'),
 					nb: Joi.number().min(1).description('Number of posts to retrieve'),
 					idToken: Joi.string().description('Identification token bound to a friend. If not provided, only public posts will be sent'),
 					signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
@@ -198,7 +206,7 @@ module.exports = {
 						responses: {
 							'200': {
 								description: 'A list of posts with an information on authentication',
-								schema: posts.responseSchema
+								schema: posts.postsArray
 							}, '401': {	description: 'The idToken is unknown' }
 						}
 					}
@@ -223,6 +231,30 @@ module.exports = {
 					'200': {
 						description: 'A list of posts with an information on authentication',
 						schema: posts.postSchema
+					}
+				}}}
+			}
+		},
+		'/server/posts/{timestamp}/comments': {
+			get: {
+				description: 'Retrieve comments from a post',
+				notes: 'Retrieve comments from a post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieving-comments-on-a-post).',
+				handler: comments.serverGet,
+				validate: { 
+					params: {
+						timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+					},
+					query: {
+						from: Joi.number().min(1).description('Most recent timestamp'),
+						nb: Joi.number().min(1).description('Number of comments to retrieve'),
+						idToken: Joi.string().description('Identification token bound to a friend. If not provided, only public posts will be sent'),
+						signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
+					}
+				},
+				plugins: { 'hapi-swagger': { responses: {
+					'200': {
+						description: 'A list of comments with an information on authentication',
+						schema: comments.commentsArray
 					}
 				}}}
 			}

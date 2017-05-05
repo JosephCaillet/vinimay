@@ -52,6 +52,7 @@ function canReadPost(username, privacy, friend) {
         }
     });
 }
+exports.canReadPost = canReadPost;
 function isFriend(username, friend) {
     return new Promise((ok, ko) => {
         let user;
@@ -102,6 +103,8 @@ function processPostAuth(arg, request, username) {
                     post.author = user.toString();
                     post.comments = await comments.count(post.creationTs);
                     post.reactions = await reactions.count(post.creationTs);
+                    post.lastEditTs = post.lastModificationTs;
+                    delete post.lastModificationTs;
                     if (await canReadPost(username, posts_1.Privacy[post.privacy], friend)) {
                         res.push(post);
                     }
@@ -112,6 +115,10 @@ function processPostAuth(arg, request, username) {
                 let post = arg;
                 let author;
                 post.author = (await utils.getUser(username)).toString();
+                post.comments = await comments.count(post.creationTs);
+                post.reactions = await reactions.count(post.creationTs);
+                post.lastEditTs = post.lastModificationTs;
+                delete post.lastModificationTs;
                 if (await canReadPost(username, posts_1.Privacy[post.privacy]), friend) {
                     ok(post);
                 }
@@ -134,6 +141,10 @@ function processPostAnon(arg, request, username) {
                 let author;
                 try {
                     post.author = (await utils.getUser(username)).toString();
+                    post.comments = await comments.count(post.creationTs);
+                    post.reactions = await reactions.count(post.creationTs);
+                    post.lastEditTs = post.lastModificationTs;
+                    delete post.lastModificationTs;
                 }
                 catch (e) {
                     return ko(e);
@@ -154,6 +165,10 @@ function processPostAnon(arg, request, username) {
             let author;
             try {
                 post.author = (await utils.getUser(username)).toString();
+                post.comments = await comments.count(post.creationTs);
+                post.reactions = await reactions.count(post.creationTs);
+                post.lastEditTs = post.lastModificationTs;
+                delete post.lastModificationTs;
             }
             catch (e) {
                 return ko(e);
@@ -172,27 +187,11 @@ function processPostAnon(arg, request, username) {
         }
     });
 }
-function getRequestUrl(method, user, path, params, sigtoken) {
-    let url = user + path;
-    let hasParams = !!(Object.keys(params).length || (params.idToken && sigtoken));
-    if (hasParams)
-        url += '?';
-    for (let key in params) {
-        url += key + '=' + params[key] + '&';
-    }
-    if (params.idToken && sigtoken) {
-        url += 'signature=' + utils.computeSignature(method, user + path, params, sigtoken);
-    }
-    else if (hasParams) {
-        url = url.substr(0, url.length - 1);
-    }
-    return url;
-}
 function retrieveRemotePosts(source, params, idtoken, sigtoken) {
     return new Promise((ok, ko) => {
         if (idtoken)
             params.idToken = idtoken;
-        let url = getRequestUrl('GET', source, '/v1/server/posts', params, sigtoken);
+        let url = utils.getGetRequestUrl(source, '/v1/server/posts', params, sigtoken);
         // We'll use HTTP only for localhost
         if (url.indexOf('localhost') < 0)
             url = 'https://' + url;
@@ -210,15 +209,15 @@ exports.retrieveRemotePosts = retrieveRemotePosts;
 function retrieveRemotePost(source, timestamp, idtoken, sigtoken) {
     return new Promise((ok, ko) => {
         let params = {
-            user: source.toString(),
             timestamp: timestamp
         };
         let reqPath = path.join('/v1/server/posts', timestamp.toString());
         let url = source + reqPath;
         if (idtoken && sigtoken) {
             params.idToken = idtoken;
+            let signature = utils.computeSignature('GET', url, params, sigtoken);
             url += '?idToken=' + idtoken;
-            url += '&signature=' + utils.computeSignature('GET', url, params, sigtoken);
+            url += '&signature=' + signature;
         }
         // We'll use HTTP only for localhost
         if (url.indexOf('localhost') < 0)
@@ -234,3 +233,10 @@ function retrieveRemotePost(source, timestamp, idtoken, sigtoken) {
     });
 }
 exports.retrieveRemotePost = retrieveRemotePost;
+function exists(username, timestamp) {
+    return new Promise((ok, ko) => {
+        sequelizeWrapper_1.SequelizeWrapper.getInstance(username).model('post').count(timestamp)
+            .then(count => ok(!!count)).catch(ko);
+    });
+}
+exports.exists = exists;
