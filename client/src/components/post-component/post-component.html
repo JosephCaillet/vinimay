@@ -55,7 +55,7 @@
 				</ion-note>
 			</ion-col>
 
-			<ion-col *ngIf="editable" center text-center col-12>
+			<ion-col *ngIf="post.author == user.username + '@' + user.url" center text-center col-12>
 				<ion-row center text-center>
 					<ion-col col-6>
 						<button ion-button small icon-left outline>
@@ -73,7 +73,7 @@
 			</ion-col>
 		</ion-row>
 
-		<comments-component [post]="post">
+		<comments-component [post]="post" [user]="user">
 
 		</comments-component>
 	</ion-card-content>

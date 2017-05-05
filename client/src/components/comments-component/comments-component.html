@@ -19,12 +19,16 @@
 			</ion-col>
 		</ion-row>
 		<ion-row>
-			<ion-col>{{ comment.content }}</ion-col>
-			<ion-col></ion-col>
+			<ion-col col-11>{{ comment.content }}</ion-col>
+			<ion-col col-1 *ngIf="user.username + '@' + user.url == post.author || user.username + '@' + user.url == comment.author">
+				<button ion-button icon-only color="danger" (click)="deleteComment(comment)" small round outline>
+					<ion-icon name="trash"></ion-icon>
+				</button>
+			</ion-col>
 		</ion-row>
 	</div>
 
-	<form [formGroup]="commentForm" action="createComment()">
+	<form [formGroup]="commentForm" (submit)="createComment()">
 		<ion-row align-items-center text-center>
 			<ion-col col-9>
 				<ion-input [placeholder]=" 'p.comment_placeholder' | translate " formControlName="comment"></ion-input>

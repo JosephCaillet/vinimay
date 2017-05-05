@@ -1,3 +1,4 @@
+import { User } from '../../providers/apiClient/model/user';
 import { Component, Input } from '@angular/core';
 import { Post, CommentsArray, V1Service } from "../../providers/apiClient/index";
 import { FormGroup, FormControl, Validators } from "@angular/forms";
@@ -11,13 +12,15 @@ import DateFormaterService from "../../providers/date-formater";
  */
 @Component({
   selector: 'comments-component',
-  templateUrl: 'comments-component.html'
+  templateUrl: 'comments-component.html',
 })
 export class CommentsComponent {
 
   @Input() post: Post
+  @Input() user: User
 	commentForm: FormGroup
-	comments: CommentsArray = [
+	comments: CommentsArray = //[]
+	[
 		{
 			"author": "bobi@url.com",
 			"content": "Can't touch this",
@@ -40,7 +43,25 @@ export class CommentsComponent {
 		this.commentForm = new FormGroup({"comment": new FormControl('', Validators.required)})
   }
 
+	ngOnInit() {
+		this.api.getV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs).subscribe( (data) => {
+			this.comments = data.comments
+		}, (err) => {
+			console.error(err)
+		})
+	}
+
 	createComment() {
+		this.api.postV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs, this.commentForm.value.comment)
+		.subscribe((data) => {
+			this.commentForm.controls['comment'].setValue('')
+			this.comments = this.comments.splice(0, 0, data)
+		}, (err) => {
+			console.error(err)
+		})
+	}
+
+	deleteComment(comment: Comment) {
 
 	}
 }

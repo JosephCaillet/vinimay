@@ -7,7 +7,7 @@ import { CommentsComponent } from './comments-component';
     CommentsComponent,
   ],
   imports: [
-    IonicPageModule.forChild(CommentsComponent),
+    IonicPageModule.forChild(CommentsComponent)
   ],
   exports: [
     CommentsComponent
