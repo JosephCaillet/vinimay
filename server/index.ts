@@ -9,11 +9,17 @@ const log = printit({
 	prefix: 'hapi'
 });
 
-const server = new Hapi.Server({ 
-	debug: {
+let debug: any = {};
+
+if(process.env.DEBUG) {
+	debug = {
 		log: ['error'],
 		request: ['error']
-	},
+	}; 
+}
+
+const server = new Hapi.Server({ 
+	debug: debug,
 	connections: <Hapi.IConnectionConfigurationServerDefaults>{
 		routes: { cors: {
 			origin: ['*'],

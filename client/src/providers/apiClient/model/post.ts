@@ -26,7 +26,7 @@ export interface Post {
     /**
      * Post author (using the `username@instance-domain.tld` format)
      */
-    author: string;
+    author?: string;
 
     /**
      * Post content

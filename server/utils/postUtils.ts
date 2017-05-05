@@ -39,7 +39,7 @@ export function processPost(arg: Post | Post[], request: h.Request, username: st
 	});
 }
 
-function canReadPost(username: string, privacy: Privacy, friend?: User): Promise<boolean> {
+export function canReadPost(username: string, privacy: Privacy, friend?: User): Promise<boolean> {
 	return new Promise<boolean>((ok, ko) => {
 		switch(privacy) {
 			case Privacy.public:
@@ -105,6 +105,8 @@ function processPostAuth(arg: Post | Post[], request: h.Request, username: strin
 					post.author = user.toString();
 					post.comments = await comments.count(post.creationTs);
 					post.reactions = await reactions.count(post.creationTs);
+					post.lastEditTs = post.lastModificationTs;
+					delete post.lastModificationTs;
 					if(await canReadPost(username, Privacy[post.privacy], friend)) {
 						res.push(post);
 					}
@@ -114,6 +116,10 @@ function processPostAuth(arg: Post | Post[], request: h.Request, username: strin
 				let post = arg;
 				let author: User;
 				post.author = (await utils.getUser(username)).toString();
+				post.comments = await comments.count(post.creationTs);
+				post.reactions = await reactions.count(post.creationTs);
+				post.lastEditTs = post.lastModificationTs;
+				delete post.lastModificationTs;
 				if(await canReadPost(username, Privacy[post.privacy]), friend) {
 					ok(post);
 				} else {
@@ -131,7 +137,13 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 			for(let i in arg) {
 				let post = arg[i];
 				let author: User;
-				try { post.author = (await utils.getUser(username)).toString() }
+				try {
+					post.author = (await utils.getUser(username)).toString();
+					post.comments = await comments.count(post.creationTs);
+					post.reactions = await reactions.count(post.creationTs);
+					post.lastEditTs = post.lastModificationTs;
+					delete post.lastModificationTs;
+				}
 				catch(e) { return ko(e) }
 				try {
 					if(await canReadPost(username, Privacy[post.privacy])) {
@@ -145,7 +157,13 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 		} else {
 			let post = arg;
 			let author: User;
-			try { post.author = (await utils.getUser(username)).toString() }
+			try {
+				post.author = (await utils.getUser(username)).toString();
+				post.comments = await comments.count(post.creationTs);
+				post.reactions = await reactions.count(post.creationTs);
+				post.lastEditTs = post.lastModificationTs;
+				delete post.lastModificationTs;
+			}
 			catch(e) { return ko(e) }
 			try {
 				if(await canReadPost(username, Privacy[post.privacy])) {
@@ -158,25 +176,11 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 	});
 }
 
-function getRequestUrl(method: string, user: User, path: string, params: any, sigtoken?: string): string {
-	let url = user + path;
-	let hasParams: boolean = !!(Object.keys(params).length || (params.idToken && sigtoken));
-	if(hasParams) url += '?'
-	for(let key in params) {
-		url += key + '=' + params[key] + '&';
-	}
-	if(params.idToken && sigtoken) {
-		url += 'signature=' + utils.computeSignature(method, user + path, params, sigtoken);
-	} else if(hasParams) {
-		url = url.substr(0, url.length-1);
-	}
-	return url;
-}
 
 export function retrieveRemotePosts(source: User, params: any, idtoken?: string, sigtoken?: string): Promise<Post[]> {
 	return new Promise<Post[]>((ok, ko) => {
 		if(idtoken) params.idToken = idtoken;
-		let url = getRequestUrl('GET', source, '/v1/server/posts', params, sigtoken);
+		let url = utils.getGetRequestUrl(source, '/v1/server/posts', params, sigtoken);
 
 		// We'll use HTTP only for localhost
 		if(url.indexOf('localhost') < 0) url = 'https://' + url;
@@ -192,10 +196,9 @@ export function retrieveRemotePosts(source: User, params: any, idtoken?: string,
 	})
 }
 
-export function retrieveRemotePost(source: User, timestamp: any, idtoken?: string, sigtoken?: string): Promise<Post[]> {
-	return new Promise<Post[]>((ok, ko) => {
+export function retrieveRemotePost(source: User, timestamp: any, idtoken?: string, sigtoken?: string): Promise<Post> {
+	return new Promise<Post>((ok, ko) => {
 		let params: any = {
-			user: source.toString(),
 			timestamp: timestamp
 		};
 		let reqPath = path.join('/v1/server/posts', timestamp.toString());
@@ -203,8 +206,9 @@ export function retrieveRemotePost(source: User, timestamp: any, idtoken?: strin
 
 		if(idtoken && sigtoken) {
 			params.idToken = idtoken;
+			let signature = utils.computeSignature('GET', url, params, sigtoken);
 			url += '?idToken=' + idtoken
-			url += '&signature=' + utils.computeSignature('GET', url, params, sigtoken);
+			url += '&signature=' + signature;
 		}
 
 		// We'll use HTTP only for localhost
@@ -218,5 +222,12 @@ export function retrieveRemotePost(source: User, timestamp: any, idtoken?: strin
 			log.debug('Received a post from ' + source);
 			ok(JSON.parse(response));
 		}).catch(ko);
+	})
+}
+
+export function exists(username: string, timestamp: number): Promise<boolean> {
+	return new Promise<boolean>((ok, ko) => {
+		SequelizeWrapper.getInstance(username).model('post').count(timestamp)
+		.then(count => ok(!!count)).catch(ko);
 	})
 }

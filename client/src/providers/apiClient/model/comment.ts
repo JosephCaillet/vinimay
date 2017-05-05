@@ -14,16 +14,6 @@
 
 export interface Comment {
     /**
-     * The author of the post that the comment is referencing
-     */
-    postAuthor: string;
-
-    /**
-     * The timestamp of the post that the comment is referencing
-     */
-    postTs: number;
-
-    /**
      * The comment's creation timestamp
      */
     creationTs: number;

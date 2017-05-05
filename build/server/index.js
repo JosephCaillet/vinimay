@@ -8,11 +8,15 @@ const log = printit({
     date: true,
     prefix: 'hapi'
 });
-const server = new Hapi.Server({
-    debug: {
+let debug = {};
+if (process.env.DEBUG) {
+    debug = {
         log: ['error'],
         request: ['error']
-    },
+    };
+}
+const server = new Hapi.Server({
+    debug: debug,
     connections: {
         routes: { cors: {
                 origin: ['*'],

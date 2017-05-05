@@ -14,6 +14,7 @@ import {VinimayError} from '../utils/vinimayError';
 import * as comments from './comment';
 import * as reactions from './reaction';
 
+import * as commons from '../utils/commons';
 import * as utils from '../utils/serverUtils';
 import * as postUtils from '../utils/postUtils';
 
@@ -24,7 +25,25 @@ const log = require('printit')({
 	prefix: 'posts'
 });
 
-// TODO: Retrieve posts from friends too
+export let postSchema = j.object({
+	"creationTs": j.number().min(1).required().description('Post creation timestamp'),
+	"lastEditTs": j.number().min(1).required().description('Last modification timestamp (equals to the creation timestamp if the post has never been edited)'),
+	"author": commons.user.description('Post author (using the `username@instance-domain.tld` format)'),
+	"content": j.string().required().description('Post content'),
+	"privacy": j.string().valid('public', 'private', 'friends').required().description('Post privacy setting (private, friends or public)'),
+	"comments": j.number().min(0).required().description('Number of comments on the post'),
+	"reactions": j.number().min(0).required().description('Numer of reactions on the post')
+}).label('Post');
+
+export let postsArray = j.array().items(postSchema).required().label('Posts array');
+
+export let responseSchema = j.object({
+	"authenticated": j.bool().required().description('Boolean indicating whether the user is authenticated'),
+	"posts": postsArray,
+	"failures": j.array().items(commons.user).required().label('Requests failures')
+}).label('Posts response');
+
+
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
 	let options = <s.FindOptions>getOptions(request.query);
@@ -40,6 +59,8 @@ export function get(request: h.Request, reply: h.IReply) {
 				try {
 					post.comments = await comments.count(post.creationTs);
 					post.reactions = await reactions.count(post.creationTs);
+					post.lastEditTs = post.lastModificationTs;
+					delete post.lastModificationTs;
 				} catch(e) {
 					return reply(b.wrap(e));
 				}
@@ -59,14 +80,8 @@ export function get(request: h.Request, reply: h.IReply) {
 					try {
 						fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
 					} catch(e) {
-						if(e instanceof r.RequestError) {
-							log.warn(e.error.code + ' when querying ' + friend);
-							failures.push(friend.toString());
-						} else if(e instanceof r.StatusCodeError && e.statusCode === 400) {
-							log.warn('Got a 400 error when querying ' + friend + '. This usually means the API was wrongly implemented either on the current instance or on the friend\'s.');
-						} else {
-							log.error(e)
-						}
+						utils.handleRequestError(friend, e, log, true);
+						failures.push(friend.toString());
 						continue;
 					}
 					for(let j in fPosts) {
@@ -77,11 +92,13 @@ export function get(request: h.Request, reply: h.IReply) {
 				posts.sort((a, b) => b.creationTs - a.creationTs);
 				// We'll have more posts than requested, so we truncate the array
 				posts = posts.slice(0, request.query.nb);
-				reply({
+				let rep: any = {
 					authenticated: true, // Temporary hardcoded value
 					posts: posts,
 					failures: failures
-				});
+				};
+				if(failures.length) rep.failures = failures;
+				return commons.checkAndSendSchema(rep, responseSchema, log, reply);
 			}).catch(e => reply(b.wrap(e)));
 		}).catch(e => reply(b.wrap(e)));
 	}).catch(e => reply(b.wrap(e)));
@@ -110,10 +127,12 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 				try {
 					post.comments = await comments.count(post.creationTs);
 					post.reactions = await reactions.count(post.creationTs);
+					post.lastEditTs = post.lastModificationTs;
+					delete post.lastModificationTs;
 				} catch(e) {
 					return reply(b.wrap(e));
 				}
-				reply(post);
+				commons.checkAndSendSchema(post, postSchema, log, reply);
 			}).catch(e => reply(b.wrap(e)));
 		} else {
 			instance.model('friend').findOne({ where: {
@@ -128,22 +147,11 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 					idtoken = friend.get('id_token');
 					sigtoken = friend.get('signature_token');
 				}
+				let user = new User(friend.get('username'), friend.get('url'));
 				// We want to retrieve only one post at a given timestamp
-				postUtils.retrieveRemotePost(author, request.params.timestamp, idtoken, sigtoken).then((posts: Post[]) => {
-					return reply(posts[0]); // We only have one element
-				}).catch(e => {
-					if(e instanceof r.RequestError) {
-						log.warn(e.error.code + ' when querying ' + friend);
-						return reply(b.serverUnavailable());
-					} else if(e instanceof r.StatusCodeError && e.statusCode === 400) {
-						log.warn('Got a 400 error when querying ' + friend + '. This usually means the API was wrongly implemented either on the current instance or on the friend\'s.');
-					} else if(e instanceof r.StatusCodeError && e.statusCode === 404) {
-						return reply(b.notFound());
-					} else {
-						log.error(e);
-						return reply(b.wrap(e));
-					}
-				});
+				postUtils.retrieveRemotePost(author, request.params.timestamp, idtoken, sigtoken).then((post: Post) => {
+					return commons.checkAndSendSchema(post, postSchema, log, reply);
+				}).catch(e => utils.handleRequestError(user, e, log, false, reply));
 			}).catch(e => reply(b.wrap(e)));
 		}
 	}).catch(e => reply(b.wrap(e)));
@@ -168,11 +176,13 @@ export function create(request: h.Request, reply: h.IReply) {
 			try {
 				created.comments = await comments.count(created.creationTs);
 				created.reactions = await reactions.count(created.creationTs);
+				created.lastEditTs = created.lastModificationTs;
+				delete created.lastModificationTs;
 			} catch(e) {
 				return reply(b.wrap(e));
 			}
 
-			reply(created).code(200);
+			return commons.checkAndSendSchema(created, postSchema, log, reply);
 		}).catch(e => reply(b.wrap(e)));
 	}).catch(e => reply(b.wrap(e)));
 }
@@ -224,7 +234,7 @@ export function serverGet(request: h.Request, reply: h.IReply) {
 			}
 			return reply(b.wrap(e))
 		}
-		if(res) return reply(res);
+		if(res) return commons.checkAndSendSchema(res, postsArray, log, reply);
 		else return reply(b.unauthorized());
 	}).catch(e => reply(b.wrap(e)));
 }
@@ -252,27 +262,12 @@ export function serverGetSingle(request: h.Request, reply: h.IReply) {
 			}
 			return reply(b.wrap(e))
 		}
-		if(res) return reply(res);
+		if(res) return commons.checkAndSendSchema(res, postSchema, log, reply);
 		else reply(b.notFound());
 	}).catch(e => reply(b.wrap(e)));
 }
 
-export let postSchema = j.object({
-	"creationTs": j.number().min(1).required().description('Post creation timestamp'),
-	"lastEditTs": j.number().min(1).required().description('Last modification timestamp (equals to the creation timestamp if the post has never been edited)'),
-	"author": j.string().regex(/.+@.+/).required().description('Post author (using the `username@instance-domain.tld` format)'),
-	"content": j.string().required().description('Post content'),
-	"privacy": j.string().valid('public', 'private', 'friends').required().description('Post privacy setting (private, friends or public)'),
-	"comments": j.number().min(0).required().description('Number of comments on the post'),
-	"reactions": j.number().min(0).required().description('Numer of reactions on the post')
-}).label('Post');
-
-export let responseSchema = j.object({
-	"authenticated": j.bool().required().description('Boolean indicating whether the user is authenticated'),
-	"posts": j.array().items(postSchema).required().label('Posts array')
-}).label('Posts response');
-
-function getOptions(queryParams) {
+export function getOptions(queryParams, timestampField?: string) {
 	let options = <s.FindOptions>{};
 	// Set the order
 	options.order = [['creationTs', 'DESC']]
@@ -282,7 +277,9 @@ function getOptions(queryParams) {
 	if(queryParams.from) {
 		let timestamp = <s.WhereOptions>{};
 		if(queryParams.from) timestamp['$lte'] = queryParams.from;
-		options.where = { creationTs: timestamp };
+		options.where = {};
+		if(timestampField) options.where[timestampField] = timestamp;
+		else options.where.creationTs = timestamp;
 	}
 	
 	return options;

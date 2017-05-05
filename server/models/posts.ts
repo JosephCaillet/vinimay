@@ -1,6 +1,7 @@
 export class Post {
 	creationTs: number;
-	lastModificationTs: number;
+	lastModificationTs?: number;
+	lastEditTs?: number;
 	author?: string;
 	content: string;
 	privacy: string;

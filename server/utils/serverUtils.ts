@@ -1,5 +1,7 @@
 import * as h from 'hapi';
+import * as b from 'boom';
 import * as s from 'sequelize';
+import * as r from 'request-promise-native/errors';
 
 import * as crypto from 'crypto';
 
@@ -28,9 +30,25 @@ export function getUser(username: string): Promise<User> {
 
 export function computeSignature(method: string, url: string, parameters, token: string): string {
 	let params = '';
-	for(let param in parameters) {
-		if(param.localeCompare('signature')) {
-			params += param + '=' + parameters[param] + '&';
+
+	// We can't sort an object on its properties' names, so we create an array from it
+	let sortable: any[] = [];
+	for (let param in parameters) {
+	    sortable.push([param, parameters[param]]);
+	}
+
+	// Sort the array
+	sortable.sort((a, b) => {
+		if(a[0] < b[0]) return -1
+		if(a[0] > b[0]) return 1
+		return 0;
+	})
+
+	// Build the reference string
+	for(let i in sortable) {
+		let param = sortable[i];
+		if(param[0].localeCompare('signature')) {
+			params += param[0] + '=' + param[1] + '&';
 		}
 	}
 	// Removing the trailing '&'
@@ -39,15 +57,65 @@ export function computeSignature(method: string, url: string, parameters, token:
 	let toSign = [method.toUpperCase(), url, params].join('&');
 	toSign = encodeURIComponent(toSign);
 	
+	
 	let signature = crypto.createHmac("sha256", token)
 	.update(toSign)
 	.digest("hex");
 
-	log.debug('Signature for ' + method.toUpperCase() + ' ' + url + ': ' +signature);
+	log.debug('Signature for ' + method.toUpperCase() + ' ' + url + ': ' +signature + ' (using token ' + token + ')');
 
 	return signature;
 }
 
 export function checkSignature(received: string, computed: string): boolean {
 	return !computed.localeCompare(received);
+}
+
+export function getGetRequestUrl(user: User, path: string, params: any, sigtoken?: string): string {
+	let url = user + path;
+	let hasParams: boolean = !!(Object.keys(params).length || (params.idToken && sigtoken));
+	let signature: string = '';
+	if(params.idToken && sigtoken) {
+		signature = computeSignature('GET', user + path, params, sigtoken);
+	}
+	if(hasParams) url += '?'
+	for(let key in params) {
+		url += key + '=' + params[key] + '&';
+	}
+	if(params.idToken && sigtoken) {
+		url += 'signature=' + signature;
+	} else if(hasParams) {
+		url = url.substr(0, url.length-1);
+	}
+	return url;
+}
+
+
+// Prints the error, sends it to the user if necessary
+export function handleRequestError(friend: User, e: Error, log: any, looped?: boolean, reply?: h.IReply) {
+	let code: number = 500; // Default value
+	let message: string = ''; // Default value
+	if(e instanceof r.RequestError) {
+		code = e.error.code;
+	} else if(e instanceof r.StatusCodeError) {
+		code = e.statusCode;
+	}
+	
+	if(e instanceof r.StatusCodeError && e.statusCode === 400) {
+		message = 'This usually means the API was wrongly implemented either on the current instance or on the friend\'s.';
+	} else if(e instanceof r.StatusCodeError && e.statusCode === 404) {
+		if(reply && !looped) return reply(b.notFound());
+		else return;
+	} else if(e instanceof r.StatusCodeError && e.statusCode === 500) {
+		message = 'This can happen because of a bug in the remote instance\'s code or a bad implentation of the Vinimay API on its side.'
+	} else if(!(e instanceof r.RequestError)) {
+		log.error(e);
+		if(reply && !looped) return reply(b.wrap(e));
+		else return;
+	}
+
+	// Default behaviour
+	log.warn('Got a ' + code + ' when querying ' + friend)
+	if(message.length) log.warn(message);
+	if(reply && !looped) reply(b.serverUnavailable());
 }
