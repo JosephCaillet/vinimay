@@ -9,28 +9,38 @@ import DateFormaterService from "../../providers/date-formater";
  * for more info on Angular Components.
  */
 @Component({
-  selector: 'post-component',
-  templateUrl: 'post-component.html'
+	selector: 'post-component',
+	templateUrl: 'post-component.html'
 })
 export class PostComponent {
 
-  @Input() post: Post
-  @Input() user: User
+	@Input() post: Post
+	@Input() user: User
 	@Output() postDeleted = new EventEmitter()
 	PrivacyEnum = Post.PrivacyEnum
 	creationDate: string
 	editionDate: string
+	hasReaction: boolean
 	deleted = false
 
-  constructor(public dateFormatter: DateFormaterService) {
-  }
+	constructor(public dateFormatter: DateFormaterService) {
+	}
 
 	ngOnInit() {
-		this.post.content =	this.post.content.replace(/\n/g, '<br>')
+		this.post.content = this.post.content.replace(/\n/g, '<br>')
 
 		this.creationDate = this.dateFormatter.fullDate(this.post.creationTs)
-		if(this.post.lastEditTs && this.post.creationTs !== this.post.lastEditTs) {
+		if (this.post.lastEditTs && this.post.creationTs !== this.post.lastEditTs) {
 			this.editionDate = this.dateFormatter.fullDate(this.post.lastEditTs)
+		}
+	}
+
+	toggleReactionState() {
+		this.hasReaction = !this.hasReaction
+		if (this.hasReaction) {
+			this.post.reactions--
+		} else {
+			this.post.reactions++
 		}
 	}
 

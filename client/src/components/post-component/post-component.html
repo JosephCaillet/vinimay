@@ -26,16 +26,16 @@
 		</ion-row>
 		<ion-row>
 			<ion-col center text-center>
-				<button ion-button icon-left clear small>
-				<ion-icon name="thumbs-up" [color]=" false ? 'primary' : 'light'"></ion-icon>
-				<div>{{ post.reactions }} {{ post.reactions == 1 ? ('p.reaction' | translate) : ('p.reactions' | translate) }}</div>
-			</button>
+				<button ion-button icon-left clear small (click)="toggleReactionState()">
+					<ion-icon name="thumbs-up" [color]=" hasReaction ? 'primary' : 'light'"></ion-icon>
+					<div>{{ post.reactions }} {{ post.reactions == 1 ? ('p.reaction' | translate) : ('p.reactions' | translate) }}</div>
+				</button>
 			</ion-col>
 			<ion-col center text-center>
 				<button ion-button icon-left clear small>
-				<ion-icon name="text"></ion-icon>
-				<div>{{ post.comments }} {{ post.comments == 1 ? ('p.comment' | translate) : ('p.comments' | translate) }}</div>
-			</button>
+					<ion-icon name="text"></ion-icon>
+					<div>{{ post.comments }} {{ post.comments == 1 ? ('p.comment' | translate) : ('p.comments' | translate) }}</div>
+				</button>
 			</ion-col>
 
 			<ion-col center text-center col-12 col-sm-3>
