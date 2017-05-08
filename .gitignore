@@ -49,3 +49,6 @@ jspm_packages
 
 # Internal scripts
 build_client.sh
+
+# Settings
+settings.json

@@ -5,6 +5,7 @@ import * as r from 'request-promise-native/errors';
 
 import * as crypto from 'crypto';
 
+import {VinimayError} from './vinimayError';
 import {User} from '../models/users';
 import {SequelizeWrapper} from './sequelizeWrapper';
 
@@ -24,6 +25,18 @@ export function getUser(username: string): Promise<User> {
 		SequelizeWrapper.getInstance(username).model('user').findOne()
 		.then((user: s.Instance<any>) => {
 			ok(new User(user.get('username'), user.get('url')))
+		}).catch(ko);
+	});
+}
+
+export function getFriendByToken(username: string, idtoken: string): Promise<any> {
+	return new Promise((ok, ko) => {
+		SequelizeWrapper.getInstance(username).model('friend').findOne({where: {
+			id_token: idtoken
+		}, raw: true})
+		.then((user: s.Instance<any>) => {
+			if(user) ok(user);
+			else throw new VinimayError('UNKNOWN_TOKEN');
 		}).catch(ko);
 	});
 }
@@ -56,8 +69,7 @@ export function computeSignature(method: string, url: string, parameters, token:
 	
 	let toSign = [method.toUpperCase(), url, params].join('&');
 	toSign = encodeURIComponent(toSign);
-	
-	
+
 	let signature = crypto.createHmac("sha256", token)
 	.update(toSign)
 	.digest("hex");
@@ -102,7 +114,9 @@ export function handleRequestError(friend: User, e: Error, log: any, looped?: bo
 	}
 	
 	if(e instanceof r.StatusCodeError && e.statusCode === 400) {
-		message = 'This usually means the API was wrongly implemented either on the current instance or on the friend\'s.';
+		message = 'This usually means the API was badly implemented either on the current instance or on the friend\'s.';
+	} else if(e instanceof r.StatusCodeError && e.statusCode === 401) {
+		message = 'This can happen because of a bad implementation of the Vinimay API on either side, or because of an instance domain mismatch between the two instances\' databases.';
 	} else if(e instanceof r.StatusCodeError && e.statusCode === 404) {
 		if(reply && !looped) return reply(b.notFound());
 		else return;
@@ -115,7 +129,8 @@ export function handleRequestError(friend: User, e: Error, log: any, looped?: bo
 	}
 
 	// Default behaviour
-	log.warn('Got a ' + code + ' when querying ' + friend)
+	if(code) log.warn('Got a ' + code + ' when querying ' + friend)
+	else log.error(e);
 	if(message.length) log.warn(message);
 	if(reply && !looped) reply(b.serverUnavailable());
 }

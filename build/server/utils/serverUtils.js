@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const b = require("boom");
 const r = require("request-promise-native/errors");
 const crypto = require("crypto");
+const vinimayError_1 = require("./vinimayError");
 const users_1 = require("../models/users");
 const sequelizeWrapper_1 = require("./sequelizeWrapper");
 const log = require('printit')({
@@ -24,6 +25,20 @@ function getUser(username) {
     });
 }
 exports.getUser = getUser;
+function getFriendByToken(username, idtoken) {
+    return new Promise((ok, ko) => {
+        sequelizeWrapper_1.SequelizeWrapper.getInstance(username).model('friend').findOne({ where: {
+                id_token: idtoken
+            }, raw: true })
+            .then((user) => {
+            if (user)
+                ok(user);
+            else
+                throw new vinimayError_1.VinimayError('UNKNOWN_TOKEN');
+        }).catch(ko);
+    });
+}
+exports.getFriendByToken = getFriendByToken;
 function computeSignature(method, url, parameters, token) {
     let params = '';
     // We can't sort an object on its properties' names, so we create an array from it
@@ -93,7 +108,10 @@ function handleRequestError(friend, e, log, looped, reply) {
         code = e.statusCode;
     }
     if (e instanceof r.StatusCodeError && e.statusCode === 400) {
-        message = 'This usually means the API was wrongly implemented either on the current instance or on the friend\'s.';
+        message = 'This usually means the API was badly implemented either on the current instance or on the friend\'s.';
+    }
+    else if (e instanceof r.StatusCodeError && e.statusCode === 401) {
+        message = 'This can happen because of a bad implementation of the Vinimay API on either side, or because of an instance domain mismatch between the two instances\' databases.';
     }
     else if (e instanceof r.StatusCodeError && e.statusCode === 404) {
         if (reply && !looped)
@@ -112,7 +130,10 @@ function handleRequestError(friend, e, log, looped, reply) {
             return;
     }
     // Default behaviour
-    log.warn('Got a ' + code + ' when querying ' + friend);
+    if (code)
+        log.warn('Got a ' + code + ' when querying ' + friend);
+    else
+        log.error(e);
     if (message.length)
         log.warn(message);
     if (reply && !looped)

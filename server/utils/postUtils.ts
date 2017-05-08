@@ -9,6 +9,7 @@ import * as comments from '../controllers/comment';
 import * as reactions from '../controllers/reaction';
 
 import * as utils from './serverUtils';
+import * as commons from './commons';
 import {SequelizeWrapper} from './sequelizeWrapper';
 
 import {User} from '../models/users';
@@ -183,7 +184,7 @@ export function retrieveRemotePosts(source: User, params: any, idtoken?: string,
 		let url = utils.getGetRequestUrl(source, '/v1/server/posts', params, sigtoken);
 
 		// We'll use HTTP only for localhost
-		if(url.indexOf('localhost') < 0) url = 'https://' + url;
+		if(url.indexOf('localhost') < 0 && !commons.settings.forceHttp) url = 'https://' + url;
 		else url = 'http://' + url
 
 		log.debug('Requesting GET ' + url);
@@ -212,7 +213,7 @@ export function retrieveRemotePost(source: User, timestamp: any, idtoken?: strin
 		}
 
 		// We'll use HTTP only for localhost
-		if(url.indexOf('localhost') < 0) url = 'https://' + url;
+		if(url.indexOf('localhost') < 0 && !commons.settings.forceHttp) url = 'https://' + url;
 		else url = 'http://' + url
 
 		log.debug('Requesting GET ' + url);
