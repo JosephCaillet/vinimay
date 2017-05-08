@@ -1,3 +1,4 @@
+import { Comment } from '../../providers/apiClient/model/comment';
 import { User } from '../../providers/apiClient/model/user';
 import { Component, Input } from '@angular/core';
 import { Post, CommentsArray, V1Service } from "../../providers/apiClient/index";
@@ -19,23 +20,18 @@ export class CommentsComponent {
   @Input() post: Post
   @Input() user: User
 	commentForm: FormGroup
-	comments: CommentsArray = //[]
-	[
+	comments: CommentsArray = [
 		{
 			"author": "bobi@url.com",
 			"content": "Can't touch this",
-			"creationTs": 123456789,
-			"lastEditTs": 123406789,
-			"postAuthor":"",
-			"postTs": 0
+			"creationTs": 12345678900,
+			"lastEditTs": 123406789
 		},
 		{
 			"author": "felicie@rngo.com",
 			"content": "LOL MDR XPTDR xDxDxDxD",
-			"creationTs": 123456789,
-			"lastEditTs": 123456789,
-			"postAuthor":"",
-			"postTs": 0
+			"creationTs": 123456789000	,
+			"lastEditTs": 123456789
 		}
 	]
 
@@ -45,7 +41,7 @@ export class CommentsComponent {
 
 	ngOnInit() {
 		this.api.getV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs).subscribe( (data) => {
-			this.comments = data.comments
+			//this.comments = data.comments
 		}, (err) => {
 			console.error(err)
 		})
@@ -61,7 +57,9 @@ export class CommentsComponent {
 		})
 	}
 
-	deleteComment(comment: Comment) {
-
+	deleteComment(commentToDelete: Comment) {
+		this.comments = this.comments.filter((comment) => {
+			return comment.creationTs != commentToDelete.creationTs
+		})
 	}
 }
