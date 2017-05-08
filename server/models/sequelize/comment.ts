@@ -14,24 +14,12 @@ module.exports = <s.DefineAttributes>{
 		allowNull: false
 	},
 	creationTs_Post: <s.DefineAttributeColumnOptions>{
-		type: s.TEXT,
-		references: {
-			model: 'post',
-			key: 'creationTs'
-		}
+		type: s.TEXT
 	},
 	username: <s.DefineAttributeColumnOptions>{
-		type: s.TEXT,
-		references: {
-			model: 'profile',
-			key: 'username'
-		}
+		type: s.TEXT
 	},
 	url: <s.DefineAttributeColumnOptions>{
-		type: s.TEXT,
-		references: {
-			model: 'profile',
-			key: 'url'
-		}
+		type: s.TEXT
 	}
 }

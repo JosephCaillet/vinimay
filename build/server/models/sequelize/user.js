@@ -4,19 +4,11 @@ const s = require("sequelize");
 module.exports = {
     username: {
         type: s.TEXT,
-        primaryKey: true,
-        references: {
-            model: 'profile',
-            key: 'username'
-        }
+        primaryKey: true
     },
     url: {
         type: s.TEXT,
-        primaryKey: true,
-        references: {
-            model: 'profile',
-            key: 'url'
-        }
+        primaryKey: true
     },
     password: {
         type: s.TEXT,

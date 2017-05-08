@@ -15,24 +15,12 @@ module.exports = {
         allowNull: false
     },
     creationTs_Post: {
-        type: s.TEXT,
-        references: {
-            model: 'post',
-            key: 'creationTs'
-        }
+        type: s.TEXT
     },
     username: {
-        type: s.TEXT,
-        references: {
-            model: 'profile',
-            key: 'username'
-        }
+        type: s.TEXT
     },
     url: {
-        type: s.TEXT,
-        references: {
-            model: 'profile',
-            key: 'url'
-        }
+        type: s.TEXT
     }
 };
