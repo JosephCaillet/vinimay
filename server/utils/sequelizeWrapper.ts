@@ -44,6 +44,29 @@ export class SequelizeWrapper {
 			instance.define('reaction', require('../models/sequelize/reaction'), { freezeTableName: true });
 			instance.define('user', require('../models/sequelize/user'), { freezeTableName: true });
 
+			// friend/user associations with profile
+			// this is needed for join requests we do in controllers/friends
+			// and controllers/user
+
+			// Detail the association between a friend and its local profile
+			instance.model('friend').belongsTo(instance.model('profile'), {
+				foreignKey: 'username',
+				targetKey: 'username'
+			});
+			instance.model('friend').belongsTo(instance.model('profile'), {
+				foreignKey: 'url',
+				targetKey: 'url'
+			});
+			// Detail the association between an user and its profile
+			instance.model('user').belongsTo(instance.model('profile'), {
+				foreignKey: 'username',
+				targetKey: 'username'
+			});
+			instance.model('user').belongsTo(instance.model('profile'), {
+				foreignKey: 'url',
+				targetKey: 'url'
+			});
+
 			this.instances[name] = instance;
 		}
 
