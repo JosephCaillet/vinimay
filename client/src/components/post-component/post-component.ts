@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Post } from "../../providers/apiClient/index";
+import { Post, User } from "../../providers/apiClient/index";
 import DateFormaterService from "../../providers/date-formater";
 
 /**
@@ -15,7 +15,7 @@ import DateFormaterService from "../../providers/date-formater";
 export class PostComponent {
 
   @Input() post: Post
-  @Input() editable: boolean
+  @Input() user: User
 	@Output() postDeleted = new EventEmitter()
 	PrivacyEnum = Post.PrivacyEnum
 	creationDate: string

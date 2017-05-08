@@ -19,7 +19,7 @@
 		{{ 'p.creation' | translate }}
 	</button>
 	<post-component #postComponent *ngFor="let post of posts"
-		[post]="post" [editable]="post.author == user.username + '@' + user.url"
+		[post]="post" [user]="user"
 		(postDeleted)="deletePost($event, postComponent)">
 	</post-component>
 </ion-content>
