@@ -108,7 +108,10 @@ function handleRequestError(friend, e, log, looped, reply) {
         code = e.statusCode;
     }
     if (e instanceof r.StatusCodeError && e.statusCode === 400) {
-        message = 'This usually means the API was wrongly implemented either on the current instance or on the friend\'s.';
+        message = 'This usually means the API was badly implemented either on the current instance or on the friend\'s.';
+    }
+    else if (e instanceof r.StatusCodeError && e.statusCode === 401) {
+        message = 'This can happen because of a bad implementation of the Vinimay API on either side, or because of an instance domain mismatch between the two instances\' databases.';
     }
     else if (e instanceof r.StatusCodeError && e.statusCode === 404) {
         if (reply && !looped)

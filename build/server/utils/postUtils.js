@@ -5,6 +5,7 @@ const request = require("request-promise-native");
 const comments = require("../controllers/comment");
 const reactions = require("../controllers/reaction");
 const utils = require("./serverUtils");
+const commons = require("./commons");
 const sequelizeWrapper_1 = require("./sequelizeWrapper");
 const users_1 = require("../models/users");
 const posts_1 = require("../models/posts");
@@ -193,7 +194,7 @@ function retrieveRemotePosts(source, params, idtoken, sigtoken) {
             params.idToken = idtoken;
         let url = utils.getGetRequestUrl(source, '/v1/server/posts', params, sigtoken);
         // We'll use HTTP only for localhost
-        if (url.indexOf('localhost') < 0)
+        if (url.indexOf('localhost') < 0 && !commons.settings.forceHttp)
             url = 'https://' + url;
         else
             url = 'http://' + url;
@@ -220,7 +221,7 @@ function retrieveRemotePost(source, timestamp, idtoken, sigtoken) {
             url += '&signature=' + signature;
         }
         // We'll use HTTP only for localhost
-        if (url.indexOf('localhost') < 0)
+        if (url.indexOf('localhost') < 0 && !commons.settings.forceHttp)
             url = 'https://' + url;
         else
             url = 'http://' + url;
