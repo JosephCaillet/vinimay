@@ -160,9 +160,7 @@ module.exports = {
                 handler: comments.add,
                 validate: {
                     params: postUrlSchema,
-                    payload: Joi.object({
-                        content: Joi.string().required().description('Comment content')
-                    }).label('CommentInput')
+                    payload: comments.commentsInput
                 },
                 plugins: { 'hapi-swagger': { responses: {
                             '200': {
@@ -245,7 +243,7 @@ module.exports = {
                     query: {
                         from: Joi.number().min(1).description('Most recent timestamp'),
                         nb: Joi.number().min(1).description('Number of comments to retrieve'),
-                        idToken: Joi.string().description('Identification token bound to a friend. If not provided, only public posts will be sent'),
+                        idToken: Joi.string().description('Identification token bound to a friend'),
                         signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
                     }
                 },
@@ -253,6 +251,27 @@ module.exports = {
                             '200': {
                                 description: 'A list of comments with an information on authentication',
                                 schema: comments.commentsArray
+                            }
+                        } } }
+            },
+            post: {
+                description: 'Add a comment to a post',
+                notes: 'Add a comment to a post using the post\'s creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#post-a-comment).',
+                handler: comments.serverAdd,
+                validate: {
+                    payload: comments.commentsInput,
+                    params: {
+                        timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+                    },
+                    query: {
+                        idToken: Joi.string().description('Identification token bound to a friend'),
+                        signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
+                    }
+                },
+                plugins: { 'hapi-swagger': { responses: {
+                            '200': {
+                                description: 'The created comment',
+                                schema: comments.commentSchema
                             }
                         } } }
             }

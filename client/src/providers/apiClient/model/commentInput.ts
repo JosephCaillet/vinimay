@@ -18,4 +18,9 @@ export interface CommentInput {
      */
     content: string;
 
+    /**
+     * Comment author (necessary for comments on public posts)
+     */
+    author?: string;
+
 }

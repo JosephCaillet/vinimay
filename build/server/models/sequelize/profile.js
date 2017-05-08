@@ -8,7 +8,7 @@ module.exports = {
     },
     url: {
         type: s.TEXT,
-        allowNull: false
+        primaryKey: true
     },
     description: s.TEXT
 };

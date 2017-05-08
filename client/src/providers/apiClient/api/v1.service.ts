@@ -238,7 +238,7 @@ export class V1Service {
      * @param timestamp The post&#39;s creation timestamp
      * @param from Most recent timestamp
      * @param nb Number of comments to retrieve
-     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param idToken Identification token bound to a friend
      * @param signature 
      */
     public getV1ServerPostsTimestampComments(timestamp: number, from?: number, nb?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<CommentsArray> {
@@ -308,6 +308,25 @@ export class V1Service {
      */
     public postV1Dummy(extraHttpRequestParams?: any): Observable<{}> {
         return this.postV1DummyWithHttpInfo(extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Add a comment to a post
+     * Add a comment to a post using the post&#39;s creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#post-a-comment).
+     * @param timestamp The post&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend
+     * @param signature 
+     * @param body 
+     */
+    public postV1ServerPostsTimestampComments(timestamp: number, idToken?: string, signature?: string, body?: CommentInput, extraHttpRequestParams?: any): Observable<Comment> {
+        return this.postV1ServerPostsTimestampCommentsWithHttpInfo(timestamp, idToken, signature, body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -704,7 +723,7 @@ export class V1Service {
      * @param timestamp The post&#39;s creation timestamp
      * @param from Most recent timestamp
      * @param nb Number of comments to retrieve
-     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param idToken Identification token bound to a friend
      * @param signature 
      */
     public getV1ServerPostsTimestampCommentsWithHttpInfo(timestamp: number, from?: number, nb?: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
@@ -891,6 +910,57 @@ export class V1Service {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Add a comment to a post
+     * Add a comment to a post using the post&#39;s creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#post-a-comment).
+     * @param timestamp The post&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend
+     * @param signature 
+     * @param body 
+     */
+    public postV1ServerPostsTimestampCommentsWithHttpInfo(timestamp: number, idToken?: string, signature?: string, body?: CommentInput, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/posts/${timestamp}/comments'
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling postV1ServerPostsTimestampComments.');
+        }
+        if (idToken !== undefined) {
+            queryParameters.set('idToken', <any>idToken);
+        }
+
+        if (signature !== undefined) {
+            queryParameters.set('signature', <any>signature);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:true
         });

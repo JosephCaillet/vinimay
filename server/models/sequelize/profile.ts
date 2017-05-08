@@ -7,7 +7,7 @@ module.exports = <s.DefineAttributes>{
 	},
 	url: <s.DefineAttributeColumnOptions>{
 		type: s.TEXT,
-		allowNull: false
+		primaryKey: true
 	},
 	description: s.TEXT
 }
