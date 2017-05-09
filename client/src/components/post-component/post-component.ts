@@ -20,7 +20,6 @@ export class PostComponent {
 	PrivacyEnum = Post.PrivacyEnum
 	creationDate: string
 	editionDate: string
-	hasReaction: boolean
 	deleted = false
 
 	constructor(public dateFormatter: DateFormaterService) {
@@ -36,11 +35,11 @@ export class PostComponent {
 	}
 
 	toggleReactionState() {
-		this.hasReaction = !this.hasReaction
-		if (this.hasReaction) {
-			this.post.reactions--
-		} else {
+		this.post.reacted = !this.post.reacted
+		if (this.post.reacted) {
 			this.post.reactions++
+		} else {
+			this.post.reactions--
 		}
 	}
 
