@@ -1,10 +1,10 @@
 post-component {
 	@keyframes foldingPost {
-    from {max-height: 500px}
-    to {max-height: 0px}
+		from {max-height: 500px}
+		to {max-height: 0px}
 	}
 
 	.deletedPost {
-    animation: ease-in foldingPost 1s forwards;
+		animation: ease-in foldingPost 1s forwards;
 	}
 }
