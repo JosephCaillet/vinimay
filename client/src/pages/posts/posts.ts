@@ -39,7 +39,7 @@ export class PostsPage {
 		let modal = this.modCtrl.create(PostModal, null, { showBackdrop: false, enableBackdropDismiss: false })
 		modal.onDidDismiss((post) => {
 			if (post) {
-				this.posts.splice(0, 0, post)
+				this.posts.unshift(post)
 			}
 		})
 		modal.present()

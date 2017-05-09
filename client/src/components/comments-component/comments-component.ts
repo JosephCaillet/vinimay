@@ -21,20 +21,7 @@ export class CommentsComponent {
 	@Input() post: Post
   @Input() user: User
 	commentForm: FormGroup
-	comments: CommentsArray = [
-		{
-			"author": "bobi@url.com",
-			"content": "Can't touch this",
-			"creationTs": 12345678900,
-			"lastEditTs": 123406789
-		},
-		{
-			"author": "felicie@rngo.com",
-			"content": "LOL MDR XPTDR xDxDxDxD",
-			"creationTs": 123456789000	,
-			"lastEditTs": 123456789
-		}
-	]
+	comments: CommentsArray = []
 	deleted = false
 
   constructor(public dateFormater: DateFormaterService, private api: V1Service) {
@@ -43,17 +30,17 @@ export class CommentsComponent {
 
 	ngOnInit() {
 		this.api.getV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs).subscribe( (data) => {
-			//this.comments = data.comments
+			this.comments = data.comments
 		}, (err) => {
 			console.error(err)
 		})
 	}
 
 	createComment() {
-		this.api.postV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs, this.commentForm.value.comment)
+		this.api.postV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs, {"content": this.commentForm.value.comment})
 		.subscribe((data) => {
 			this.commentForm.controls['comment'].setValue('')
-			this.comments = this.comments.splice(0, 0, data)
+			this.comments.push(data)
 		}, (err) => {
 			console.error(err)
 		})
