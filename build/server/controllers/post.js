@@ -268,10 +268,10 @@ function serverGetSingle(request, reply) {
     }).catch(e => reply(b.wrap(e)));
 }
 exports.serverGetSingle = serverGetSingle;
-function getOptions(queryParams, timestampField) {
+function getOptions(queryParams, order = 'DESC') {
     let options = {};
     // Set the order
-    options.order = [['creationTs', 'DESC']];
+    options.order = [['creationTs', order]];
     // Apply filters
     if (queryParams.nb)
         options.limit = queryParams.nb;
@@ -281,10 +281,7 @@ function getOptions(queryParams, timestampField) {
         if (queryParams.from)
             timestamp['$lte'] = queryParams.from;
         options.where = {};
-        if (timestampField)
-            options.where[timestampField] = timestamp;
-        else
-            options.where.creationTs = timestamp;
+        options.where.creationTs = timestamp;
     }
     return options;
 }

@@ -53,7 +53,7 @@ async function get(request, reply) {
             return reply(Boom.notFound());
         // Check if the post is local or not
         if (!user.get('url').localeCompare(author.instance)) {
-            let options = post_1.getOptions(request.query, 'creationTs');
+            let options = post_1.getOptions(request.query, 'ASC');
             // Use the post's creation timestamp to filter the results
             if (!options.where)
                 options.where = {};
@@ -62,9 +62,9 @@ async function get(request, reply) {
             instance.model('comment').findAll(options)
                 .then((comments) => {
                 let res = new Array();
-                let author = new users_1.User(user.get('username'), user.get('url'));
                 for (let i in comments) {
                     let comment = comments[i];
+                    let author = new users_1.User(comment.get('username'), comment.get('url'));
                     res.push({
                         creationTs: comment.get('creationTs'),
                         lastEditTs: comment.get('lastModificationTs'),
@@ -217,7 +217,7 @@ async function serverGet(request, reply) {
         }
         if (!canRead)
             return reply(Boom.notFound());
-        let options = post_1.getOptions(request.query, 'creationTs');
+        let options = post_1.getOptions(request.query, 'ASC');
         // Use the post's creation timestamp to filter the results
         if (!options.where)
             options.where = {};
@@ -228,10 +228,11 @@ async function serverGet(request, reply) {
             let res = new Array();
             for (let i in comments) {
                 let comment = comments[i];
+                let author = new users_1.User(comment.get('username'), comment.get('url'));
                 res.push({
                     creationTs: comment.creationTs,
                     lastEditTs: comment.lastModificationTs,
-                    author: user.toString(),
+                    author: author.toString(),
                     content: comment.content
                 });
             }
