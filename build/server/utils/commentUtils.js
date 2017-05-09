@@ -74,14 +74,13 @@ function createRemoteComment(author, user, timestamp, content, idtoken, sigtoken
     });
 }
 exports.createRemoteComment = createRemoteComment;
-function deleteRemoteComment(currentUser, postAuthor, commentAuthor, tsPost, tsComment, idtoken, sigtoken) {
+function deleteRemoteComment(postAuthor, tsPost, tsComment, idtoken, sigtoken) {
     return new Promise((resolve, reject) => {
         let params = {
             timestamp: tsPost,
-            author: commentAuthor,
             commentTimestamp: tsComment
         };
-        let reqPath = path.join('/v1/server/posts', tsPost.toString(), 'comments', commentAuthor.toString(), tsComment.toString());
+        let reqPath = path.join('/v1/server/posts', tsPost.toString(), 'comments', tsComment.toString());
         let url = postAuthor + reqPath;
         if (idtoken && sigtoken) {
             params.idToken = idtoken;

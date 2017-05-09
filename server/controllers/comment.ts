@@ -203,16 +203,9 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 
 	let user = await utils.getUser(username);
 	let author = new User(request.params.user);
-	let commentAuthor = new User(request.params.author);
 
 	let tsPost = parseInt(request.params.timestamp);
 	let tsComment = parseInt(request.params.commentTimestamp);
-
-	// Can we remove the comment
-	if(user.username.localeCompare(commentAuthor.username) 
-			|| user.instance.localeCompare(commentAuthor.instance)) {
-		return reply(Boom.unauthorized());
-	}
 
 	// Is the post local
 	if(!user.instance.localeCompare(author.instance)) {
@@ -221,7 +214,9 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 			instance.model('comment').destroy({ where: {
 				creationTs_Post: tsPost,
 				creationTs: tsComment
-			}}).then(() => {
+			}}).then((destroyedRows: number) => {
+				// If no row was destroyed, 
+				if(!destroyedRows) return reply(Boom.notFound());
 				return reply(null).code(204);
 			});
 		} else {
@@ -240,10 +235,10 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 				idtoken = friend.get('id_token');
 				sigtoken = friend.get('signature_token');
 			}
-			commentsUtils.deleteRemoteComment(user, author, commentAuthor, tsPost, tsComment, idtoken, sigtoken)
+			commentsUtils.deleteRemoteComment(author, tsPost, tsComment, idtoken, sigtoken)
 			.then(() => {
 				return reply(null).code(204);
-			}).catch(e => reply(Boom.wrap(e)));
+			}).catch(e => utils.handleRequestError(author, e, log, false, reply));
 		});
 	}
 }
@@ -444,16 +439,10 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 		if(request.query.idToken && request.query.signature) {
 			return utils.getFriendByToken(username, request.query.idToken);
 		} else {
-			let schema = commons.user.required().label('Comment author');
-			let err;
-			if(err = Joi.validate(request.params.author, schema).error) {
-				return reply(Boom.badRequest(err));
-			}
-			let author = new User(request.params.author);
 			// If the user isn't a friend, use its entry from the profile table
 			return instance.model('profile').findOne({where: {
-				username: author.username,
-				url: author.instance
+				username: comment.get('username'),
+				url: comment.get('url')
 			}, raw: true });
 		}
 	}).then((friend) => {
@@ -477,6 +466,8 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 					&& !friend.url.localeCompare(comment.get('url'))) {
 			comment.destroy();
 			return reply(null).code(204);
+		} else {
+			return reply(Boom.unauthorized());
 		}
 	}).catch(e => reply(Boom.wrap(e)))
 }

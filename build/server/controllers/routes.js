@@ -176,7 +176,7 @@ module.exports = {
                         } } }
             }
         },
-        '/client/posts/{user}/{timestamp}/comments/{author}/{commentTimestamp}': {
+        '/client/posts/{user}/{timestamp}/comments/{commentTimestamp}': {
             delete: {
                 description: 'Remove a comment',
                 notes: 'Remove a comment given its author and timestamp',
@@ -185,7 +185,6 @@ module.exports = {
                     params: {
                         user: commons.user.required().description('Post author'),
                         timestamp: Joi.number().required().description('Post timestamp'),
-                        author: commons.user.required().description('Comment author'),
                         commentTimestamp: Joi.number().required().description('Comment timestamp'),
                     }
                 }
@@ -289,7 +288,7 @@ module.exports = {
                         } } }
             }
         },
-        '/server/posts/{timestamp}/comments/{author}/{commentTimestamp}': {
+        '/server/posts/{timestamp}/comments/{commentTimestamp}': {
             delete: {
                 description: 'Remove a comment',
                 notes: 'Remove a comment given its author and timestamp',
@@ -297,7 +296,6 @@ module.exports = {
                 validate: {
                     params: {
                         timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp'),
-                        author: commons.user.description('The comment\'s author'),
                         commentTimestamp: Joi.number().integer().min(1).required().description('The comment\'s creation timestamp')
                     },
                     query: tokens
