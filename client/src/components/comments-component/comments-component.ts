@@ -12,24 +12,24 @@ import DateFormaterService from "../../providers/date-formater";
  * for more info on Angular Components.
  */
 @Component({
-  selector: 'comments-component',
-  templateUrl: 'comments-component.html',
+	selector: 'comments-component',
+	templateUrl: 'comments-component.html',
 })
 export class CommentsComponent {
 
-  @ViewChild('commentsList') commentList
+	@ViewChild('commentsList') commentList
 	@Input() post: Post
-  @Input() user: User
+	@Input() user: User
 	commentForm: FormGroup
 	comments: CommentsArray = []
 	deleted = false
 
-  constructor(public dateFormater: DateFormaterService, private api: V1Service) {
-		this.commentForm = new FormGroup({"comment": new FormControl('', Validators.required)})
-  }
+	constructor(public dateFormater: DateFormaterService, private api: V1Service) {
+		this.commentForm = new FormGroup({ "comment": new FormControl('', Validators.required) })
+	}
 
 	ngOnInit() {
-		this.api.getV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs).subscribe( (data) => {
+		this.api.getV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs).subscribe((data) => {
 			this.comments = data.comments
 		}, (err) => {
 			console.error(err)
@@ -37,23 +37,29 @@ export class CommentsComponent {
 	}
 
 	createComment() {
-		this.api.postV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs, {"content": this.commentForm.value.comment})
-		.subscribe((data) => {
-			this.commentForm.controls['comment'].setValue('')
-			this.comments.push(data)
-		}, (err) => {
-			console.error(err)
-		})
+		this.api.postV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs, { "content": this.commentForm.value.comment })
+			.subscribe((data) => {
+				this.commentForm.controls['comment'].setValue('')
+				this.comments.push(data)
+			}, (err) => {
+				console.error(err)
+			})
 	}
 
 	deleteComment(commentToDelete: Comment) {
-		let index = this.comments.indexOf(commentToDelete)
-		this.commentList.nativeElement.children[index].classList.add('deletedComment')
+		this.api.deleteV1ClientPostsUserTimestampCommentsCommenttimestamp(
+			this.post.author, this.post.creationTs, commentToDelete.creationTs)
+			.subscribe(() => {
+				let index = this.comments.indexOf(commentToDelete)
+				this.commentList.nativeElement.children[index].classList.add('deletedComment')
 
-		setTimeout(() => {
-			this.comments = this.comments.filter((comment) => {
-				return comment.creationTs != commentToDelete.creationTs
+				setTimeout(() => {
+					this.comments = this.comments.filter((comment) => {
+						return comment.creationTs != commentToDelete.creationTs
+					})
+				}, 500)
+			}, err => {
+				console.error(err)
 			})
-		}, 500)
 	}
 }
