@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 const request = require("request-promise-native");
+const commons = require("./commons");
 const utils = require("./serverUtils");
 const log = require('printit')({
     date: true,
@@ -21,7 +22,7 @@ function retrieveRemoteComments(source, timestamp, params, idtoken, sigtoken) {
             url += '&signature=' + signature;
         }
         // We'll use HTTP only for localhost
-        if (url.indexOf('localhost') < 0)
+        if (url.indexOf('localhost') < 0 && !commons.settings.forceHttp)
             url = 'https://' + url;
         else
             url = 'http://' + url;
@@ -37,9 +38,9 @@ exports.retrieveRemoteComments = retrieveRemoteComments;
 function createRemoteComment(author, user, timestamp, content, idtoken, sigtoken) {
     return new Promise((ok, ko) => {
         let params = {
-            timestamp: parseInt(timestamp),
+            timestamp: timestamp,
             content: content,
-            author: author.toString(),
+            author: author.toString()
         };
         let reqPath = path.join('/v1/server/posts', timestamp.toString(), 'comments');
         let url = user + reqPath;
@@ -50,7 +51,7 @@ function createRemoteComment(author, user, timestamp, content, idtoken, sigtoken
             url += '&signature=' + signature;
         }
         // We'll use HTTP only for localhost
-        if (url.indexOf('localhost') < 0)
+        if (url.indexOf('localhost') < 0 && !commons.settings.forceHttp)
             url = 'https://' + url;
         else
             url = 'http://' + url;
@@ -73,3 +74,35 @@ function createRemoteComment(author, user, timestamp, content, idtoken, sigtoken
     });
 }
 exports.createRemoteComment = createRemoteComment;
+function deleteRemoteComment(currentUser, postAuthor, commentAuthor, tsPost, tsComment, idtoken, sigtoken) {
+    return new Promise((resolve, reject) => {
+        let params = {
+            timestamp: tsPost,
+            author: commentAuthor,
+            commentTimestamp: tsComment
+        };
+        let reqPath = path.join('/v1/server/posts', tsPost.toString(), 'comments', commentAuthor.toString(), tsComment.toString());
+        let url = postAuthor + reqPath;
+        if (idtoken && sigtoken) {
+            params.idToken = idtoken;
+            let signature = utils.computeSignature('DELETE', url, params, sigtoken);
+            url += '?idToken=' + idtoken;
+            url += '&signature=' + signature;
+        }
+        // We'll use HTTP only for localhost
+        if (url.indexOf('localhost') < 0 && !commons.settings.forceHttp)
+            url = 'https://' + url;
+        else
+            url = 'http://' + url;
+        log.debug('Requesting DELETE', url);
+        request({
+            method: 'DELETE',
+            uri: url,
+        })
+            .then((response) => {
+            log.debug('Deleted a comment on', postAuthor.toString());
+            resolve(response);
+        }).catch(reject);
+    });
+}
+exports.deleteRemoteComment = deleteRemoteComment;

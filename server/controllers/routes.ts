@@ -13,6 +13,11 @@ const postUrlSchema = Joi.object({
 	timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
 }).label('PostParams');
 
+const tokens = Joi.object({
+	idToken: Joi.string().description('Identification token bound to a friend'),
+	signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
+}).label('Tokens')
+
 module.exports = {
 	v1: {
 		'/client/me': {
@@ -175,6 +180,21 @@ module.exports = {
 				}}}
 			}
 		},
+		'/client/posts/{user}/{timestamp}/comments/{author}/{commentTimestamp}': {
+			delete: {
+				description: 'Remove a comment',
+				notes: 'Remove a comment given its author and timestamp',
+				handler: comments.del,
+				validate: {
+					params: {
+						user: commons.user.required().description('Post author'),
+						timestamp: Joi.number().required().description('Post timestamp'),
+						author: commons.user.required().description('Comment author'),
+						commentTimestamp: Joi.number().required().description('Comment timestamp'),
+					}
+				}
+			}
+		},
 		'/client/friends': {
 			get: {
 				description: 'Retrieve all friend requests',
@@ -220,10 +240,7 @@ module.exports = {
 					params: {
 						timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
 					},
-					query: {
-						idToken: Joi.string().description('Identification token bound to a friend. If not provided, only public posts will be sent'),
-						signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
-					}
+					query: tokens
 				},
 				plugins: { 'hapi-swagger': { responses: {
 					'200': {
@@ -265,16 +282,34 @@ module.exports = {
 					params: {
 						timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
 					},
-					query: {
-						idToken: Joi.string().description('Identification token bound to a friend'),
-						signature: Joi.string().when('idToken', { is: Joi.string().required(), then: Joi.required(), otherwise: Joi.optional() }).description('Request signature. Must be provided if an idToken is provided')
-					}
+					query: tokens
 				},
 				plugins: { 'hapi-swagger': { responses: {
 					'200': {
 						description: 'The created comment',
 						schema: comments.commentSchema
 					}
+				}}}
+			}
+		},
+		'/server/posts/{timestamp}/comments/{author}/{commentTimestamp}': {
+			delete: {
+				description: 'Remove a comment',
+				notes: 'Remove a comment given its author and timestamp',
+				handler: comments.serverDel,
+				validate: {
+					params: {
+						timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp'),
+						author: commons.user.description('The comment\'s author'),
+						commentTimestamp: Joi.number().integer().min(1).required().description('The comment\'s creation timestamp')
+					},
+					query: tokens
+				},
+				plugins: { 'hapi-swagger': { responses: {
+					'204': { description: 'The comment has been deleted' },
+					'400': { description: 'The comment author was required but not provided' },
+					'401': { description: 'Incorrect signature' },
+					'404': { description: 'The comment or its author was not found' }
 				}}}
 			}
 		},

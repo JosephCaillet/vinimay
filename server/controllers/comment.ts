@@ -46,8 +46,10 @@ export let commentsInput = Joi.object({
 export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 	let instance: sequelize.Sequelize;
 
+	let user: User;
+
 	try {
-		let user = await utils.getUser(username)
+		user = await utils.getUser(username)
 		instance = SequelizeWrapper.getInstance(username);
 	} catch(e) {
 		return reply(Boom.wrap(e));
@@ -105,14 +107,14 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 					idtoken = friend.get('id_token');
 					sigtoken = friend.get('signature_token');
 				}
-				let user = new User(friend.get('username'), friend.get('url'));
-				commentsUtils.retrieveRemoteComments(author, request.params.timestamp, {}, idtoken, sigtoken).then((comments: Comment[]) => {
+				let timestamp = parseInt(request.params.timestamp);
+				commentsUtils.retrieveRemoteComments(author, timestamp, {}, idtoken, sigtoken).then((comments: Comment[]) => {
 					let rep = {
 						authenticated: true,
 						comments: comments
 					};
 					return commons.checkAndSendSchema(rep, commentsSchema, log, reply)
-				}).catch(e => utils.handleRequestError(user, e, log, false, reply));
+				}).catch(e => utils.handleRequestError(author, e, log, false, reply));
 			}).catch(e => reply(Boom.wrap(e)));
 		}
 	}).catch(e => reply(Boom.wrap(e)));
@@ -123,7 +125,6 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 	let instance: sequelize.Sequelize;
 
 	try {
-		let user = await utils.getUser(username)
 		instance = SequelizeWrapper.getInstance(username);
 	} catch(e) {
 		return reply(Boom.wrap(e));
@@ -177,7 +178,8 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 				idtoken = friend.get('id_token');
 				sigtoken = friend.get('signature_token');
 			}
-			commentsUtils.createRemoteComment(author, postAuthor, request.params.timestamp, request.payload.content, idtoken, sigtoken).then((comment: Comment) => {
+			let timestamp = parseInt(request.params.timestamp);
+			commentsUtils.createRemoteComment(author, postAuthor, timestamp, request.payload.content, idtoken, sigtoken).then((comment: Comment) => {
 				return commons.checkAndSendSchema(comment, commentSchema, log, reply);
 			}).catch(e => utils.handleRequestError(postAuthor, e, log, false, reply));
 		}).catch(e => reply(Boom.wrap(e)));
@@ -190,8 +192,60 @@ export function update(request: Hapi.Request, reply: Hapi.IReply) {
 }
 
 
-export function del(request: Hapi.Request, reply: Hapi.IReply) {
-	
+export async function del(request: Hapi.Request, reply: Hapi.IReply) {
+	let instance: sequelize.Sequelize;
+
+	try {
+		instance = SequelizeWrapper.getInstance(username);
+	} catch(e) {
+		return reply(Boom.wrap(e));
+	}
+
+	let user = await utils.getUser(username);
+	let author = new User(request.params.user);
+	let commentAuthor = new User(request.params.author);
+
+	let tsPost = parseInt(request.params.timestamp);
+	let tsComment = parseInt(request.params.commentTimestamp);
+
+	// Can we remove the comment
+	if(user.username.localeCompare(commentAuthor.username) 
+			|| user.instance.localeCompare(commentAuthor.instance)) {
+		return reply(Boom.unauthorized());
+	}
+
+	// Is the post local
+	if(!user.instance.localeCompare(author.instance)) {
+		// Is the post from the current user
+		if(!user.username.localeCompare(author.username)) {
+			instance.model('comment').destroy({ where: {
+				creationTs_Post: tsPost,
+				creationTs: tsComment
+			}}).then(() => {
+				return reply(null).code(204);
+			});
+		} else {
+			// TODO: Suppoer multi-user
+		}
+	} else {
+		instance.model('friend').findOne({ where: {
+			username: author.username,
+			url: author.instance
+		}}).then((friend: sequelize.Instance<any>) => {
+			let idtoken, sigtoken;
+			// Set the token if the post author is known
+			// Note: if the author isn't a friend (following doesn't count),
+			// tokens will still be null/undefined
+			if(friend) {
+				idtoken = friend.get('id_token');
+				sigtoken = friend.get('signature_token');
+			}
+			commentsUtils.deleteRemoteComment(user, author, commentAuthor, tsPost, tsComment, idtoken, sigtoken)
+			.then(() => {
+				return reply(null).code(204);
+			}).catch(e => reply(Boom.wrap(e)));
+		});
+	}
 }
 
 
@@ -243,20 +297,20 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 		// We cast directly as comment, so we don't need getters and setters
 		options.raw = true;
 
-		instance.model('comment').findAll(options).then((comments: any[]) => {
-			let res = new Array<Comment>();
-			for(let i in comments) {
-				let comment = comments[i];
-				let author = new User(comment.username, comment.url);
-				res.push({
-					creationTs: comment.creationTs,
-					lastEditTs: comment.lastModificationTs,
-					author: author.toString(),
-					content: comment.content
-				});
-			}
-			return commons.checkAndSendSchema(res, commentsArray, log, reply)
-		}).catch(e => reply(Boom.wrap(e)));
+		return instance.model('comment').findAll(options)
+	}).then((comments: any[]) => {
+		let res = new Array<Comment>();
+		for(let i in comments) {
+			let comment = comments[i];
+			let author = new User(comment.username, comment.url);
+			res.push({
+				creationTs: comment.creationTs,
+				lastEditTs: comment.lastModificationTs,
+				author: author.toString(),
+				content: comment.content
+			});
+		}
+		return commons.checkAndSendSchema(res, commentsArray, log, reply)
 	}).catch(e => reply(Boom.wrap(e)));
 }
 
@@ -275,7 +329,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 	.then(async (post: sequelize.Instance<Post>) => {
 		if(!post) return reply(Boom.notFound());
 
-		let privacy: Privacy = Privacy[<string>post.get('privacy')];;
+		let privacy: Privacy = Privacy[<string>post.get('privacy')];
 
 		let author: User;
 		// Commenting on a public post requires info on the author as identification
@@ -287,24 +341,48 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 				return reply(Boom.badRequest(err));
 			}
 
-			author = new User(request.payload.author);
 
-			// Check if we know the author
-			let knownAuthor = !!(await instance.model('profile').count({where: {
-				url: author.instance,
-				username: author.username
-			}}));
-			
-			// If we don't know the author, save it
-			if(!knownAuthor) {
-				await instance.model('profile').create({
+			// No need to check if we know the author if its a friend
+			if(request.query.idToken && request.query.signature) {
+				try {
+					let res = await utils.getFriendByToken(username, request.query.idToken);
+					author = new User(res.username, res.url);
+					if(!author || !await postUtils.canReadPost(username, privacy, author)) {
+						return reply(Boom.notFound());
+					}
+					let url = user + request.path;
+					let params = Object.assign(request.params, request.query);
+					params = Object.assign(params, request.payload);
+					let sig = utils.computeSignature('POST', url, params, res.signature_token)
+					if(!utils.checkSignature(request.query.signature, sig)) {
+						return reply(Boom.unauthorized('WRONG_SIGNATURE'))
+					}
+				} catch(e) {
+					if(e instanceof VinimayError) return reply(Boom.notFound())
+					throw e;
+				}				
+			} else {
+				author = new User(request.payload.author);
+				// Check if we know the author
+				let knownAuthor = !!(await instance.model('profile').count({where: {
 					url: author.instance,
 					username: author.username
-				});
+				}}));
+				
+				// If we don't know the author, save it
+				if(!knownAuthor) {
+					await instance.model('profile').create({
+						url: author.instance,
+						username: author.username
+					});
+				}
+				
+				// TODO: Ask the server for confirmation on the addition
 			}
+
 		} else {
-			if(!request.query.idToken) return reply(Boom.notFound())
-			
+			if(!request.query.idToken) return reply(Boom.notFound());
+
 			try {
 				let res = await utils.getFriendByToken(username, request.query.idToken);
 				author = new User(res.username, res.url);
@@ -320,34 +398,87 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 				}
 			} catch(e) {
 				if(e instanceof VinimayError) return reply(Boom.notFound())
-				return reply(Boom.wrap(e));
+				throw e;
 			}
 		}
 
 		let timestamp = (new Date()).getTime()
 
-		instance.model('comment').create({
+		return instance.model('comment').create({
 			creationTs: timestamp,
 			lastModificationTs: timestamp,
 			creationTs_Post: request.params.timestamp,
 			content: request.payload.content,
 			username: author.username,
 			url: author.instance
-		}).then((comment: sequelize.Instance<any>) => {
-			let author = new User(comment.get('username'), comment.get('url'));
-			let res = {
-				creationTs: comment.get('creationTs'),
-				lastEditTs: comment.get('lastModificationTs'),
-				author: author.toString(),
-				content: comment.get('content')
-			};
-			return commons.checkAndSendSchema(res, commentSchema, log, reply);
-		}).catch(e => reply(Boom.wrap(e)))
+		})
+	}).then((comment: sequelize.Instance<any>) => {
+		let author = new User(comment.get('username'), comment.get('url'));
+		let res = {
+			creationTs: comment.get('creationTs'),
+			lastEditTs: comment.get('lastModificationTs'),
+			author: author.toString(),
+			content: comment.get('content')
+		};
+		return commons.checkAndSendSchema(res, commentSchema, log, reply);
 	}).catch(e => reply(Boom.wrap(e)))
 }
 
-export function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
+export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
+	let username = utils.getUsername(request);
+	let user = await utils.getUser(username);
+	let instance: sequelize.Sequelize;
+
+	try { instance = SequelizeWrapper.getInstance(username); }
+	catch(e) { return reply(Boom.notFound()) }
+
+	let comment: sequelize.Instance<any>;
 	
+	instance.model('comment').findOne({
+		where: { creationTs: request.params.commentTimestamp }
+	}).then((res: sequelize.Instance<any>) => {
+		if(!res) return reply(Boom.notFound());
+		comment = res;
+
+		// No need to verify if the author's here if we have an idtoken
+		if(request.query.idToken && request.query.signature) {
+			return utils.getFriendByToken(username, request.query.idToken);
+		} else {
+			let schema = commons.user.required().label('Comment author');
+			let err;
+			if(err = Joi.validate(request.params.author, schema).error) {
+				return reply(Boom.badRequest(err));
+			}
+			let author = new User(request.params.author);
+			// If the user isn't a friend, use its entry from the profile table
+			return instance.model('profile').findOne({where: {
+				username: author.username,
+				url: author.instance
+			}, raw: true });
+		}
+	}).then((friend) => {
+		// If we don't know the user, it may be someone trying to exploit the
+		// API to retrieve posts
+		if(!friend) return reply(Boom.notFound());
+		// Check if the author is a friend. If so, we verify the signature
+		if(friend && friend.id_token && friend.signature_token) {
+			let url = user + request.path;
+			let params = Object.assign(request.params, request.query);
+			let sig = utils.computeSignature('DELETE', url, params, friend.signature_token)
+			if(!utils.checkSignature(request.query.signature, sig)) {
+				return reply(Boom.unauthorized('WRONG_SIGNATURE'))
+			}
+		} else {
+			// TODO: Ask the comment's author's server to confirm the deletion
+		}
+
+		// Check if the user is the comment's author
+		if(!friend.username.localeCompare(comment.get('username')) 
+					&& !friend.url.localeCompare(comment.get('url'))) {
+			comment.destroy();
+			return reply(null).code(204);
+		}
+	}).catch(e => reply(Boom.wrap(e)))
 }
 
 

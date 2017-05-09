@@ -98,6 +98,45 @@ export class V1Service {
     }
 
     /**
+     * Remove a comment
+     * Remove a comment given its author and timestamp
+     * @param user Post author
+     * @param timestamp Post timestamp
+     * @param author Comment author
+     * @param commentTimestamp Comment timestamp
+     */
+    public deleteV1ClientPostsUserTimestampCommentsAuthorCommenttimestamp(user: string, timestamp: number, author: string, commentTimestamp: number, extraHttpRequestParams?: any): Observable<string> {
+        return this.deleteV1ClientPostsUserTimestampCommentsAuthorCommenttimestampWithHttpInfo(user, timestamp, author, commentTimestamp, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Remove a comment
+     * Remove a comment given its author and timestamp
+     * @param timestamp The post&#39;s creation timestamp
+     * @param author The comment&#39;s author
+     * @param commentTimestamp The comment&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend
+     * @param signature 
+     */
+    public deleteV1ServerPostsTimestampCommentsAuthorCommenttimestamp(timestamp: number, author: string, commentTimestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteV1ServerPostsTimestampCommentsAuthorCommenttimestampWithHttpInfo(timestamp, author, commentTimestamp, idToken, signature, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Retrieve all friend requests
      * Retrieve all friend requests (accepted, incoming and sent). Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-4).
      */
@@ -218,7 +257,7 @@ export class V1Service {
      * Retrieve a single post
      * Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-one-post).
      * @param timestamp The post&#39;s creation timestamp
-     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param idToken Identification token bound to a friend
      * @param signature 
      */
     public getV1ServerPostsTimestamp(timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Post> {
@@ -368,6 +407,120 @@ export class V1Service {
         if (timestamp === null || timestamp === undefined) {
             throw new Error('Required parameter timestamp was null or undefined when calling deleteV1ClientPostsTimestamp.');
         }
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Remove a comment
+     * Remove a comment given its author and timestamp
+     * @param user Post author
+     * @param timestamp Post timestamp
+     * @param author Comment author
+     * @param commentTimestamp Comment timestamp
+     */
+    public deleteV1ClientPostsUserTimestampCommentsAuthorCommenttimestampWithHttpInfo(user: string, timestamp: number, author: string, commentTimestamp: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts/${user}/${timestamp}/comments/${author}/${commentTimestamp}'
+                    .replace('${' + 'user' + '}', String(user))
+                    .replace('${' + 'timestamp' + '}', String(timestamp))
+                    .replace('${' + 'author' + '}', String(author))
+                    .replace('${' + 'commentTimestamp' + '}', String(commentTimestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling deleteV1ClientPostsUserTimestampCommentsAuthorCommenttimestamp.');
+        }
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling deleteV1ClientPostsUserTimestampCommentsAuthorCommenttimestamp.');
+        }
+        // verify required parameter 'author' is not null or undefined
+        if (author === null || author === undefined) {
+            throw new Error('Required parameter author was null or undefined when calling deleteV1ClientPostsUserTimestampCommentsAuthorCommenttimestamp.');
+        }
+        // verify required parameter 'commentTimestamp' is not null or undefined
+        if (commentTimestamp === null || commentTimestamp === undefined) {
+            throw new Error('Required parameter commentTimestamp was null or undefined when calling deleteV1ClientPostsUserTimestampCommentsAuthorCommenttimestamp.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Remove a comment
+     * Remove a comment given its author and timestamp
+     * @param timestamp The post&#39;s creation timestamp
+     * @param author The comment&#39;s author
+     * @param commentTimestamp The comment&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend
+     * @param signature 
+     */
+    public deleteV1ServerPostsTimestampCommentsAuthorCommenttimestampWithHttpInfo(timestamp: number, author: string, commentTimestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/posts/${timestamp}/comments/${author}/${commentTimestamp}'
+                    .replace('${' + 'timestamp' + '}', String(timestamp))
+                    .replace('${' + 'author' + '}', String(author))
+                    .replace('${' + 'commentTimestamp' + '}', String(commentTimestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling deleteV1ServerPostsTimestampCommentsAuthorCommenttimestamp.');
+        }
+        // verify required parameter 'author' is not null or undefined
+        if (author === null || author === undefined) {
+            throw new Error('Required parameter author was null or undefined when calling deleteV1ServerPostsTimestampCommentsAuthorCommenttimestamp.');
+        }
+        // verify required parameter 'commentTimestamp' is not null or undefined
+        if (commentTimestamp === null || commentTimestamp === undefined) {
+            throw new Error('Required parameter commentTimestamp was null or undefined when calling deleteV1ServerPostsTimestampCommentsAuthorCommenttimestamp.');
+        }
+        if (idToken !== undefined) {
+            queryParameters.set('idToken', <any>idToken);
+        }
+
+        if (signature !== undefined) {
+            queryParameters.set('signature', <any>signature);
+        }
+
 
         // to determine the Accept header
         let produces: string[] = [
@@ -674,7 +827,7 @@ export class V1Service {
      * Retrieve a single post
      * Retrieve a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-one-post).
      * @param timestamp The post&#39;s creation timestamp
-     * @param idToken Identification token bound to a friend. If not provided, only public posts will be sent
+     * @param idToken Identification token bound to a friend
      * @param signature 
      */
     public getV1ServerPostsTimestampWithHttpInfo(timestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<Response> {

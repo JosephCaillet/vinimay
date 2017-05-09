@@ -5,6 +5,8 @@ import * as r from 'request-promise-native/errors';
 
 import * as crypto from 'crypto';
 
+import * as Friend from '../models/friends';
+
 import {VinimayError} from './vinimayError';
 import {User} from '../models/users';
 import {SequelizeWrapper} from './sequelizeWrapper';
