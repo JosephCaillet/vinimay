@@ -53,8 +53,13 @@ async function get(request, reply) {
             return reply(Boom.notFound());
         // Check if the post is local or not
         if (!user.get('url').localeCompare(author.instance)) {
+            let options = post_1.getOptions(request.query, 'creationTs');
+            // Use the post's creation timestamp to filter the results
+            if (!options.where)
+                options.where = {};
+            options.where['creationTs_Post'] = request.params.timestamp;
             // We don't support multi-user instances yet
-            instance.model('comment').findAll(post_1.getOptions(request.query, 'creationTs_Post'))
+            instance.model('comment').findAll(options)
                 .then((comments) => {
                 let res = new Array();
                 let author = new users_1.User(user.get('username'), user.get('url'));
@@ -178,9 +183,6 @@ async function serverGet(request, reply) {
     catch (e) {
         return reply(Boom.notFound());
     }
-    let options = post_1.getOptions(request.query, 'creationTs_Post');
-    // We cast directly as comment, so we don't need getters and setters
-    options.raw = true;
     let friend;
     if (request.query.idToken) {
         try {
@@ -215,6 +217,13 @@ async function serverGet(request, reply) {
         }
         if (!canRead)
             return reply(Boom.notFound());
+        let options = post_1.getOptions(request.query, 'creationTs');
+        // Use the post's creation timestamp to filter the results
+        if (!options.where)
+            options.where = {};
+        options.where['creationTs_Post'] = request.params.timestamp;
+        // We cast directly as comment, so we don't need getters and setters
+        options.raw = true;
         instance.model('comment').findAll(options).then((comments) => {
             let res = new Array();
             for (let i in comments) {

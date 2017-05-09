@@ -68,8 +68,12 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 		
 		// Check if the post is local or not
 		if(!user.get('url').localeCompare(author.instance)) {
+			let options = getOptions(request.query, 'creationTs');
+			// Use the post's creation timestamp to filter the results
+			if(!options.where) options.where = {};
+			options.where['creationTs_Post'] = request.params.timestamp;
 			// We don't support multi-user instances yet
-			instance.model('comment').findAll(getOptions(request.query, 'creationTs_Post'))
+			instance.model('comment').findAll(options)
 			.then((comments: sequelize.Instance<any>[]) => {
 				let res = new Array<Comment>();
 				let author = new User(user.get('username'), user.get('url'));
@@ -199,10 +203,6 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 	try { instance = SequelizeWrapper.getInstance(username); }
 	catch(e) { return reply(Boom.notFound()) }
 
-	let options = <sequelize.FindOptions>getOptions(request.query, 'creationTs_Post');
-	// We cast directly as comment, so we don't need getters and setters
-	options.raw = true;
-
 	let friend: User;
 	if(request.query.idToken) {
 		try {
@@ -235,6 +235,13 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 		}
 
 		if(!canRead) return reply(Boom.notFound());
+
+		let options = <sequelize.FindOptions>getOptions(request.query, 'creationTs');
+		// Use the post's creation timestamp to filter the results
+		if(!options.where) options.where = {};
+		options.where['creationTs_Post'] = request.params.timestamp;
+		// We cast directly as comment, so we don't need getters and setters
+		options.raw = true;
 
 		instance.model('comment').findAll(options).then((comments: any[]) => {
 			let res = new Array<Comment>();
