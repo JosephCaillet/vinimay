@@ -2,6 +2,9 @@ import * as Hapi from 'hapi';
 import * as url from 'url';
 
 const routes = require('./routes');
+const log = require('printit')({
+	date: true
+})
 
 export function loadRoutes(server: Hapi.Server) {
 	for(let tag in routes) {
@@ -25,7 +28,10 @@ export function loadRoutes(server: Hapi.Server) {
 				delete route.config.handler;
 
 				server.route(route);
+
+				log.debug('Loaded route ' + method.toUpperCase() + ' ' + route.path);
 			}
 		}
 	}
+	log.info('Routes loaded')
 }

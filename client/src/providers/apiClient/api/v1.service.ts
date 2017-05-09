@@ -27,6 +27,8 @@ import { Post } from '../model/post';
 import { PostInput } from '../model/postInput';
 import { PostsArray } from '../model/postsArray';
 import { PostsResponse } from '../model/postsResponse';
+import { Reaction } from '../model/reaction';
+import { Reactions } from '../model/reactions';
 import { User } from '../model/user';
 import { UserDataInput } from '../model/userDataInput';
 
@@ -340,6 +342,23 @@ export class V1Service {
     }
 
     /**
+     * Add a reaction
+     * Add a reaction to a given post
+     * @param user Post author
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public postV1ClientPostsUserTimestampReactions(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Reactions> {
+        return this.postV1ClientPostsUserTimestampReactionsWithHttpInfo(user, timestamp, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * 401 error
      * 
      */
@@ -364,6 +383,25 @@ export class V1Service {
      */
     public postV1ServerPostsTimestampComments(timestamp: number, idToken?: string, signature?: string, body?: CommentInput, extraHttpRequestParams?: any): Observable<Comment> {
         return this.postV1ServerPostsTimestampCommentsWithHttpInfo(timestamp, idToken, signature, body, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Add a reaction
+     * Add a reaction to a given post
+     * @param timestamp The post&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend
+     * @param signature 
+     * @param body 
+     */
+    public postV1ServerPostsTimestampReactions(timestamp: number, idToken?: string, signature?: string, body?: Reaction, extraHttpRequestParams?: any): Observable<Reactions> {
+        return this.postV1ServerPostsTimestampReactionsWithHttpInfo(timestamp, idToken, signature, body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -1031,6 +1069,49 @@ export class V1Service {
     }
 
     /**
+     * Add a reaction
+     * Add a reaction to a given post
+     * @param user Post author
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public postV1ClientPostsUserTimestampReactionsWithHttpInfo(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts/${user}/${timestamp}/reactions'
+                    .replace('${' + 'user' + '}', String(user))
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling postV1ClientPostsUserTimestampReactions.');
+        }
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling postV1ClientPostsUserTimestampReactions.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
      * 401 error
      * 
      */
@@ -1079,6 +1160,57 @@ export class V1Service {
         // verify required parameter 'timestamp' is not null or undefined
         if (timestamp === null || timestamp === undefined) {
             throw new Error('Required parameter timestamp was null or undefined when calling postV1ServerPostsTimestampComments.');
+        }
+        if (idToken !== undefined) {
+            queryParameters.set('idToken', <any>idToken);
+        }
+
+        if (signature !== undefined) {
+            queryParameters.set('signature', <any>signature);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Add a reaction
+     * Add a reaction to a given post
+     * @param timestamp The post&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend
+     * @param signature 
+     * @param body 
+     */
+    public postV1ServerPostsTimestampReactionsWithHttpInfo(timestamp: number, idToken?: string, signature?: string, body?: Reaction, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/posts/${timestamp}/reactions'
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling postV1ServerPostsTimestampReactions.');
         }
         if (idToken !== undefined) {
             queryParameters.set('idToken', <any>idToken);
