@@ -146,7 +146,7 @@ function processPostAnon(arg, request, username) {
                     post.author = (await utils.getUser(username)).toString();
                     post.comments = await comments.count(post.creationTs);
                     post.reactions = await reactions.count(post.creationTs);
-                    post.reacted = false;
+                    post.reacted = false; // TODO: Find a way to identify the requesting
                     post.lastEditTs = post.lastModificationTs;
                     delete post.lastModificationTs;
                 }
@@ -171,7 +171,7 @@ function processPostAnon(arg, request, username) {
                 post.author = (await utils.getUser(username)).toString();
                 post.comments = await comments.count(post.creationTs);
                 post.reactions = await reactions.count(post.creationTs);
-                post.reacted = false;
+                post.reacted = false; // TODO: Find a way to identify the requesting
                 post.lastEditTs = post.lastModificationTs;
                 delete post.lastModificationTs;
             }
