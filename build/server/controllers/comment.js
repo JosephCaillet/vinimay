@@ -228,7 +228,7 @@ async function serverGet(request, reply) {
             let res = new Array();
             for (let i in comments) {
                 let comment = comments[i];
-                let author = new users_1.User(comment.get('username'), comment.get('url'));
+                let author = new users_1.User(comment.username, comment.url);
                 res.push({
                     creationTs: comment.creationTs,
                     lastEditTs: comment.lastModificationTs,
