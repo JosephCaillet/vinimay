@@ -1,5 +1,6 @@
 {
 	"test": "It works !",
+	"app_name": "Vinimay - alpha version",
 	"global": {
 		"yes": "Yes",
 		"no": "No",
