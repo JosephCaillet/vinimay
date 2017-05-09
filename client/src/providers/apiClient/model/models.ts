@@ -13,6 +13,8 @@ export * from './post';
 export * from './postInput';
 export * from './postsArray';
 export * from './postsResponse';
+export * from './reaction';
+export * from './reactions';
 export * from './requestsFailures';
 export * from './user';
 export * from './userDataInput';

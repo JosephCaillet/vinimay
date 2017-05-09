@@ -106,7 +106,7 @@ function processPostAuth(arg: Post | Post[], request: h.Request, username: strin
 					post.author = user.toString();
 					post.comments = await comments.count(post.creationTs);
 					post.reactions = await reactions.count(post.creationTs);
-					post.reacted = await reactions.reacted(post.creationTs);
+					post.reacted = await reactions.reacted(post.creationTs, friend);
 					post.lastEditTs = post.lastModificationTs;
 					delete post.lastModificationTs;
 					if(await canReadPost(username, Privacy[post.privacy], friend)) {
@@ -120,7 +120,7 @@ function processPostAuth(arg: Post | Post[], request: h.Request, username: strin
 				post.author = (await utils.getUser(username)).toString();
 				post.comments = await comments.count(post.creationTs);
 				post.reactions = await reactions.count(post.creationTs);
-				post.reacted = await reactions.reacted(post.creationTs);
+				post.reacted = await reactions.reacted(post.creationTs, friend);
 				post.lastEditTs = post.lastModificationTs;
 				delete post.lastModificationTs;
 				if(await canReadPost(username, Privacy[post.privacy]), friend) {
@@ -144,7 +144,7 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 					post.author = (await utils.getUser(username)).toString();
 					post.comments = await comments.count(post.creationTs);
 					post.reactions = await reactions.count(post.creationTs);
-					post.reacted = await reactions.reacted(post.creationTs);
+					post.reacted = false;
 					post.lastEditTs = post.lastModificationTs;
 					delete post.lastModificationTs;
 				}
@@ -165,7 +165,7 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 				post.author = (await utils.getUser(username)).toString();
 				post.comments = await comments.count(post.creationTs);
 				post.reactions = await reactions.count(post.creationTs);
-				post.reacted = await reactions.reacted(post.creationTs);
+				post.reacted = false;
 				post.lastEditTs = post.lastModificationTs;
 				delete post.lastModificationTs;
 			}

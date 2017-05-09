@@ -336,7 +336,6 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 				return reply(Boom.badRequest(err));
 			}
 
-
 			// No need to check if we know the author if its a friend
 			if(request.query.idToken && request.query.signature) {
 				try {

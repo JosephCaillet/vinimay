@@ -3,6 +3,7 @@ import * as Joi from 'joi';
 
 import * as posts from './post';
 import * as comments from './comment';
+import * as reactions from './reaction';
 import * as user from './user';
 import * as friend from './friend';
 
@@ -180,6 +181,25 @@ module.exports = {
 				}}}
 			}
 		},
+		'/client/posts/{user}/{timestamp}/reactions': {
+			post: {
+				description: 'Add a reaction',
+				notes: 'Add a reaction to a given post',
+				handler: reactions.add,
+				validate: {
+					params: {
+						user: commons.user.required().description('Post author'),
+						timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+					}
+				},
+				plugins: { 'hapi-swagger': { responses: {
+					'200': {
+						description: 'The created reaction',
+						schema: reactions.reactionsSchema
+					}
+				}}}
+			}
+		},
 		'/client/posts/{user}/{timestamp}/comments/{commentTimestamp}': {
 			delete: {
 				description: 'Remove a comment',
@@ -312,6 +332,28 @@ module.exports = {
 					'400': { description: 'The comment author was required but not provided' },
 					'401': { description: 'Incorrect signature' },
 					'404': { description: 'The comment or its author was not found' }
+				}}}
+			}
+		},
+		'/server/posts/{timestamp}/reactions': {
+			post: {
+				description: 'Add a reaction',
+				notes: 'Add a reaction to a given post',
+				handler: reactions.serverAdd,
+				validate: {
+					payload: Joi.object({
+						author: commons.user.required().description('Reaction author'),
+					}).label('Reaction'),
+					params: {
+						timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+					},
+					query: tokens
+				},
+				plugins: { 'hapi-swagger': { responses: {
+					'200': {
+						description: 'The created reaction',
+						schema: reactions.reactionsSchema
+					}
 				}}}
 			}
 		},

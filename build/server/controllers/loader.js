@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const routes = require('./routes');
+const log = require('printit')({
+    date: true
+});
 function loadRoutes(server) {
     for (let tag in routes) {
         let paths = routes[tag];
@@ -17,8 +20,10 @@ function loadRoutes(server) {
                 route.config.tags = ['api', tag];
                 delete route.config.handler;
                 server.route(route);
+                log.debug('Loaded route ' + method.toUpperCase() + ' ' + route.path);
             }
         }
     }
+    log.info('Routes loaded');
 }
 exports.loadRoutes = loadRoutes;
