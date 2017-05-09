@@ -247,7 +247,7 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 			let res = new Array<Comment>();
 			for(let i in comments) {
 				let comment = comments[i];
-				let author = new User(comment.get('username'), comment.get('url'));
+				let author = new User(comment.username, comment.url);
 				res.push({
 					creationTs: comment.creationTs,
 					lastEditTs: comment.lastModificationTs,
