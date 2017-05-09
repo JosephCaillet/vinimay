@@ -267,10 +267,10 @@ export function serverGetSingle(request: h.Request, reply: h.IReply) {
 	}).catch(e => reply(b.wrap(e)));
 }
 
-export function getOptions(queryParams, timestampField?: string) {
+export function getOptions(queryParams, order = 'DESC') {
 	let options = <s.FindOptions>{};
 	// Set the order
-	options.order = [['creationTs', 'DESC']]
+	options.order = [['creationTs', order]]
 	// Apply filters
 	if(queryParams.nb) options.limit = queryParams.nb;
 	// Filter by timestamp require a WHERE clause
@@ -278,8 +278,7 @@ export function getOptions(queryParams, timestampField?: string) {
 		let timestamp = <s.WhereOptions>{};
 		if(queryParams.from) timestamp['$lte'] = queryParams.from;
 		options.where = {};
-		if(timestampField) options.where[timestampField] = timestamp;
-		else options.where.creationTs = timestamp;
+		options.where.creationTs = timestamp;
 	}
 	
 	return options;

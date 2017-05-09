@@ -68,7 +68,7 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 		
 		// Check if the post is local or not
 		if(!user.get('url').localeCompare(author.instance)) {
-			let options = getOptions(request.query, 'creationTs');
+			let options = getOptions(request.query, 'ASC');
 			// Use the post's creation timestamp to filter the results
 			if(!options.where) options.where = {};
 			options.where['creationTs_Post'] = request.params.timestamp;
@@ -76,9 +76,9 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 			instance.model('comment').findAll(options)
 			.then((comments: sequelize.Instance<any>[]) => {
 				let res = new Array<Comment>();
-				let author = new User(user.get('username'), user.get('url'));
 				for(let i in comments) {
 					let comment = comments[i];
+					let author = new User(comment.get('username'), comment.get('url'));
 					res.push({
 						creationTs: comment.get('creationTs'),
 						lastEditTs: comment.get('lastModificationTs'),
@@ -236,7 +236,7 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 
 		if(!canRead) return reply(Boom.notFound());
 
-		let options = <sequelize.FindOptions>getOptions(request.query, 'creationTs');
+		let options = <sequelize.FindOptions>getOptions(request.query, 'ASC');
 		// Use the post's creation timestamp to filter the results
 		if(!options.where) options.where = {};
 		options.where['creationTs_Post'] = request.params.timestamp;
@@ -247,10 +247,11 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 			let res = new Array<Comment>();
 			for(let i in comments) {
 				let comment = comments[i];
+				let author = new User(comment.get('username'), comment.get('url'));
 				res.push({
 					creationTs: comment.creationTs,
 					lastEditTs: comment.lastModificationTs,
-					author: user.toString(),
+					author: author.toString(),
 					content: comment.content
 				});
 			}
