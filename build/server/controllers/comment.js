@@ -57,12 +57,13 @@ async function get(request, reply) {
             instance.model('comment').findAll(post_1.getOptions(request.query, 'creationTs_Post'))
                 .then((comments) => {
                 let res = new Array();
+                let author = new users_1.User(user.get('username'), user.get('url'));
                 for (let i in comments) {
                     let comment = comments[i];
                     res.push({
                         creationTs: comment.get('creationTs'),
                         lastEditTs: comment.get('lastModificationTs'),
-                        author: user.toString(),
+                        author: author.toString(),
                         content: comment.get('content')
                     });
                 }

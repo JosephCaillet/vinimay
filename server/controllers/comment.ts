@@ -72,12 +72,13 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 			instance.model('comment').findAll(getOptions(request.query, 'creationTs_Post'))
 			.then((comments: sequelize.Instance<any>[]) => {
 				let res = new Array<Comment>();
+				let author = new User(user.get('username'), user.get('url'));
 				for(let i in comments) {
 					let comment = comments[i];
 					res.push({
 						creationTs: comment.get('creationTs'),
 						lastEditTs: comment.get('lastModificationTs'),
-						author: user.toString(),
+						author: author.toString(),
 						content: comment.get('content')
 					});
 				}
