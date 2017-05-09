@@ -85,7 +85,7 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 					authenticated: true, // TODO: Change hard-coded value
 					comments: res
 				};
-				return commons.checkAndSendSchema(rep, commentSchema, log, reply);
+				return commons.checkAndSendSchema(rep, commentsSchema, log, reply);
 			})
 		} else {
 			instance.model('friend').findOne({ where: {
@@ -335,6 +335,10 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 			return commons.checkAndSendSchema(res, commentSchema, log, reply);
 		}).catch(e => reply(Boom.wrap(e)))
 	}).catch(e => reply(Boom.wrap(e)))
+}
+
+export function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
+	
 }
 
 

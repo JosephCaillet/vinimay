@@ -70,7 +70,7 @@ async function get(request, reply) {
                     authenticated: true,
                     comments: res
                 };
-                return commons.checkAndSendSchema(rep, exports.commentSchema, log, reply);
+                return commons.checkAndSendSchema(rep, exports.commentsSchema, log, reply);
             });
         }
         else {
@@ -314,6 +314,9 @@ async function serverAdd(request, reply) {
     }).catch(e => reply(Boom.wrap(e)));
 }
 exports.serverAdd = serverAdd;
+function serverDel(request, reply) {
+}
+exports.serverDel = serverDel;
 function count(postTimestamp) {
     return new Promise((ok, ko) => {
         sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username).model('comment').count({ where: {
