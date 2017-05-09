@@ -7,6 +7,7 @@ export class Post {
 	privacy: string;
 	comments: number;
 	reactions: number;
+	reacted: boolean;
 }
 
 export enum Privacy {

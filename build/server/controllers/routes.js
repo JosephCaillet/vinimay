@@ -187,7 +187,11 @@ module.exports = {
                         timestamp: Joi.number().required().description('Post timestamp'),
                         commentTimestamp: Joi.number().required().description('Comment timestamp'),
                     }
-                }
+                },
+                plugins: { 'hapi-swagger': { responses: {
+                            '204': { description: 'The comment has been deleted' },
+                            '404': { description: 'The comment was not found' }
+                        } } }
             }
         },
         '/client/friends': {

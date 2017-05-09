@@ -23,7 +23,8 @@ exports.postSchema = j.object({
     "content": j.string().required().description('Post content'),
     "privacy": j.string().valid('public', 'private', 'friends').required().description('Post privacy setting (private, friends or public)'),
     "comments": j.number().min(0).required().description('Number of comments on the post'),
-    "reactions": j.number().min(0).required().description('Numer of reactions on the post')
+    "reactions": j.number().min(0).required().description('Numer of reactions on the post'),
+    "reacted": j.boolean().required().description('Information on whether the current user reacted to the post')
 }).label('Post');
 exports.postsArray = j.array().items(exports.postSchema).required().label('Posts array');
 exports.responseSchema = j.object({
@@ -45,6 +46,7 @@ function get(request, reply) {
                 try {
                     post.comments = await comments.count(post.creationTs);
                     post.reactions = await reactions.count(post.creationTs);
+                    post.reacted = await reactions.reacted(post.creationTs);
                     post.lastEditTs = post.lastModificationTs;
                     delete post.lastModificationTs;
                 }
@@ -115,6 +117,7 @@ async function getSingle(request, reply) {
                 try {
                     post.comments = await comments.count(post.creationTs);
                     post.reactions = await reactions.count(post.creationTs);
+                    post.reacted = await reactions.reacted(post.creationTs);
                     post.lastEditTs = post.lastModificationTs;
                     delete post.lastModificationTs;
                 }
@@ -156,7 +159,8 @@ function create(request, reply) {
         content: request.payload.content,
         privacy: request.payload.privacy,
         comments: 0,
-        reactions: 0
+        reactions: 0,
+        reacted: false
     };
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     instance.model('post').create(post).then(async (res) => {

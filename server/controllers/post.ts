@@ -32,7 +32,8 @@ export let postSchema = j.object({
 	"content": j.string().required().description('Post content'),
 	"privacy": j.string().valid('public', 'private', 'friends').required().description('Post privacy setting (private, friends or public)'),
 	"comments": j.number().min(0).required().description('Number of comments on the post'),
-	"reactions": j.number().min(0).required().description('Numer of reactions on the post')
+	"reactions": j.number().min(0).required().description('Numer of reactions on the post'),
+	"reacted": j.boolean().required().description('Information on whether the current user reacted to the post')
 }).label('Post');
 
 export let postsArray = j.array().items(postSchema).required().label('Posts array');
@@ -59,6 +60,7 @@ export function get(request: h.Request, reply: h.IReply) {
 				try {
 					post.comments = await comments.count(post.creationTs);
 					post.reactions = await reactions.count(post.creationTs);
+					post.reacted = await reactions.reacted(post.creationTs);
 					post.lastEditTs = post.lastModificationTs;
 					delete post.lastModificationTs;
 				} catch(e) {
@@ -127,6 +129,7 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 				try {
 					post.comments = await comments.count(post.creationTs);
 					post.reactions = await reactions.count(post.creationTs);
+					post.reacted = await reactions.reacted(post.creationTs);
 					post.lastEditTs = post.lastModificationTs;
 					delete post.lastModificationTs;
 				} catch(e) {
@@ -166,7 +169,8 @@ export function create(request: h.Request, reply: h.IReply) {
 		content: request.payload.content,
 		privacy: request.payload.privacy,
 		comments: 0,
-		reactions: 0
+		reactions: 0,
+		reacted: false
 	};
 	let instance = SequelizeWrapper.getInstance(username);
 	instance.model('post').create(post).then(async (res: s.Instance<Post>) => {

@@ -104,6 +104,7 @@ function processPostAuth(arg, request, username) {
                     post.author = user.toString();
                     post.comments = await comments.count(post.creationTs);
                     post.reactions = await reactions.count(post.creationTs);
+                    post.reacted = await reactions.reacted(post.creationTs);
                     post.lastEditTs = post.lastModificationTs;
                     delete post.lastModificationTs;
                     if (await canReadPost(username, posts_1.Privacy[post.privacy], friend)) {
@@ -118,6 +119,7 @@ function processPostAuth(arg, request, username) {
                 post.author = (await utils.getUser(username)).toString();
                 post.comments = await comments.count(post.creationTs);
                 post.reactions = await reactions.count(post.creationTs);
+                post.reacted = await reactions.reacted(post.creationTs);
                 post.lastEditTs = post.lastModificationTs;
                 delete post.lastModificationTs;
                 if (await canReadPost(username, posts_1.Privacy[post.privacy]), friend) {
@@ -144,6 +146,7 @@ function processPostAnon(arg, request, username) {
                     post.author = (await utils.getUser(username)).toString();
                     post.comments = await comments.count(post.creationTs);
                     post.reactions = await reactions.count(post.creationTs);
+                    post.reacted = await reactions.reacted(post.creationTs);
                     post.lastEditTs = post.lastModificationTs;
                     delete post.lastModificationTs;
                 }
@@ -168,6 +171,7 @@ function processPostAnon(arg, request, username) {
                 post.author = (await utils.getUser(username)).toString();
                 post.comments = await comments.count(post.creationTs);
                 post.reactions = await reactions.count(post.creationTs);
+                post.reacted = await reactions.reacted(post.creationTs);
                 post.lastEditTs = post.lastModificationTs;
                 delete post.lastModificationTs;
             }

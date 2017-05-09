@@ -48,6 +48,11 @@ export interface Post {
      */
     reactions: number;
 
+    /**
+     * Information on whether the current user reacted to the post
+     */
+    reacted: boolean;
+
 }
 export namespace Post {
     export enum PrivacyEnum {

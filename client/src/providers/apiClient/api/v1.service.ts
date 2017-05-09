@@ -104,7 +104,7 @@ export class V1Service {
      * @param timestamp Post timestamp
      * @param commentTimestamp Comment timestamp
      */
-    public deleteV1ClientPostsUserTimestampCommentsCommenttimestamp(user: string, timestamp: number, commentTimestamp: number, extraHttpRequestParams?: any): Observable<string> {
+    public deleteV1ClientPostsUserTimestampCommentsCommenttimestamp(user: string, timestamp: number, commentTimestamp: number, extraHttpRequestParams?: any): Observable<{}> {
         return this.deleteV1ClientPostsUserTimestampCommentsCommenttimestampWithHttpInfo(user, timestamp, commentTimestamp, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
