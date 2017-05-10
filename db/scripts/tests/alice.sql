@@ -36,11 +36,11 @@ VALUES('frank', 'localhost:3006', NULL, NULL, 'following');
 
 --export enum Status {pending, declined, incoming, accepted, following}
 
-INSERT INTO post VALUES(1493825857425,1493825857425,'Hello friends :-)','friends');
-INSERT INTO post VALUES(1493825872348,1493825872348,'Hello there :-)','public');
-INSERT INTO post VALUES(1493825874248,1493825874248,'Hello myself :-)','private');
+--INSERT INTO post VALUES(1493825857425,1493825857425,'Hello friends :-)','friends');
+--INSERT INTO post VALUES(1493825872348,1493825872348,'Hello there :-)','public');
+--INSERT INTO post VALUES(1493825874248,1493825874248,'Hello myself :-)','private');
 
-INSERT INTO comment VALUES(1494318157268,1494318157268,'Hey, this is Alice',1493825857425,'alice','localhost:3000');
-INSERT INTO comment VALUES(1494319241555,1494319241555,'Hey Alice, this is Bob! :-)',1493825857425,'bob','localhost:3001');
+--INSERT INTO comment VALUES(1494318157268,1494318157268,'Hey, this is Alice',1493825857425,'alice','localhost:3000');
+--INSERT INTO comment VALUES(1494319241555,1494319241555,'Hey Alice, this is Bob! :-)',1493825857425,'bob','localhost:3001');
 
-INSERT INTO comment VALUES(1494319241155,1494319241155,'You can''t see me haha!',1493825874248,'alice','localhost:3000');
+--INSERT INTO comment VALUES(1494319241155,1494319241155,'You can''t see me haha!',1493825874248,'alice','localhost:3000');
