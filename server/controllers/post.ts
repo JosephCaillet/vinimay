@@ -93,7 +93,7 @@ export function get(request: h.Request, reply: h.IReply) {
 				}
 				posts.sort((a, b) => b.creationTs - a.creationTs);
 				// We'll have more posts than requested, so we truncate the array
-				posts = posts.slice(0, request.query.nb);
+				if(request.query.nb) posts = posts.slice(0, request.query.nb);
 				let rep: any = {
 					authenticated: true, // Temporary hardcoded value
 					posts: posts,
@@ -150,11 +150,10 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 					idtoken = friend.get('id_token');
 					sigtoken = friend.get('signature_token');
 				}
-				let user = new User(friend.get('username'), friend.get('url'));
 				// We want to retrieve only one post at a given timestamp
 				postUtils.retrieveRemotePost(author, request.params.timestamp, idtoken, sigtoken).then((post: Post) => {
 					return commons.checkAndSendSchema(post, postSchema, log, reply);
-				}).catch(e => utils.handleRequestError(user, e, log, false, reply));
+				}).catch(e => utils.handleRequestError(author, e, log, false, reply));
 			}).catch(e => reply(b.wrap(e)));
 		}
 	}).catch(e => reply(b.wrap(e)));
@@ -218,7 +217,7 @@ export async function del(request: h.Request, reply: h.IReply) {
 	}).catch(e => reply(b.wrap(e)));
 }
 
-export function serverGet(request: h.Request, reply: h.IReply) {
+export async function serverGet(request: h.Request, reply: h.IReply) {
 	let username = utils.getUsername(request);
 	let instance: s.Sequelize;
 
@@ -229,6 +228,22 @@ export function serverGet(request: h.Request, reply: h.IReply) {
 	let options = <s.FindOptions>getOptions(request.query);
 	// We cast directly as post, so we don't need getters and setters
 	options.raw = true;
+
+	if(!options.where) options.where = {} as s.WhereOptions;
+	// Force the cast
+	options.where = options.where as s.WhereOptions;
+
+	let or = new Array<any>();
+	or.push({ privacy: Privacy[Privacy.public] });
+
+	if(request.query.idToken && request.query.signature) {
+		let friend = await utils.getFriendByToken(username, request.query.idToken);
+		if(friend.status === Status[Status.accepted]) {
+			or.push({ privacy: Privacy[Privacy.friends] });
+		}
+	}
+
+	options.where['$or'] = or;
 
 	instance.model('post').findAll(options).then(async (posts: Post[]) => {
 		let res: Post | Post[] | undefined;

@@ -123,7 +123,7 @@ function processPostAuth(arg: Post | Post[], request: h.Request, username: strin
 				post.reacted = await reactions.reacted(post.creationTs, friend);
 				post.lastEditTs = post.lastModificationTs;
 				delete post.lastModificationTs;
-				if(await canReadPost(username, Privacy[post.privacy]), friend) {
+				if(await canReadPost(username, Privacy[post.privacy], friend)) {
 					ok(post);
 				} else {
 					ok();
