@@ -1,6 +1,10 @@
 #!/bin/bash
 
-users=$(find db/scripts/dev -name "*.sql" -printf "%f\n" | cut -d. -f1)
+if [ $# -gt 0 ]; then
+	users=$@
+else
+	users=$(find db/scripts/dev -name "*.sql" -printf "%f\n" | cut -d. -f1)
+fi
 
 for user in $users; do
 	rm db/$user.db > /dev/null 2>&1

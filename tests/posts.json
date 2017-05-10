@@ -1,0 +1,1669 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Posts",
+		"_postman_id": "ca1079f4-5fca-d126-61d7-b703c718208c",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0 - Before",
+			"description": "",
+			"item": [
+				{
+					"name": "Create friend public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendPublicTs', JSON.parse(responseBody).creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friend friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendFriendsTs', JSON.parse(responseBody).creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"friends\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friend private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendPrivateTs', JSON.parse(responseBody).creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingPublicTs', JSON.parse(responseBody).creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingFriendsTs', JSON.parse(responseBody).creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"friends\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingPrivateTs', JSON.parse(responseBody).creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "1 - Local",
+			"description": "",
+			"item": [
+				{
+					"name": "Create public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"let ts = (new Date()).getTime();",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post is new\"] = (responseJSON.creationTs >= ts - 1000); // We give a 1s frame because of the HTTP request time",
+									"tests[\"Post matches the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"alice@localhost:3000\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"public\",",
+									"    reacted: false",
+									"});",
+									"",
+									"postman.setGlobalVariable(\"creationTs\", responseJSON.creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Post is public\"] = !responseJSON.privacy.localeCompare(\"public\");",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post matches the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"alice@localhost:3000\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"public\",",
+									"    reacted: false",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{creationTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/{{creationTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"let ts = (new Date()).getTime();",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post is new\"] = (responseJSON.creationTs >= ts - 1000); // We give a 1s frame because of the HTTP request time",
+									"tests[\"Post matches the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"alice@localhost:3000\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"friends\",",
+									"    reacted: false",
+									"});",
+									"",
+									"postman.setGlobalVariable(\"creationTs\", responseJSON.creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"friends\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Post is shared with friends\"] = !responseJSON.privacy.localeCompare(\"friends\");",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post matches the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"alice@localhost:3000\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"friends\",",
+									"    reacted: false",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{creationTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/{{creationTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"let ts = (new Date()).getTime();",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post is new\"] = (responseJSON.creationTs >= ts - 1000); // We give a 1s frame because of the HTTP request time",
+									"tests[\"Post matches the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"alice@localhost:3000\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"private\",",
+									"    reacted: false",
+									"});",
+									"",
+									"postman.setGlobalVariable(\"creationTs\", responseJSON.creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post is shared with friends\"] = !responseJSON.privacy.localeCompare(\"private\");",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post is a new post matching the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"alice@localhost:3000\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"private\",",
+									"    reacted: false",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{creationTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/{{creationTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2 - Friend",
+			"description": "",
+			"item": [
+				{
+					"name": "Get public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Post is public\"] = !responseJSON.privacy.localeCompare(\"public\");",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post matches the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"bob@localhost:3001\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"public\",",
+									"    reacted: false",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Post is shared with friends\"] = !responseJSON.privacy.localeCompare(\"friends\");",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post matches the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"bob@localhost:3001\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"friends\",",
+									"    reacted: false",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPrivateTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3 - Following",
+			"description": "",
+			"item": [
+				{
+					"name": "Get public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
+									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a content\"] = !!responseJSON.content;",
+									"tests[\"Post has an author\"] = !!responseJSON.author;",
+									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
+									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
+									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
+									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Post is public\"] = !responseJSON.privacy.localeCompare(\"public\");",
+									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
+									"tests[\"Post matches the input data\"] = JSON.stringify({",
+									"    content: responseJSON.content,",
+									"    author: responseJSON.author,",
+									"    comments: responseJSON.comments,",
+									"    reactions: responseJSON.reactions,",
+									"    privacy: responseJSON.privacy,",
+									"    reacted: responseJSON.reacted",
+									"}) === JSON.stringify({",
+									"    content: \"Hello world, testing new schemas!\",",
+									"    author: \"frank@localhost:3006\",",
+									"    comments: 0,",
+									"    reactions: 0,",
+									"    privacy: \"public\",",
+									"    reacted: false",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingFriendsTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPrivateTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4 - Get posts",
+			"description": "",
+			"item": [
+				{
+					"name": "Get posts",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON;",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an array\"] = JSON.parse(responseBody).posts instanceof Array;",
+									"tests[\"Array in response is not empty\"] = JSON.parse(responseBody).posts.length > 0;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get posts with params",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON;",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an array\"] = JSON.parse(responseBody).posts instanceof Array;",
+									"tests[\"Response contains two posts\"] = JSON.parse(responseBody).posts.length === 2;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?from={{followingPublicTs}}&nb=2",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get posts with from",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON;",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an array\"] = JSON.parse(responseBody).posts instanceof Array;",
+									"tests[\"Response contains all created posts\"] = JSON.parse(responseBody).posts.length === 3;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?from={{followingPublicTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get posts with nb",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON;",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an array\"] = JSON.parse(responseBody).posts instanceof Array;",
+									"tests[\"Response contains two posts\"] = JSON.parse(responseBody).posts.length === 2;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?nb=2",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5 - Retrieving errors",
+			"description": "",
+			"item": [
+				{
+					"name": "Get non existing post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/424242424242",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non numeric timestamp",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the timestamp\"] = responseJSON.validation.keys.includes('timestamp');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/azertyuiop",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "User without @",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the user\"] = responseJSON.validation.keys.includes('user');",
+									"tests[\"Error is about the missing @\"] = responseJSON.message.includes('required pattern: /.+@.+/');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/boblocalhost:3001/{{creationTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non existing user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 503 Service Unavailable\"] = responseCode.code === 503;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/foo@bar.baz/{{creationTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non numeric from",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the from parameter\"] = responseJSON.validation.keys.includes('from');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?from=foobar",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non numeric nb",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the from parameter\"] = responseJSON.validation.keys.includes('nb');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?nb=foobar",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6 - Creating errors",
+			"description": "",
+			"item": [
+				{
+					"name": "No content",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the timestamp\"] = responseJSON.validation.keys.includes('content');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non string content",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the timestamp\"] = responseJSON.validation.keys.includes('content');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": 42424242424242,\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "No privacy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the timestamp\"] = responseJSON.validation.keys.includes('privacy');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non string privacy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the timestamp\"] = responseJSON.validation.keys.includes('privacy');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": 424242424242\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid privacy string",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the timestamp\"] = responseJSON.validation.keys.includes('privacy');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"42424242424242\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7 - After",
+			"description": "",
+			"item": [
+				{
+					"name": "Delete friend public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendPublicTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete friend friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendFriendsTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete friend private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendPrivateTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts/{{followingPublicTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts/{{followingFriendsTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{followingPrivateTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -1,15 +1,15 @@
 #!/bin/bash
 if [[ $1 = "start" ]]; then
 	echo "Starting Alice's server..."
-	npm run start:alice &
+	npm run start:alice > /dev/null 2>&1 &
 	echo $! > alice.pid
 	
 	echo "Starting Bob's server..."
-	npm run start:bob &
+	npm run start:bob > /dev/null 2>&1 &
 	echo $! > bob.pid
 	
 	echo "Starting Frank's server..."
-	npm run start:frank &
+	npm run start:frank > /dev/null 2>&1 &
 	echo $! > frank.pid
 elif [[ $1 = "stop" ]]; then
 	echo "Stopping Alice's server..."
@@ -23,7 +23,7 @@ elif [[ $1 = "stop" ]]; then
 elif [[ $1 = "clean" ]]; then
 	rm alice.pid
 	rm bob.pid
-	rm franck.pid
+	rm frank.pid
 else
 	echo "Error : Valid arguments are start, stop, clean."
 fi

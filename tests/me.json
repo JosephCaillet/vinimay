@@ -1,0 +1,47 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Me",
+		"_postman_id": "5a4ca952-c2d9-c60e-4239-bda7a43a06c3",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get user data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"var responseJSON = JSON.parse(responseBody);",
+							"",
+							"tests[\"Response is 200\"] = responseCode.code === 200;",
+							"tests[\"Username is Alice\"] = !responseJSON.username.localeCompare(\"alice\");",
+							"tests[\"Instance is localhost:3000\"] = !responseJSON.url.localeCompare(\"localhost:3000\");",
+							"tests[\"Description is \\\"Hello I'm Alice\\\"\"] = !responseJSON.description.localeCompare(\"Hello, I'm Alice\");"
+						]
+					}
+				}
+			],
+			"request": {
+				"url": "alice@localhost:3000/v1/client/me",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
