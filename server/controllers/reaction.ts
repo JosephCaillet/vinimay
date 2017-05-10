@@ -58,8 +58,7 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 			username: author.username,
 			url: author.instance
 		}).then((reaction: sequelize.Instance<any>) => {
-			let author = new User(reaction.get('username'), reaction.get('url'));
-			return commons.checkAndSendSchema(author.toString(), commons.user, log, reply);
+			return reply(null).code(200);
 		}).catch(e => reply(Boom.wrap(e)));
 	} else {
 		instance.model('friend').findOne({ where: {

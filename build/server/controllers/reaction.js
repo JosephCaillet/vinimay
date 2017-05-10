@@ -48,8 +48,7 @@ async function add(request, reply) {
             username: author.username,
             url: author.instance
         }).then((reaction) => {
-            let author = new users_1.User(reaction.get('username'), reaction.get('url'));
-            return commons.checkAndSendSchema(author.toString(), commons.user, log, reply);
+            return reply(null).code(200);
         }).catch(e => reply(Boom.wrap(e)));
     }
     else {
