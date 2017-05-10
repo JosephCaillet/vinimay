@@ -67,7 +67,7 @@ async function add(request, reply) {
             }
             let timestamp = parseInt(request.params.timestamp);
             reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then((reaction) => {
-                return commons.checkAndSendSchema(reaction, commons.user, log, reply);
+                return reply(null).code(200);
             }).catch(e => utils.handleRequestError(postAuthor, e, log, false, reply));
         }).catch(e => {
             if (e.isBoom)

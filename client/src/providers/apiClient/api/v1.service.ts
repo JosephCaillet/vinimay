@@ -256,21 +256,6 @@ export class V1Service {
     }
 
     /**
-     * Ping
-     * 
-     */
-    public getV1Dummy(extraHttpRequestParams?: any): Observable<string> {
-        return this.getV1DummyWithHttpInfo(extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json();
-                }
-            });
-    }
-
-    /**
      * Retrieve posts
      * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
      * @param from Most recent timestamp
@@ -328,22 +313,6 @@ export class V1Service {
     }
 
     /**
-     * Update data on the current user
-     * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
-     * @param body 
-     */
-    public postV1ClientMe(body?: UserDataInput, extraHttpRequestParams?: any): Observable<User> {
-        return this.postV1ClientMeWithHttpInfo(body, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json();
-                }
-            });
-    }
-
-    /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
      * @param body 
@@ -383,23 +352,8 @@ export class V1Service {
      * @param user Post author
      * @param timestamp The post&#39;s creation timestamp
      */
-    public postV1ClientPostsUserTimestampReactions(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Reactions> {
+    public postV1ClientPostsUserTimestampReactions(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<string> {
         return this.postV1ClientPostsUserTimestampReactionsWithHttpInfo(user, timestamp, extraHttpRequestParams)
-            .map((response: Response) => {
-                if (response.status === 204) {
-                    return undefined;
-                } else {
-                    return response.json();
-                }
-            });
-    }
-
-    /**
-     * 401 error
-     * 
-     */
-    public postV1Dummy(extraHttpRequestParams?: any): Observable<{}> {
-        return this.postV1DummyWithHttpInfo(extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -448,11 +402,12 @@ export class V1Service {
     }
 
     /**
-     * 500 error
-     * 
+     * Update data on the current user
+     * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
+     * @param body 
      */
-    public putV1Dummy(extraHttpRequestParams?: any): Observable<{}> {
-        return this.putV1DummyWithHttpInfo(extraHttpRequestParams)
+    public putV1ClientMe(body?: UserDataInput, extraHttpRequestParams?: any): Observable<User> {
+        return this.putV1ClientMeWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -896,37 +851,6 @@ export class V1Service {
     }
 
     /**
-     * Ping
-     * 
-     */
-    public getV1DummyWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/v1/dummy';
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-        ];
-
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Get,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:true
-        });
-
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(path, requestOptions);
-    }
-
-    /**
      * Retrieve posts
      * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#retrieve-several-posts).
      * @param from Most recent timestamp
@@ -1082,41 +1006,6 @@ export class V1Service {
     }
 
     /**
-     * Update data on the current user
-     * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
-     * @param body 
-     */
-    public postV1ClientMeWithHttpInfo(body?: UserDataInput, extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/v1/client/me';
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-        ];
-
-            
-        headers.set('Content-Type', 'application/json');
-
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
-            search: queryParameters,
-            withCredentials:true
-        });
-
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(path, requestOptions);
-    }
-
-    /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
      * @param body 
@@ -1242,37 +1131,6 @@ export class V1Service {
     }
 
     /**
-     * 401 error
-     * 
-     */
-    public postV1DummyWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/v1/dummy';
-
-        let queryParameters = new URLSearchParams();
-        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
-
-
-        // to determine the Accept header
-        let produces: string[] = [
-        ];
-
-            
-        let requestOptions: RequestOptionsArgs = new RequestOptions({
-            method: RequestMethod.Post,
-            headers: headers,
-            search: queryParameters,
-            withCredentials:true
-        });
-
-        // https://github.com/swagger-api/swagger-codegen/issues/4037
-        if (extraHttpRequestParams) {
-            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
-        }
-
-        return this.http.request(path, requestOptions);
-    }
-
-    /**
      * Add a comment to a post
      * Add a comment to a post using the post&#39;s creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#post-a-comment).
      * @param timestamp The post&#39;s creation timestamp
@@ -1375,11 +1233,12 @@ export class V1Service {
     }
 
     /**
-     * 500 error
-     * 
+     * Update data on the current user
+     * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
+     * @param body 
      */
-    public putV1DummyWithHttpInfo(extraHttpRequestParams?: any): Observable<Response> {
-        const path = this.basePath + '/v1/dummy';
+    public putV1ClientMeWithHttpInfo(body?: UserDataInput, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/me';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
@@ -1390,9 +1249,12 @@ export class V1Service {
         ];
 
             
+        headers.set('Content-Type', 'application/json');
+
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Put,
             headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:true
         });
