@@ -4,4 +4,4 @@ node_js:
   - 7
  
 before_install:
-  - npm install -g tsc newman
+  - npm install -g tsc newman --silent
