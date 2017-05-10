@@ -45,13 +45,13 @@ function createRemoteReaction(author, user, timestamp, idtoken, sigtoken) {
     });
 }
 exports.createRemoteReaction = createRemoteReaction;
-function deleteRemoteReaction(postAuthor, tsPost, tsComment, idtoken, sigtoken) {
+function deleteRemoteReaction(postAuthor, tsPost, reactionAuthor, idtoken, sigtoken) {
     return new Promise((resolve, reject) => {
         let params = {
             timestamp: tsPost,
-            commentTimestamp: tsComment
+            author: reactionAuthor.toString()
         };
-        let reqPath = path.join('/v1/server/posts', tsPost.toString(), 'comments', tsComment.toString());
+        let reqPath = path.join('/v1/server/posts', tsPost.toString(), 'reactions');
         let url = postAuthor + reqPath;
         if (idtoken && sigtoken) {
             params.idToken = idtoken;
@@ -68,9 +68,14 @@ function deleteRemoteReaction(postAuthor, tsPost, tsComment, idtoken, sigtoken) 
         request({
             method: 'DELETE',
             uri: url,
+            headers: { 'Content-Type': 'application/json' },
+            body: {
+                author: reactionAuthor.toString()
+            },
+            json: true
         })
             .then((response) => {
-            log.debug('Deleted a comment on', postAuthor.toString());
+            log.debug('Deleted a reaction on', postAuthor.toString());
             resolve(response);
         }).catch(reject);
     });

@@ -64,6 +64,7 @@ function computeSignature(method, url, parameters, token) {
     // Removing the trailing '&'
     params = params.substr(0, params.length - 1);
     let toSign = [method.toUpperCase(), url, params].join('&');
+    log.debug('String to sign:', toSign);
     toSign = encodeURIComponent(toSign);
     let signature = crypto.createHmac("sha256", token)
         .update(toSign)
