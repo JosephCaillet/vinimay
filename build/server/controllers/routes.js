@@ -189,7 +189,7 @@ module.exports = {
                     }
                 },
                 plugins: { 'hapi-swagger': { responses: {
-                            '200': { description: 'The reaction was successfully created' }
+                            '204': { description: 'The reaction was successfully created' }
                         } } }
             },
             delete: {

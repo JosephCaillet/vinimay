@@ -352,7 +352,7 @@ export class V1Service {
      * @param user Post author
      * @param timestamp The post&#39;s creation timestamp
      */
-    public postV1ClientPostsUserTimestampReactions(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<string> {
+    public postV1ClientPostsUserTimestampReactions(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<{}> {
         return this.postV1ClientPostsUserTimestampReactionsWithHttpInfo(user, timestamp, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {

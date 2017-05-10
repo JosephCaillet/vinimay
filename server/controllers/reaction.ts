@@ -58,7 +58,7 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 			username: author.username,
 			url: author.instance
 		}).then((reaction: sequelize.Instance<any>) => {
-			return reply(null).code(200);
+			return reply(null).code(204);
 		}).catch(e => reply(Boom.wrap(e)));
 	} else {
 		instance.model('friend').findOne({ where: {
@@ -75,7 +75,7 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 			}
 			let timestamp = parseInt(request.params.timestamp);
 			reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then((reaction) => {
-				return reply(null).code(200);
+				return reply(null).code(204);
 			}).catch(e => utils.handleRequestError(postAuthor, e, log, false, reply));
 		}).catch(e => {
 			if(e.isBoom) return reply(e);
