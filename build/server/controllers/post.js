@@ -170,6 +170,7 @@ function create(request, reply) {
             try {
                 created.comments = await comments.count(created.creationTs);
                 created.reactions = await reactions.count(created.creationTs);
+                created.reacted = await reactions.reacted(created.creationTs);
                 created.lastEditTs = created.lastModificationTs;
                 delete created.lastModificationTs;
             }
