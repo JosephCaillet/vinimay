@@ -45,6 +45,6 @@
     "build:server": "tsc -p server",
     "build:client": "cd client && echo ' build:client is not implemented yet :D'",
     "build": "npm run build:server && npm run build:client",
-    "resetdb": "cd db && ./resetdb.sh"
+    "test": "./run_tests.sh"
   }
 }

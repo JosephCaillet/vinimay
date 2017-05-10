@@ -2,6 +2,8 @@
 
 # Build
 
+echo 'Building'
+
 rm -rf build
 tsc -p server
 
@@ -29,7 +31,7 @@ codes="$codes $?"
 ./starTestInstances.sh stop
 ./starTestInstances.sh clean
 
-if [[ $codes == *"1"* ]];then
+if [[ $codes == *"1"* ]]; then
 	exit 1
 else
 	exit 0
