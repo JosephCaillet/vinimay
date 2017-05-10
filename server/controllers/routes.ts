@@ -391,35 +391,6 @@ module.exports = {
 					}
 				}}}
 			}
-		},
-		'/dummy': {
-			get: {
-				description: 'Ping',
-				handler: function(request: Hapi.Response, reply: Hapi.IReply) {
-					reply('pong');
-				},
-				plugins: { 'hapi-swagger': {responses: { '200': {
-					description: 'Pong',
-				}}}}
-			},
-			post: {
-				description: '401 error',
-				handler: function(request: Hapi.Response, reply: Hapi.IReply) {
-					reply('pong').code(401);
-				},
-				plugins: { 'hapi-swagger': {responses: { '401': {
-					description: 'Pong',
-				}}}}
-			},
-			put: {
-				description: '500 error',
-				handler: function(request: Hapi.Response, reply: Hapi.IReply) {
-					reply('pong').code(500);
-				},
-				plugins: { 'hapi-swagger': {responses: { '500': {
-					description: 'Pong',
-				}}}}
-			}
 		}
 	}
 }
