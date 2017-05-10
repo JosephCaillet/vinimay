@@ -20,7 +20,7 @@ CREATE TABLE user(
 	password	TEXT NOT NULL,
 	salt		TEXT NOT NULL,
 	PRIMARY KEY(username, url),
-	FOREIGN KEY(username, url) REFERENCES profile(username, url)
+	FOREIGN KEY(username, url) REFERENCES profile(username, url) ON UPDATE CASCADE
 );
 
 CREATE TABLE friend(
@@ -30,7 +30,7 @@ CREATE TABLE friend(
 	signature_token	TEXT,
 	status			TEXT NOT NULL,
 	PRIMARY KEY(username, url),
-	FOREIGN KEY(username, url) REFERENCES profile(username, url)
+	FOREIGN KEY(username, url) REFERENCES profile(username, url) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE post(
@@ -49,8 +49,8 @@ CREATE TABLE comment(
 	username			TEXT NOT NULL,
 	url					TEXT NOT NULL,
 	PRIMARY KEY(creationTs, creationTs_Post),
-	FOREIGN KEY(creationTs_Post) REFERENCES post(creationTs),
-	FOREIGN KEY(username, url) REFERENCES profile(username, url)
+	FOREIGN KEY(creationTs_Post) REFERENCES post(creationTs) ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY(username, url) REFERENCES profile(username, url) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE TABLE reaction(
@@ -58,5 +58,5 @@ CREATE TABLE reaction(
 	username			TEXT NOT NULL,
 	url					TEXT NOT NULL,
 	PRIMARY KEY(creationTs, username, url),
-	FOREIGN KEY(username, url) REFERENCES profile(username, url)
+	FOREIGN KEY(username, url) REFERENCES profile(username, url) ON UPDATE CASCADE ON DELETE CASCADE
 );

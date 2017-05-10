@@ -35,7 +35,7 @@ module.exports = {
                     }
                 }
             },
-            post: {
+            put: {
                 description: 'Update data on the current user',
                 notes: 'Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).',
                 handler: user.update,
@@ -387,35 +387,6 @@ module.exports = {
                                 description: 'The reaction has been successfully deleted'
                             }
                         } } }
-            }
-        },
-        '/dummy': {
-            get: {
-                description: 'Ping',
-                handler: function (request, reply) {
-                    reply('pong');
-                },
-                plugins: { 'hapi-swagger': { responses: { '200': {
-                                description: 'Pong',
-                            } } } }
-            },
-            post: {
-                description: '401 error',
-                handler: function (request, reply) {
-                    reply('pong').code(401);
-                },
-                plugins: { 'hapi-swagger': { responses: { '401': {
-                                description: 'Pong',
-                            } } } }
-            },
-            put: {
-                description: '500 error',
-                handler: function (request, reply) {
-                    reply('pong').code(500);
-                },
-                plugins: { 'hapi-swagger': { responses: { '500': {
-                                description: 'Pong',
-                            } } } }
             }
         }
     }
