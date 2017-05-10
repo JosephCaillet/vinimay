@@ -39,7 +39,7 @@ module.exports = {
 					}
 				}
 			},
-			post: {
+			put: {
 				description: 'Update data on the current user',
 				notes: 'Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).',
 				handler: user.update,
