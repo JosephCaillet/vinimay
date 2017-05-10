@@ -16,6 +16,7 @@ import { BASE_PATH } from '../providers/apiClient/variables';
 import { PostModal } from "../components/post-modal/post-modal";
 import { Autoresize } from "../components/autoresize/autoresize";
 import DateFormaterService from "../providers/date-formater";
+let Config = require("../config");
 
 @NgModule({
 	declarations: [
@@ -53,7 +54,7 @@ import DateFormaterService from "../providers/date-formater";
 	providers: [
 		StatusBar,
 		SplashScreen,
-		[V1Service, { provide: BASE_PATH, useValue: 'http://127.0.0.1:3000' }],
+		[V1Service, { provide: BASE_PATH, useValue: Config.apiEndpoint }],
 		// { provide: LOCALE_ID, useValue: 'en-EN' },
 		{ provide: ErrorHandler, useClass: IonicErrorHandler },
 		DateFormaterService
