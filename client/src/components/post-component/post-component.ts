@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Post, User } from "../../providers/apiClient/index";
+import { Post, User, V1Service } from "../../providers/apiClient/index";
 import DateFormaterService from "../../providers/date-formater";
 
 /**
@@ -22,7 +22,7 @@ export class PostComponent {
 	editionDate: string
 	deleted = false
 
-	constructor(public dateFormatter: DateFormaterService) {
+	constructor(public dateFormatter: DateFormaterService, private api: V1Service) {
 	}
 
 	ngOnInit() {
@@ -35,12 +35,22 @@ export class PostComponent {
 	}
 
 	toggleReactionState() {
-		this.post.reacted = !this.post.reacted
 		if (this.post.reacted) {
-			this.post.reactions++
+			this.api.deleteV1ClientPostsUserTimestampReactions(this.user.username + '@' + this.user.url, this.post.creationTs)
+				.subscribe(() => {
+					this.post.reactions--
+					this.post.reacted = !this.post.reacted
+				}, err => {
+					console.error(err)
+				})
 		} else {
-			this.post.reactions--
+			this.api.postV1ClientPostsUserTimestampReactions(this.user.username + '@' + this.user.url, this.post.creationTs)
+				.subscribe(() => {
+					this.post.reactions++
+					this.post.reacted = !this.post.reacted
+				}, err => {
+					console.error(err)
+				})
 		}
 	}
-
 }
