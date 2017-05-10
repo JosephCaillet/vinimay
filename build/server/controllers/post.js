@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const j = require("joi");
 const b = require("boom");
 const users_1 = require("../models/users");
+const posts_1 = require("../models/posts");
 const friends_1 = require("../models/friends");
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
 const vinimayError_1 = require("../utils/vinimayError");
@@ -81,7 +82,8 @@ function get(request, reply) {
                 }
                 posts.sort((a, b) => b.creationTs - a.creationTs);
                 // We'll have more posts than requested, so we truncate the array
-                posts = posts.slice(0, request.query.nb);
+                if (request.query.nb)
+                    posts = posts.slice(0, request.query.nb);
                 let rep = {
                     authenticated: true,
                     posts: posts,
@@ -140,11 +142,10 @@ async function getSingle(request, reply) {
                     idtoken = friend.get('id_token');
                     sigtoken = friend.get('signature_token');
                 }
-                let user = new users_1.User(friend.get('username'), friend.get('url'));
                 // We want to retrieve only one post at a given timestamp
                 postUtils.retrieveRemotePost(author, request.params.timestamp, idtoken, sigtoken).then((post) => {
                     return commons.checkAndSendSchema(post, exports.postSchema, log, reply);
-                }).catch(e => utils.handleRequestError(user, e, log, false, reply));
+                }).catch(e => utils.handleRequestError(author, e, log, false, reply));
             }).catch(e => reply(b.wrap(e)));
         }
     }).catch(e => reply(b.wrap(e)));
@@ -207,7 +208,7 @@ async function del(request, reply) {
     }).catch(e => reply(b.wrap(e)));
 }
 exports.del = del;
-function serverGet(request, reply) {
+async function serverGet(request, reply) {
     let username = utils.getUsername(request);
     let instance;
     // Check if the user exists (the wrapper will return an error if not)
@@ -220,6 +221,19 @@ function serverGet(request, reply) {
     let options = getOptions(request.query);
     // We cast directly as post, so we don't need getters and setters
     options.raw = true;
+    if (!options.where)
+        options.where = {};
+    // Force the cast
+    options.where = options.where;
+    let or = new Array();
+    or.push({ privacy: posts_1.Privacy[posts_1.Privacy.public] });
+    if (request.query.idToken && request.query.signature) {
+        let friend = await utils.getFriendByToken(username, request.query.idToken);
+        if (friend.status === friends_1.Status[friends_1.Status.accepted]) {
+            or.push({ privacy: posts_1.Privacy[posts_1.Privacy.friends] });
+        }
+    }
+    options.where['$or'] = or;
     instance.model('post').findAll(options).then(async (posts) => {
         let res;
         try {

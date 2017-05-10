@@ -122,7 +122,7 @@ function processPostAuth(arg, request, username) {
                 post.reacted = await reactions.reacted(post.creationTs, friend);
                 post.lastEditTs = post.lastModificationTs;
                 delete post.lastModificationTs;
-                if (await canReadPost(username, posts_1.Privacy[post.privacy]), friend) {
+                if (await canReadPost(username, posts_1.Privacy[post.privacy], friend)) {
                     ok(post);
                 }
                 else {
