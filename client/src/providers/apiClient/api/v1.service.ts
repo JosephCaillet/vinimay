@@ -118,6 +118,23 @@ export class V1Service {
     }
 
     /**
+     * Delete a reaction
+     * Delete a reaction to a given post
+     * @param user Post author
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public deleteV1ClientPostsUserTimestampReactions(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteV1ClientPostsUserTimestampReactionsWithHttpInfo(user, timestamp, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Remove a comment
      * Remove a comment given its author and timestamp
      * @param timestamp The post&#39;s creation timestamp
@@ -127,6 +144,25 @@ export class V1Service {
      */
     public deleteV1ServerPostsTimestampCommentsCommenttimestamp(timestamp: number, commentTimestamp: number, idToken?: string, signature?: string, extraHttpRequestParams?: any): Observable<{}> {
         return this.deleteV1ServerPostsTimestampCommentsCommenttimestampWithHttpInfo(timestamp, commentTimestamp, idToken, signature, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Delete a reaction
+     * Delete a reaction to a given post
+     * @param timestamp The post&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend
+     * @param signature 
+     * @param body 
+     */
+    public deleteV1ServerPostsTimestampReactions(timestamp: number, idToken?: string, signature?: string, body?: Reaction, extraHttpRequestParams?: any): Observable<{}> {
+        return this.deleteV1ServerPostsTimestampReactionsWithHttpInfo(timestamp, idToken, signature, body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -514,6 +550,49 @@ export class V1Service {
     }
 
     /**
+     * Delete a reaction
+     * Delete a reaction to a given post
+     * @param user Post author
+     * @param timestamp The post&#39;s creation timestamp
+     */
+    public deleteV1ClientPostsUserTimestampReactionsWithHttpInfo(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/posts/${user}/${timestamp}/reactions'
+                    .replace('${' + 'user' + '}', String(user))
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling deleteV1ClientPostsUserTimestampReactions.');
+        }
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling deleteV1ClientPostsUserTimestampReactions.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
      * Remove a comment
      * Remove a comment given its author and timestamp
      * @param timestamp The post&#39;s creation timestamp
@@ -554,6 +633,57 @@ export class V1Service {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Delete a reaction
+     * Delete a reaction to a given post
+     * @param timestamp The post&#39;s creation timestamp
+     * @param idToken Identification token bound to a friend
+     * @param signature 
+     * @param body 
+     */
+    public deleteV1ServerPostsTimestampReactionsWithHttpInfo(timestamp: number, idToken?: string, signature?: string, body?: Reaction, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/posts/${timestamp}/reactions'
+                    .replace('${' + 'timestamp' + '}', String(timestamp));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'timestamp' is not null or undefined
+        if (timestamp === null || timestamp === undefined) {
+            throw new Error('Required parameter timestamp was null or undefined when calling deleteV1ServerPostsTimestampReactions.');
+        }
+        if (idToken !== undefined) {
+            queryParameters.set('idToken', <any>idToken);
+        }
+
+        if (signature !== undefined) {
+            queryParameters.set('signature', <any>signature);
+        }
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:true
         });

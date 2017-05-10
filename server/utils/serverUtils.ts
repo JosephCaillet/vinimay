@@ -70,6 +70,7 @@ export function computeSignature(method: string, url: string, parameters, token:
 	params = params.substr(0, params.length-1);
 	
 	let toSign = [method.toUpperCase(), url, params].join('&');
+	log.debug('String to sign:', toSign);
 	toSign = encodeURIComponent(toSign);
 
 	let signature = crypto.createHmac("sha256", token)

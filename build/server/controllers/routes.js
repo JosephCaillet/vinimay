@@ -194,6 +194,22 @@ module.exports = {
                                 schema: reactions.reactionsSchema
                             }
                         } } }
+            },
+            delete: {
+                description: 'Delete a reaction',
+                notes: 'Delete a reaction to a given post',
+                handler: reactions.del,
+                validate: {
+                    params: {
+                        user: commons.user.required().description('Post author'),
+                        timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+                    }
+                },
+                plugins: { 'hapi-swagger': { responses: {
+                            '204': {
+                                description: 'The reaction was successfully deleted'
+                            }
+                        } } }
             }
         },
         '/client/posts/{user}/{timestamp}/comments/{commentTimestamp}': {
@@ -350,6 +366,25 @@ module.exports = {
                             '200': {
                                 description: 'The created reaction',
                                 schema: reactions.reactionsSchema
+                            }
+                        } } }
+            },
+            delete: {
+                description: 'Delete a reaction',
+                notes: 'Delete a reaction to a given post',
+                handler: reactions.serverDel,
+                validate: {
+                    payload: Joi.object({
+                        author: commons.user.required().description('Reaction author'),
+                    }).label('Reaction'),
+                    params: {
+                        timestamp: Joi.number().integer().min(1).required().description('The post\'s creation timestamp')
+                    },
+                    query: tokens
+                },
+                plugins: { 'hapi-swagger': { responses: {
+                            '204': {
+                                description: 'The reaction has been successfully deleted'
                             }
                         } } }
             }
