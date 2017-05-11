@@ -47,6 +47,7 @@
   "cordovaPlatforms": [],
   "description": "vinimay-client: An Ionic project",
   "config": {
-  	"ionic_copy": "config/copy.config.js"
+  	"ionic_copy": "config/copy.config.js",
+  	"ionic_manual_treeshaking": false
   }
 }

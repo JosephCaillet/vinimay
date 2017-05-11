@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Post, User, V1Service } from "../../providers/apiClient/index";
-import DateFormaterService from "../../providers/date-formater";
+import { DateFormaterService } from "../../providers/date-formater";
 
 /**
  * Generated class for the PostComponent component.

@@ -8,7 +8,7 @@ import { TranslateService } from "@ngx-translate/core";
   for more info on providers and Angular 2 DI.
 */
 @Injectable()
-export default class DateFormaterService {
+export class DateFormaterService {
 
 	readonly options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZoneName: 'short' }
 
