@@ -248,16 +248,16 @@ export async function serverGet(request: h.Request, reply: h.IReply) {
 
 	instance.model('post').findAll(options).then(async (posts: Post[]) => {
 		let res: Post | Post[] | undefined;
-		try { res = await postUtils.processPost(posts, request, username); }
-		catch(e) {
-			if(e instanceof VinimayError) {
-				return reply(b.unauthorized(e.message));
-			}
-			return reply(b.wrap(e))
-		}
+		return postUtils.processPost(posts, request, username);
+	}).then((res) => {
 		if(res) return commons.checkAndSendSchema(res, postsArray, log, reply);
 		else return reply(b.unauthorized());
-	}).catch(e => reply(b.wrap(e)));
+	}).catch(e => {
+		if(e instanceof VinimayError) {
+			return reply(b.unauthorized(e.message));
+		}
+		return reply(b.wrap(e))
+	});
 }
 
 export function serverGetSingle(request: h.Request, reply: h.IReply) {

@@ -238,20 +238,18 @@ async function serverGet(request, reply) {
     options.where['$or'] = or;
     instance.model('post').findAll(options).then(async (posts) => {
         let res;
-        try {
-            res = await postUtils.processPost(posts, request, username);
-        }
-        catch (e) {
-            if (e instanceof vinimayError_1.VinimayError) {
-                return reply(b.unauthorized(e.message));
-            }
-            return reply(b.wrap(e));
-        }
+        return postUtils.processPost(posts, request, username);
+    }).then((res) => {
         if (res)
             return commons.checkAndSendSchema(res, exports.postsArray, log, reply);
         else
             return reply(b.unauthorized());
-    }).catch(e => reply(b.wrap(e)));
+    }).catch(e => {
+        if (e instanceof vinimayError_1.VinimayError) {
+            return reply(b.unauthorized(e.message));
+        }
+        return reply(b.wrap(e));
+    });
 }
 exports.serverGet = serverGet;
 function serverGetSingle(request, reply) {
