@@ -7,4 +7,7 @@ before_install:
   - npm install -g tsc newman --silent
 
 before_script:
+  - cp settings.example.json settings.json
   - npm run start:alice &
+  - npm run start:bob &
+  - npm run start:frank &
