@@ -232,7 +232,9 @@ export function retrieveRemotePost(source: User, timestamp: any, idtoken?: strin
 
 export function exists(username: string, timestamp: number): Promise<boolean> {
 	return new Promise<boolean>((ok, ko) => {
-		SequelizeWrapper.getInstance(username).model('post').count(timestamp)
+		SequelizeWrapper.getInstance(username).model('post').count({ where: {
+			creationTs: timestamp
+		}})
 		.then(count => ok(!!count)).catch(ko);
 	})
 }
