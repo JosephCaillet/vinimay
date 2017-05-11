@@ -177,6 +177,24 @@ module.exports = {
                         } } }
             }
         },
+        '/client/posts/{user}/{timestamp}/comments/{commentTimestamp}': {
+            delete: {
+                description: 'Remove a comment',
+                notes: 'Remove a comment given its author and timestamp',
+                handler: comments.del,
+                validate: {
+                    params: {
+                        user: commons.user.required().description('Post author'),
+                        timestamp: Joi.number().required().description('Post timestamp'),
+                        commentTimestamp: Joi.number().required().description('Comment timestamp'),
+                    }
+                },
+                plugins: { 'hapi-swagger': { responses: {
+                            '204': { description: 'The comment has been deleted' },
+                            '404': { description: 'The comment was not found' }
+                        } } }
+            }
+        },
         '/client/posts/{user}/{timestamp}/reactions': {
             post: {
                 description: 'Add a reaction',
@@ -206,24 +224,6 @@ module.exports = {
                             '204': {
                                 description: 'The reaction was successfully deleted'
                             }
-                        } } }
-            }
-        },
-        '/client/posts/{user}/{timestamp}/comments/{commentTimestamp}': {
-            delete: {
-                description: 'Remove a comment',
-                notes: 'Remove a comment given its author and timestamp',
-                handler: comments.del,
-                validate: {
-                    params: {
-                        user: commons.user.required().description('Post author'),
-                        timestamp: Joi.number().required().description('Post timestamp'),
-                        commentTimestamp: Joi.number().required().description('Comment timestamp'),
-                    }
-                },
-                plugins: { 'hapi-swagger': { responses: {
-                            '204': { description: 'The comment has been deleted' },
-                            '404': { description: 'The comment was not found' }
                         } } }
             }
         },
