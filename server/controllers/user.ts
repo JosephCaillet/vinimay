@@ -7,6 +7,11 @@ import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
 import {username} from '../utils/username';
 
+const log = require('printit')({
+	date: true,
+	prefix: 'user'
+});
+
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
 	
@@ -16,7 +21,11 @@ export function get(request: h.Request, reply: h.IReply) {
 			attributes: ['description']
 		}]
 	}).then((user: s.Instance<any>) => {
-		reply({
+		if(!user) {
+			log.warn('Could not retrieve current user. This means the user creation failed or the database has been tempered with.')
+			return reply(b.notFound())
+		}
+		return reply({
 			username: user.get('username'),
 			url: user.get('url'),
 			description: user['profile'].get('description')

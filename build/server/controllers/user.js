@@ -4,6 +4,10 @@ const b = require("boom");
 const j = require("joi");
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
 const username_1 = require("../utils/username");
+const log = require('printit')({
+    date: true,
+    prefix: 'user'
+});
 function get(request, reply) {
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     instance.model('user').findOne({
@@ -12,7 +16,11 @@ function get(request, reply) {
                 attributes: ['description']
             }]
     }).then((user) => {
-        reply({
+        if (!user) {
+            log.warn('Could not retrieve current user. This means the user creation failed or the database has been tempered with.');
+            return reply(b.notFound());
+        }
+        return reply({
             username: user.get('username'),
             url: user.get('url'),
             description: user['profile'].get('description')
