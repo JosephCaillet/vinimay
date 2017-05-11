@@ -45,5 +45,8 @@
     "cordova-plugin-statusbar"
   ],
   "cordovaPlatforms": [],
-  "description": "vinimay-client: An Ionic project"
+  "description": "vinimay-client: An Ionic project",
+  "config": {
+  	"ionic_copy": "config/copy.config.js"
+  }
 }

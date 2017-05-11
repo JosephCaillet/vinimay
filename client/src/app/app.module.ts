@@ -77,7 +77,7 @@ export function createTranslateLoader(http: Http) {
 }
 
 export function loadConfiguration(conf: ConfigurationService) {
-	return () => conf.load("assets/config.json");
+	return () => conf.load("config.json");
 }
 
 export function createAPIEndpointLoader(http: Http, conf: ConfigurationService) {
