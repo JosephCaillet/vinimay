@@ -8,5 +8,3 @@ before_install:
 
 before_script:
   - npm run start:alice &
-  - npm run start:bob &
-  - npm run start:frank &
