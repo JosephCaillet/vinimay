@@ -1,6 +1,5 @@
 language: node_js
 node_js:
-  - 6
   - 7
 
 before_install:
@@ -8,6 +7,3 @@ before_install:
 
 before_script:
   - cp settings.example.json settings.json
-  - npm run start:alice &
-  - npm run start:bob &
-  - npm run start:frank &
