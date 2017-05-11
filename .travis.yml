@@ -4,6 +4,4 @@ node_js:
 
 before_install:
   - npm install -g tsc newman --silent
-
-before_script:
   - cp settings.example.json settings.json
