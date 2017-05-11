@@ -295,8 +295,10 @@ export function getOptions(queryParams, order = 'DESC') {
 	if(queryParams.nb) options.limit = queryParams.nb;
 	// Filter by timestamp require a WHERE clause
 	if(queryParams.from) {
+		let filter = '$lte';
+		if(order === 'ASC') filter = '$gte';
 		let timestamp = <s.WhereOptions>{};
-		if(queryParams.from) timestamp['$lte'] = queryParams.from;
+		if(queryParams.from) timestamp[filter] = queryParams.from;
 		options.where = {};
 		options.where.creationTs = timestamp;
 	}
