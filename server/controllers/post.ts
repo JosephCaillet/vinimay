@@ -211,8 +211,9 @@ export async function del(request: h.Request, reply: h.IReply) {
 		// Run the query
 		instance.model('post').destroy({ where: {
 			creationTs: request.params.timestamp
-		}}).then(() => {
-			reply(null).code(204);
+		}}).then((nb) => {
+			if(!nb) return reply(b.notFound());
+			return reply(null).code(204);
 		}).catch(e => reply(b.wrap(e)));
 	}).catch(e => reply(b.wrap(e)));
 }
