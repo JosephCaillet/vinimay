@@ -43,17 +43,18 @@ async function get(request, reply) {
     }
     let author = new users_1.User(request.params.user);
     instance.model('user').findOne().then(async (user) => {
-        let postExists;
-        try {
-            postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
-        }
-        catch (e) {
-            return reply(Boom.wrap(e));
-        }
-        if (!postExists)
-            return reply(Boom.notFound());
         // Check if the post is local or not
         if (!user.get('url').localeCompare(author.instance)) {
+            // Check if the post exists locally
+            let postExists;
+            try {
+                postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
+            }
+            catch (e) {
+                return reply(Boom.wrap(e));
+            }
+            if (!postExists)
+                return reply(Boom.notFound());
             let options = post_1.getOptions(request.query, 'ASC');
             // Use the post's creation timestamp to filter the results
             if (!options.where)
@@ -78,7 +79,7 @@ async function get(request, reply) {
                     comments: res
                 };
                 return commons.checkAndSendSchema(rep, exports.commentsSchema, log, reply);
-            });
+            }).catch(e => reply(Boom.wrap(e)));
         }
         else {
             instance.model('friend').findOne({ where: {
@@ -116,18 +117,19 @@ async function add(request, reply) {
     }
     let author = await utils.getUser(username_1.username);
     let postAuthor = new users_1.User(request.params.user);
-    let postExists;
-    try {
-        postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
-    }
-    catch (e) {
-        return reply(Boom.wrap(e));
-    }
-    if (!postExists)
-        return reply(Boom.notFound());
     // Check if the post is local or not
     if (!postAuthor.instance.localeCompare(author.instance)) {
         // We don't support multi-user instances yet
+        // Check if the post exists locally
+        let postExists;
+        try {
+            postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
+        }
+        catch (e) {
+            return reply(Boom.wrap(e));
+        }
+        if (!postExists)
+            return reply(Boom.notFound());
         let timestamp = (new Date()).getTime();
         instance.model('comment').create({
             creationTs: timestamp,
@@ -195,7 +197,7 @@ async function del(request, reply) {
                 if (!destroyedRows)
                     return reply(Boom.notFound());
                 return reply(null).code(204);
-            });
+            }).catch(e => reply(Boom.wrap(e)));
         }
         else {
             // TODO: Suppoer multi-user
@@ -218,7 +220,7 @@ async function del(request, reply) {
                 .then(() => {
                 return reply(null).code(204);
             }).catch(e => utils.handleRequestError(author, e, log, false, reply));
-        });
+        }).catch(e => reply(Boom.wrap(e)));
     }
 }
 exports.del = del;
@@ -255,17 +257,17 @@ async function serverGet(request, reply) {
     instance.model('post').findById(request.params.timestamp)
         .then(async (post) => {
         if (!post)
-            return reply(Boom.notFound());
+            throw Boom.notFound();
         let canRead;
         try {
             let privacy = posts_1.Privacy[post.get('privacy')];
             canRead = await postUtils.canReadPost(username, privacy, friend);
         }
         catch (e) {
-            return reply(Boom.wrap(e));
+            throw Boom.wrap(e);
         }
         if (!canRead)
-            return reply(Boom.notFound());
+            throw Boom.notFound();
         let options = post_1.getOptions(request.query, 'ASC');
         // Use the post's creation timestamp to filter the results
         if (!options.where)
@@ -287,7 +289,11 @@ async function serverGet(request, reply) {
             });
         }
         return commons.checkAndSendSchema(res, exports.commentsArray, log, reply);
-    }).catch(e => reply(Boom.wrap(e)));
+    }).catch(e => {
+        if (e.isBoom)
+            return reply(e);
+        return reply(Boom.wrap(e));
+    });
 }
 exports.serverGet = serverGet;
 async function serverAdd(request, reply) {
@@ -304,7 +310,7 @@ async function serverAdd(request, reply) {
     instance.model('post').findById(request.params.timestamp)
         .then(async (post) => {
         if (!post)
-            return reply(Boom.notFound());
+            throw Boom.notFound();
         let privacy = posts_1.Privacy[post.get('privacy')];
         let author;
         // Commenting on a public post requires info on the author as identification
@@ -313,7 +319,7 @@ async function serverAdd(request, reply) {
             let schema = commons.user.required().label('Comment author');
             let err;
             if (err = Joi.validate(request.payload.author, schema).error) {
-                return reply(Boom.badRequest(err));
+                throw Boom.badRequest(err);
             }
             // No need to check if we know the author if its a friend
             if (request.query.idToken && request.query.signature) {
@@ -321,7 +327,7 @@ async function serverAdd(request, reply) {
                     let res = await utils.getFriendByToken(username, request.query.idToken);
                     author = new users_1.User(res.username, res.url);
                     if (!author || !await postUtils.canReadPost(username, privacy, author)) {
-                        return reply(Boom.notFound());
+                        throw Boom.notFound();
                     }
                     let url = user + request.path;
                     let params = Object.assign(request.params, request.query);
@@ -333,7 +339,7 @@ async function serverAdd(request, reply) {
                 }
                 catch (e) {
                     if (e instanceof vinimayError_1.VinimayError)
-                        return reply(Boom.notFound());
+                        throw Boom.notFound();
                     throw e;
                 }
             }
@@ -356,12 +362,12 @@ async function serverAdd(request, reply) {
         }
         else {
             if (!request.query.idToken)
-                return reply(Boom.notFound());
+                throw Boom.notFound();
             try {
                 let res = await utils.getFriendByToken(username, request.query.idToken);
                 author = new users_1.User(res.username, res.url);
                 if (!author || !await postUtils.canReadPost(username, privacy, author)) {
-                    return reply(Boom.notFound());
+                    throw Boom.notFound();
                 }
                 let url = user + request.path;
                 let params = Object.assign(request.params, request.query);
@@ -373,7 +379,7 @@ async function serverAdd(request, reply) {
             }
             catch (e) {
                 if (e instanceof vinimayError_1.VinimayError)
-                    return reply(Boom.notFound());
+                    throw Boom.notFound();
                 throw e;
             }
         }
@@ -395,7 +401,11 @@ async function serverAdd(request, reply) {
             content: comment.get('content')
         };
         return commons.checkAndSendSchema(res, exports.commentSchema, log, reply);
-    }).catch(e => reply(Boom.wrap(e)));
+    }).catch(e => {
+        if (e.isBoom)
+            return reply(e);
+        return reply(Boom.wrap(e));
+    });
 }
 exports.serverAdd = serverAdd;
 async function serverDel(request, reply) {
@@ -413,7 +423,7 @@ async function serverDel(request, reply) {
         where: { creationTs: request.params.commentTimestamp }
     }).then((res) => {
         if (!res)
-            return reply(Boom.notFound());
+            throw Boom.notFound();
         comment = res;
         // No need to verify if the author's here if we have an idtoken
         if (request.query.idToken && request.query.signature) {
@@ -437,7 +447,7 @@ async function serverDel(request, reply) {
             let params = Object.assign(request.params, request.query);
             let sig = utils.computeSignature('DELETE', url, params, friend.signature_token);
             if (!utils.checkSignature(request.query.signature, sig)) {
-                return reply(Boom.unauthorized('WRONG_SIGNATURE'));
+                throw Boom.unauthorized('WRONG_SIGNATURE');
             }
         }
         else {
@@ -450,9 +460,13 @@ async function serverDel(request, reply) {
             return reply(null).code(204);
         }
         else {
-            return reply(Boom.unauthorized());
+            throw Boom.unauthorized();
         }
-    }).catch(e => reply(Boom.wrap(e)));
+    }).catch(e => {
+        if (e.isBoom)
+            return reply(e);
+        return reply(Boom.wrap(e));
+    });
 }
 exports.serverDel = serverDel;
 function count(postTimestamp) {

@@ -58,18 +58,18 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 	let author = new User(request.params.user);
 
 	instance.model('user').findOne().then(async (user: sequelize.Instance<any>) => {
-		let postExists: boolean;
-		
-		try {
-			postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
-		} catch(e) {
-			return reply(Boom.wrap(e));
-		}
-		
-		if(!postExists) return reply(Boom.notFound())
 		
 		// Check if the post is local or not
 		if(!user.get('url').localeCompare(author.instance)) {
+			// Check if the post exists locally
+			let postExists: boolean;
+			try {
+				postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
+			} catch(e) {
+				return reply(Boom.wrap(e));
+			}
+			if(!postExists) return reply(Boom.notFound())
+
 			let options = getOptions(request.query, 'ASC');
 			// Use the post's creation timestamp to filter the results
 			if(!options.where) options.where = {};
@@ -93,7 +93,7 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 					comments: res
 				};
 				return commons.checkAndSendSchema(rep, commentsSchema, log, reply);
-			})
+			}).catch(e => reply(Boom.wrap(e)));
 		} else {
 			instance.model('friend').findOne({ where: {
 				username: author.username,
@@ -133,19 +133,21 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 	let author = await utils.getUser(username);
 	let postAuthor = new User(request.params.user);
 
-	let postExists: boolean;
-	
-	try {
-		postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
-	} catch(e) {
-		return reply(Boom.wrap(e));
-	}
-	
-	if(!postExists) return reply(Boom.notFound());
-	
 	// Check if the post is local or not
 	if(!postAuthor.instance.localeCompare(author.instance)) {
 		// We don't support multi-user instances yet
+
+		// Check if the post exists locally
+		let postExists: boolean;
+		
+		try {
+			postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
+		} catch(e) {
+			return reply(Boom.wrap(e));
+		}
+		
+		if(!postExists) return reply(Boom.notFound());
+
 		let timestamp = (new Date()).getTime()
 		
 		instance.model('comment').create({
@@ -218,7 +220,7 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 				// If no row was destroyed, 
 				if(!destroyedRows) return reply(Boom.notFound());
 				return reply(null).code(204);
-			});
+			}).catch(e => reply(Boom.wrap(e)));
 		} else {
 			// TODO: Suppoer multi-user
 		}
@@ -239,7 +241,7 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 			.then(() => {
 				return reply(null).code(204);
 			}).catch(e => utils.handleRequestError(author, e, log, false, reply));
-		});
+		}).catch(e => reply(Boom.wrap(e)));
 	}
 }
 
@@ -273,17 +275,17 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 
 	instance.model('post').findById(request.params.timestamp)
 	.then(async (post: sequelize.Instance<Post>) => {
-		if(!post) return reply(Boom.notFound());
+		if(!post) throw Boom.notFound();
 
 		let canRead: boolean;
 		try {
 			let privacy: Privacy = Privacy[<string>post.get('privacy')];
 			canRead = await postUtils.canReadPost(username, privacy, friend);
 		} catch (e) {
-			return reply(Boom.wrap(e));
+			throw Boom.wrap(e);
 		}
 
-		if(!canRead) return reply(Boom.notFound());
+		if(!canRead) throw Boom.notFound();
 
 		let options = <sequelize.FindOptions>getOptions(request.query, 'ASC');
 		// Use the post's creation timestamp to filter the results
@@ -306,7 +308,10 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 			});
 		}
 		return commons.checkAndSendSchema(res, commentsArray, log, reply)
-	}).catch(e => reply(Boom.wrap(e)));
+	}).catch(e => {
+		if(e.isBoom) return reply(e);
+		return reply(Boom.wrap(e))
+	})
 }
 
 
@@ -322,7 +327,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 
 	instance.model('post').findById(request.params.timestamp)
 	.then(async (post: sequelize.Instance<Post>) => {
-		if(!post) return reply(Boom.notFound());
+		if(!post) throw Boom.notFound();
 
 		let privacy: Privacy = Privacy[<string>post.get('privacy')];
 
@@ -333,7 +338,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 			let schema = commons.user.required().label('Comment author')
 			let err;
 			if(err = Joi.validate(request.payload.author, schema).error) {
-				return reply(Boom.badRequest(err));
+				throw Boom.badRequest(err);
 			}
 
 			// No need to check if we know the author if its a friend
@@ -342,7 +347,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 					let res = await utils.getFriendByToken(username, request.query.idToken);
 					author = new User(res.username, res.url);
 					if(!author || !await postUtils.canReadPost(username, privacy, author)) {
-						return reply(Boom.notFound());
+						throw Boom.notFound();
 					}
 					let url = user + request.path;
 					let params = Object.assign(request.params, request.query);
@@ -352,7 +357,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 						return reply(Boom.unauthorized('WRONG_SIGNATURE'))
 					}
 				} catch(e) {
-					if(e instanceof VinimayError) return reply(Boom.notFound())
+					if(e instanceof VinimayError) throw Boom.notFound();
 					throw e;
 				}				
 			} else {
@@ -375,13 +380,13 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 			}
 
 		} else {
-			if(!request.query.idToken) return reply(Boom.notFound());
+			if(!request.query.idToken) throw Boom.notFound();
 
 			try {
 				let res = await utils.getFriendByToken(username, request.query.idToken);
 				author = new User(res.username, res.url);
 				if(!author || !await postUtils.canReadPost(username, privacy, author)) {
-					return reply(Boom.notFound());
+					throw Boom.notFound();
 				}
 				let url = user + request.path;
 				let params = Object.assign(request.params, request.query);
@@ -391,7 +396,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 					return reply(Boom.unauthorized('WRONG_SIGNATURE'))
 				}
 			} catch(e) {
-				if(e instanceof VinimayError) return reply(Boom.notFound())
+				if(e instanceof VinimayError) throw Boom.notFound();
 				throw e;
 			}
 		}
@@ -415,7 +420,10 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 			content: comment.get('content')
 		};
 		return commons.checkAndSendSchema(res, commentSchema, log, reply);
-	}).catch(e => reply(Boom.wrap(e)))
+	}).catch(e => {
+		if(e.isBoom) return reply(e);
+		return reply(Boom.wrap(e))
+	})
 }
 
 export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
@@ -431,7 +439,7 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 	instance.model('comment').findOne({
 		where: { creationTs: request.params.commentTimestamp }
 	}).then((res: sequelize.Instance<any>) => {
-		if(!res) return reply(Boom.notFound());
+		if(!res) throw Boom.notFound();
 		comment = res;
 
 		// No need to verify if the author's here if we have an idtoken
@@ -454,7 +462,7 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 			let params = Object.assign(request.params, request.query);
 			let sig = utils.computeSignature('DELETE', url, params, friend.signature_token)
 			if(!utils.checkSignature(request.query.signature, sig)) {
-				return reply(Boom.unauthorized('WRONG_SIGNATURE'))
+				throw Boom.unauthorized('WRONG_SIGNATURE');
 			}
 		} else {
 			// TODO: Ask the comment's author's server to confirm the deletion
@@ -466,9 +474,12 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 			comment.destroy();
 			return reply(null).code(204);
 		} else {
-			return reply(Boom.unauthorized());
+			throw Boom.unauthorized();
 		}
-	}).catch(e => reply(Boom.wrap(e)))
+	}).catch(e => {
+		if(e.isBoom) return reply(e);
+		return reply(Boom.wrap(e))
+	})
 }
 
 

@@ -19,7 +19,9 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"postman.setGlobalVariable('friendPublicTs', JSON.parse(responseBody).creationTs)"
+									"postman.setGlobalVariable('friendPublicTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
 								]
 							}
 						}
@@ -50,7 +52,9 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"postman.setGlobalVariable('friendFriendsTs', JSON.parse(responseBody).creationTs)"
+									"postman.setGlobalVariable('friendFriendsTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
 								]
 							}
 						}
@@ -81,7 +85,9 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"postman.setGlobalVariable('friendPrivateTs', JSON.parse(responseBody).creationTs)"
+									"postman.setGlobalVariable('friendPrivateTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
 								]
 							}
 						}
@@ -112,7 +118,9 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"postman.setGlobalVariable('followingPublicTs', JSON.parse(responseBody).creationTs)"
+									"postman.setGlobalVariable('followingPublicTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
 								]
 							}
 						}
@@ -143,7 +151,9 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"postman.setGlobalVariable('followingFriendsTs', JSON.parse(responseBody).creationTs)"
+									"postman.setGlobalVariable('followingFriendsTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
 								]
 							}
 						}
@@ -174,7 +184,9 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"postman.setGlobalVariable('followingPrivateTs', JSON.parse(responseBody).creationTs)"
+									"postman.setGlobalVariable('followingPrivateTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
 								]
 							}
 						}
@@ -1089,7 +1101,7 @@
 			]
 		},
 		{
-			"name": "5 - Retrieving errors",
+			"name": "5 - Retrieval errors",
 			"description": "",
 			"item": [
 				{
@@ -1298,7 +1310,7 @@
 			]
 		},
 		{
-			"name": "6 - Creating errors",
+			"name": "6 - Creation errors",
 			"description": "",
 			"item": [
 				{
@@ -1474,7 +1486,44 @@
 			]
 		},
 		{
-			"name": "7 - After",
+			"name": "7 - Deletion errors",
+			"description": "",
+			"item": [
+				{
+					"name": "Non existing post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/424242424242",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8 - After",
 			"description": "",
 			"item": [
 				{
@@ -1646,7 +1695,7 @@
 						}
 					],
 					"request": {
-						"url": "bob@localhost:3001/v1/client/posts/{{followingPrivateTs}}",
+						"url": "frank@localhost:3006/v1/client/posts/{{followingPrivateTs}}",
 						"method": "DELETE",
 						"header": [
 							{
