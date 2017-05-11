@@ -1101,7 +1101,7 @@
 			]
 		},
 		{
-			"name": "5 - Retrieving errors",
+			"name": "5 - Retrieval errors",
 			"description": "",
 			"item": [
 				{
@@ -1310,7 +1310,7 @@
 			]
 		},
 		{
-			"name": "6 - Creating errors",
+			"name": "6 - Creation errors",
 			"description": "",
 			"item": [
 				{
@@ -1486,7 +1486,7 @@
 			]
 		},
 		{
-			"name": "7 - Deleting error",
+			"name": "7 - Deletion errors",
 			"description": "",
 			"item": [
 				{
