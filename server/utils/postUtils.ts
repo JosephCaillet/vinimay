@@ -85,7 +85,7 @@ function processPostAuth(arg: Post | Post[], request: h.Request, username: strin
 		let instance = SequelizeWrapper.getInstance(username);
 		let friendInstance: any;
 		try {
-			 friendInstance = await instance.model('friend').findOne({ where: {
+			friendInstance = await instance.model('friend').findOne({ where: {
 				id_token: request.query.idToken,
 				status: Status[Status.accepted]
 			}});

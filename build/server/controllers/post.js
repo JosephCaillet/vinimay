@@ -230,7 +230,16 @@ async function serverGet(request, reply) {
     let or = new Array();
     or.push({ privacy: posts_1.Privacy[posts_1.Privacy.public] });
     if (request.query.idToken && request.query.signature) {
-        let friend = await utils.getFriendByToken(username, request.query.idToken);
+        let friend;
+        try {
+            friend = await utils.getFriendByToken(username, request.query.idToken);
+        }
+        catch (e) {
+            if (e instanceof vinimayError_1.VinimayError) {
+                return reply(b.unauthorized(e.message));
+            }
+            return reply(b.wrap(e));
+        }
         if (friend.status === friends_1.Status[friends_1.Status.accepted]) {
             or.push({ privacy: posts_1.Privacy[posts_1.Privacy.friends] });
         }

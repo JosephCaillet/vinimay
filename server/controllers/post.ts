@@ -238,7 +238,15 @@ export async function serverGet(request: h.Request, reply: h.IReply) {
 	or.push({ privacy: Privacy[Privacy.public] });
 
 	if(request.query.idToken && request.query.signature) {
-		let friend = await utils.getFriendByToken(username, request.query.idToken);
+		let friend: any;
+		try {
+			friend = await utils.getFriendByToken(username, request.query.idToken);
+		} catch(e) {
+			if(e instanceof VinimayError) {
+				return reply(b.unauthorized(e.message));
+			}
+			return reply(b.wrap(e));
+		}
 		if(friend.status === Status[Status.accepted]) {
 			or.push({ privacy: Privacy[Privacy.friends] });
 		}
