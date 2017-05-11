@@ -216,8 +216,8 @@
 									"let ts = (new Date()).getTime();",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -276,8 +276,8 @@
 									"var responseJSON = JSON.parse(responseBody);",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -367,8 +367,8 @@
 									"let ts = (new Date()).getTime();",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -427,8 +427,8 @@
 									"var responseJSON = JSON.parse(responseBody);",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -518,8 +518,8 @@
 									"let ts = (new Date()).getTime();",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -578,8 +578,8 @@
 									"var responseJSON = JSON.parse(responseBody);",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -672,8 +672,8 @@
 									"var responseJSON = JSON.parse(responseBody);",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -730,8 +730,8 @@
 									"var responseJSON = JSON.parse(responseBody);",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -827,8 +827,8 @@
 									"var responseJSON = JSON.parse(responseBody);",
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Post has a creation timestamp\"] = !!responseJSON.creationTs;",
-									"tests[\"Post has a last edit timestamp\"] = !!responseJSON.lastEditTs;",
+									"tests[\"Post has a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Post has a last edit timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
 									"tests[\"Post has a content\"] = !!responseJSON.content;",
 									"tests[\"Post has an author\"] = !!responseJSON.author;",
 									"tests[\"Post has a comments count\"] = typeof responseJSON.comments === 'number';",
@@ -958,7 +958,7 @@
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
 									"tests[\"Response contains an array\"] = JSON.parse(responseBody).posts instanceof Array;",
-									"tests[\"Array in response is not empty\"] = JSON.parse(responseBody).posts.length > 0;"
+									"tests[\"Array in response is not empty\"] = JSON.parse(responseBody).posts.length === 3;"
 								]
 							}
 						}
@@ -1028,13 +1028,13 @@
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
 									"tests[\"Response contains an array\"] = JSON.parse(responseBody).posts instanceof Array;",
-									"tests[\"Response contains all created posts\"] = JSON.parse(responseBody).posts.length === 3;"
+									"tests[\"Response contains all created posts\"] = JSON.parse(responseBody).posts.length === 2;"
 								]
 							}
 						}
 					],
 					"request": {
-						"url": "alice@localhost:3000/v1/client/posts?from={{followingPublicTs}}",
+						"url": "alice@localhost:3000/v1/client/posts?from={{friendFriendsTs}}",
 						"method": "GET",
 						"header": [
 							{
