@@ -13,7 +13,7 @@ import { HttpModule, Http } from '@angular/http';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { V1Service } from '../providers/apiClient/api/v1.service';
-import { BASE_PATH } from '../providers/apiClient/variables';
+//import { BASE_PATH } from '../providers/apiClient/variables';
 import { PostModal } from "../components/post-modal/post-modal";
 import { Autoresize } from "../components/autoresize/autoresize";
 import DateFormaterService from "../providers/date-formater";
@@ -54,8 +54,11 @@ import DateFormaterService from "../providers/date-formater";
 	],
 	providers: [
 		StatusBar,
+		//{ provide: StatusBar, useClass: StatusBar },
 		SplashScreen,
+		//{ provide: SplashScreen, useClass: SplashScreen },
 		ConfigurationService,
+		//{ provide: ConfigurationService, useClass: ConfigurationService },
 		{
 			provide: APP_INITIALIZER,
       useFactory: loadConfiguration,
