@@ -36,7 +36,7 @@ export class PostComponent {
 
 	toggleReactionState() {
 		if (this.post.reacted) {
-			this.api.deleteV1ClientPostsUserTimestampReactions(this.user.username + '@' + this.user.url, this.post.creationTs)
+			this.api.deleteV1ClientPostsUserTimestampReactions(this.post.author, this.post.creationTs)
 				.subscribe(() => {
 					this.post.reactions--
 					this.post.reacted = !this.post.reacted
@@ -44,7 +44,7 @@ export class PostComponent {
 					console.error(err)
 				})
 		} else {
-			this.api.postV1ClientPostsUserTimestampReactions(this.user.username + '@' + this.user.url, this.post.creationTs)
+			this.api.postV1ClientPostsUserTimestampReactions(this.post.author, this.post.creationTs)
 				.subscribe(() => {
 					this.post.reactions++
 					this.post.reacted = !this.post.reacted

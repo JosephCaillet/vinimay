@@ -6,7 +6,7 @@
   "private": true,
   "scripts": {
     "clean": "ionic-app-scripts clean",
-    "build": "ionic-app-scripts build",
+    "build": "ionic-app-scripts build browser --prod --wwwDir ../build/client",
     "ionic:build": "ionic-app-scripts build",
     "ionic:serve": "ionic-app-scripts serve"
   },
@@ -47,7 +47,6 @@
   "cordovaPlatforms": [],
   "description": "vinimay-client: An Ionic project",
   "config": {
-  	"ionic_copy": "config/copy.config.js",
-  	"ionic_manual_treeshaking": false
+  	"ionic_copy": "config/copy.config.js"
   }
 }
