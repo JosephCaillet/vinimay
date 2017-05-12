@@ -29,6 +29,8 @@ newman run tests/posts.json
 codes="$codes $?"
 newman run tests/comments.json
 codes="$codes $?"
+newman run tests/reactions.json
+codes="$codes $?"
 
 ./starTestInstances.sh stop
 ./starTestInstances.sh clean

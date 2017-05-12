@@ -35,28 +35,45 @@ async function add(request, reply) {
     }
     let author = await utils.getUser(username_1.username);
     let postAuthor = new users_1.User(request.params.user);
-    let postExists;
-    try {
-        postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
-    }
-    catch (e) {
-        return reply(Boom.wrap(e));
-    }
-    if (!postExists)
-        return reply(Boom.notFound());
+    clientLog.debug('Adding reaction on post', request.params.timestamp, 'by', postAuthor.toString());
     // Check if the post is local or not
     if (!postAuthor.instance.localeCompare(author.instance)) {
         // We don't support multi-user instances yet
+        clientLog.debug('Post is local');
+        let postExists;
+        try {
+            postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
+        }
+        catch (e) {
+            return reply(Boom.wrap(e));
+        }
+        if (!postExists) {
+            clientLog.debug('Post does not exist');
+            return reply(Boom.notFound());
+        }
+        ;
         let timestamp = (new Date()).getTime();
-        return instance.model('reaction').create({
-            creationTs: request.params.timestamp,
-            username: author.username,
-            url: author.instance
-        }).then((reaction) => {
+        reacted(parseInt(request.params.timestamp))
+            .then((hasReacted) => {
+            if (hasReacted) {
+                clientLog.debug('User has already reacted to this post');
+                throw Boom.conflict();
+            }
+            return instance.model('reaction').create({
+                creationTs: request.params.timestamp,
+                username: author.username,
+                url: author.instance
+            });
+        }).then(() => {
             return reply(null).code(204);
-        }).catch(e => reply(Boom.wrap(e)));
+        }).catch(e => {
+            if (e.isBoom)
+                return reply(e);
+            return reply(Boom.wrap(e));
+        });
     }
     else {
+        clientLog.debug('Post is remote');
         instance.model('friend').findOne({ where: {
                 username: postAuthor.username,
                 url: postAuthor.instance
@@ -70,7 +87,9 @@ async function add(request, reply) {
                 sigtoken = friend.get('signature_token');
             }
             let timestamp = parseInt(request.params.timestamp);
+            clientLog.debug('Adding a reaction to', postAuthor.toString() + '\'s', 'post');
             reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then((reaction) => {
+                clientLog.debug('Added a reaction to', postAuthor.toString() + '\'s', 'post');
                 return reply(null).code(204);
             }).catch(e => utils.handleRequestError(postAuthor, e, clientLog, false, reply));
         }).catch(e => {
@@ -135,6 +154,7 @@ exports.del = del;
 async function serverAdd(request, reply) {
     let username = utils.getUsername(request);
     let user = await utils.getUser(username);
+    serverLog.debug('Adding reaction on post', request.params.timestamp);
     let instance;
     try {
         instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
@@ -143,20 +163,17 @@ async function serverAdd(request, reply) {
         throw Boom.notFound();
     }
     let friend;
+    let author;
     instance.model('post').findById(request.params.timestamp)
         .then(async (post) => {
-        if (!post)
+        if (!post) {
+            serverLog.debug('Post does not exist');
             throw Boom.notFound();
+        }
         let privacy = posts_1.Privacy[post.get('privacy')];
-        let author;
         // Commenting on a public post requires info on the author as identification
         // isn't required
         if (privacy === posts_1.Privacy.public) {
-            let schema = commons.user.required().label('Reaction author');
-            let err;
-            if (err = Joi.validate(request.payload.author, schema).error) {
-                throw Boom.badRequest(err);
-            }
             // No need to check if we know the author if its a friend
             if (request.query.idToken && request.query.signature) {
                 try {
@@ -180,6 +197,11 @@ async function serverAdd(request, reply) {
                 }
             }
             else {
+                let schema = commons.user.required().label('Reaction author');
+                let err;
+                if (err = Joi.validate(request.payload.author, schema).error) {
+                    throw Boom.badRequest(err);
+                }
                 author = new users_1.User(request.payload.author);
                 // Check if we know the author
                 let knownAuthor = !!(await instance.model('profile').count({ where: {
@@ -221,6 +243,13 @@ async function serverAdd(request, reply) {
             }
         }
         let timestamp = (new Date()).getTime();
+        serverLog.debug('Identified the reaction author as', author.toString());
+        return reacted(parseInt(request.params.timestamp), author);
+    }).then((hasReacted) => {
+        if (hasReacted) {
+            serverLog.debug('User has already reacted to this post');
+            throw Boom.conflict();
+        }
         return instance.model('reaction').create({
             creationTs: request.params.timestamp,
             username: author.username,
@@ -228,6 +257,7 @@ async function serverAdd(request, reply) {
         });
     }).then((reaction) => {
         let author = new users_1.User(reaction.get('username'), reaction.get('url'));
+        serverLog.debug('Created reaction for user', author.toString());
         return commons.checkAndSendSchema(author.toString(), commons.user, serverLog, reply);
     }).catch(e => {
         if (e.isBoom)
