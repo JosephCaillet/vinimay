@@ -27,12 +27,16 @@ export class PostsPage {
 		public api: V1Service, public modCtrl: ModalController,
 		private alertCtrl: AlertController, private tr: TranslateService
 	) {
-		api.getV1ClientPosts().subscribe((data) => {
+		this.retrievePost()
+		this.user = this.navParams.data
+	}
+
+	retrievePost() {
+		this.api.getV1ClientPosts().subscribe((data) => {
 			this.posts = data.posts
 		}, (err) => {
 			console.error(err)
 		})
-		this.user = this.navParams.data
 	}
 
 	createPost() {
