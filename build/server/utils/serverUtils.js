@@ -7,6 +7,7 @@ const vinimayError_1 = require("./vinimayError");
 const users_1 = require("../models/users");
 const sequelizeWrapper_1 = require("./sequelizeWrapper");
 const log = require('printit')({
+    prefix: 'utils',
     date: true
 });
 function getUsername(request) {

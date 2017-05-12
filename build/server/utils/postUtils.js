@@ -193,7 +193,7 @@ function processPostAnon(arg, request, username) {
     });
 }
 function retrieveRemotePosts(source, params, idtoken, sigtoken) {
-    return new Promise((ok, ko) => {
+    return new Promise((resolve, reject) => {
         if (idtoken)
             params.idToken = idtoken;
         let url = utils.getGetRequestUrl(source, '/v1/server/posts', params, sigtoken);
@@ -203,11 +203,15 @@ function retrieveRemotePosts(source, params, idtoken, sigtoken) {
         else
             url = 'http://' + url;
         log.debug('Requesting GET ' + url);
-        request.get(url)
+        request.get(url, { timeout: commons.settings.timeout })
             .then((response) => {
-            log.debug('Received ' + JSON.parse(response).length + ' posts from ' + source);
-            ok(JSON.parse(response));
-        }).catch(ko);
+            let posts = JSON.parse(response);
+            log.debug('Received ' + posts.length + ' posts from ' + source);
+            for (let i in posts) {
+                posts[i].author = source.toString();
+            }
+            resolve(posts);
+        }).catch(reject);
     });
 }
 exports.retrieveRemotePosts = retrieveRemotePosts;
@@ -230,7 +234,7 @@ function retrieveRemotePost(source, timestamp, idtoken, sigtoken) {
         else
             url = 'http://' + url;
         log.debug('Requesting GET ' + url);
-        request.get(url)
+        request.get(url, { timeout: commons.settings.timeout })
             .then((response) => {
             log.debug('Received a post from ' + source);
             ok(JSON.parse(response));

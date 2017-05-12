@@ -12,6 +12,7 @@ import {User} from '../models/users';
 import {SequelizeWrapper} from './sequelizeWrapper';
 
 const log = require('printit')({
+	prefix: 'utils',
 	date: true
 });
 

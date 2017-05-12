@@ -45,7 +45,7 @@ export function retrieveRemoteComments(source: User, timestamp: number, params: 
 
 		log.debug('Requesting GET ' + url);
 
-		request.get(url, {json: true})
+		request.get(url, {json: true, timeout: commons.settings.timeout})
 		.then((response) => {
 			log.debug('Received ' + response.length + ' comments from ' + source);
 			ok(response);
@@ -87,7 +87,8 @@ export function createRemoteComment(author: User, user: User, timestamp: number,
 			uri: url,
 			headers: { 'Content-Type': 'application/json' },
 			body: body,
-			json: true
+			json: true,
+			timeout: commons.settings.timeout
 		})
 		.then((response) => {
 			log.debug('Created a comment on', user.toString());
@@ -122,6 +123,7 @@ export function deleteRemoteComment(postAuthor: User, tsPost: number, tsComment:
 		request({
 			method: 'DELETE',
 			uri: url,
+			timeout: commons.settings.timeout
 		})
 		.then((response) => {
 			log.debug('Deleted a comment on', postAuthor.toString());
