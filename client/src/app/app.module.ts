@@ -1,4 +1,4 @@
-import { AddProfileModal } from './../components/add-profile-modal/add-profile-modal';
+import { AddProfileModalModule } from '../components/add-profile-modal/add-profile-modal.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule, APP_INITIALIZER } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
@@ -16,15 +16,17 @@ import { V1Service } from '../providers/apiClient/api/v1.service';
 //import { BASE_PATH } from '../providers/apiClient/variables';
 import { PostModal } from "../components/post-modal/post-modal";
 import { Autoresize } from "../components/autoresize/autoresize";
-import DateFormaterService from "../providers/date-formater";
+import { DateFormaterService} from "../providers/date-formater";
+import { AddProfileModal } from "../components/add-profile-modal/add-profile-modal";
+import { PostModalModule } from "../components/post-modal/post-modal.module";
 //let Config = require("../config");
 
 @NgModule({
 	declarations: [
 		MyApp,
 		HomePage,
-		AddProfileModal,
-		PostModal,
+		//AddProfileModal,
+		//PostModal,
 		Autoresize
 	],
 	imports: [
@@ -43,7 +45,9 @@ import DateFormaterService from "../providers/date-formater";
 				useFactory: (createTranslateLoader),
 				deps: [Http]
 			}
-		})
+		}),
+		AddProfileModalModule,
+		PostModalModule
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
@@ -61,8 +65,8 @@ import DateFormaterService from "../providers/date-formater";
 		//{ provide: ConfigurationService, useClass: ConfigurationService },
 		{
 			provide: APP_INITIALIZER,
-      useFactory: loadConfiguration,
-      deps: [ConfigurationService],
+			useFactory: loadConfiguration,
+			deps: [ConfigurationService],
 			multi: true
 		},
 		{ provide: V1Service, useFactory: createAPIEndpointLoader, deps: [Http, ConfigurationService] },

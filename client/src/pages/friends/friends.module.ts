@@ -9,7 +9,7 @@ import { FriendsPage } from './friends';
   ],
   imports: [
     IonicPageModule.forChild(FriendsPage),
-		TranslateModule.forChild()
+		TranslateModule.forChild(),
   ],
   exports: [
     FriendsPage
