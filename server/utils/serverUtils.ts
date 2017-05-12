@@ -121,11 +121,12 @@ export function handleRequestError(friend: User, e: Error, log: any, looped?: bo
 		message = 'This usually means the API was badly implemented either on the current instance or on the friend\'s.';
 	} else if(e instanceof r.StatusCodeError && e.statusCode === 401) {
 		message = 'This can happen because of a bad implementation of the Vinimay API on either side, or because of an instance domain mismatch between the two instances\' databases.';
-	} else if(e instanceof r.StatusCodeError && e.statusCode === 404) {
-		if(reply && !looped) return reply(b.notFound());
-		else return;
 	} else if(e instanceof r.StatusCodeError && e.statusCode === 500) {
 		message = 'This can happen because of a bug in the remote instance\'s code or a bad implentation of the Vinimay API on its side.'
+	} else if(e instanceof r.StatusCodeError) {
+		// Some errors are thrown willingly to be sent to the client
+		if(reply && !looped) return reply(b.create(e.statusCode));
+		else return;
 	} else if(!(e instanceof r.RequestError)) {
 		log.error(e);
 		if(reply && !looped) return reply(b.wrap(e));

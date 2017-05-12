@@ -34,6 +34,7 @@ export const responseSchema = Joi.object({
 }).label('Reactions response');
 
 export async function add(request: Hapi.Request, reply: Hapi.IReply) {
+
 	let instance: sequelize.Sequelize;
 
 	try {
@@ -44,30 +45,46 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 
 	let author = await utils.getUser(username);
 	let postAuthor = new User(request.params.user);
-
-	let postExists: boolean;
-	
-	try {
-		postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
-	} catch(e) {
-		return reply(Boom.wrap(e));
-	}
-
-	if(!postExists) return reply(Boom.notFound());
+	clientLog.debug('Adding reaction on post', request.params.timestamp, 'by', postAuthor.toString());
 
 	// Check if the post is local or not
 	if(!postAuthor.instance.localeCompare(author.instance)) {
 		// We don't support multi-user instances yet
-		let timestamp = (new Date()).getTime()
+		clientLog.debug('Post is local');
+
+		let postExists: boolean;		
+		try {
+			postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
+		} catch(e) {
+			return reply(Boom.wrap(e));
+		}
 		
-		return instance.model('reaction').create({
-			creationTs: request.params.timestamp,
-			username: author.username,
-			url: author.instance
-		}).then((reaction: sequelize.Instance<any>) => {
+		if(!postExists) {
+			clientLog.debug('Post does not exist');
+			return reply(Boom.notFound())
+		};
+
+		let timestamp = (new Date()).getTime()
+
+		reacted(parseInt(request.params.timestamp))
+		.then((hasReacted) => {
+			if(hasReacted) {
+				clientLog.debug('User has already reacted to this post');
+				throw Boom.conflict();
+			}
+			return instance.model('reaction').create({
+				creationTs: request.params.timestamp,
+				username: author.username,
+				url: author.instance
+			});
+		}).then(() => {
 			return reply(null).code(204);
-		}).catch(e => reply(Boom.wrap(e)));
+		}).catch(e => {
+			if(e.isBoom) return reply(e);
+			return reply(Boom.wrap(e))
+		});
 	} else {
+		clientLog.debug('Post is remote');
 		instance.model('friend').findOne({ where: {
 			username: postAuthor.username,
 			url: postAuthor.instance
@@ -81,13 +98,15 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 				sigtoken = friend.get('signature_token');
 			}
 			let timestamp = parseInt(request.params.timestamp);
+			clientLog.debug('Adding a reaction to', postAuthor.toString() + '\'s', 'post');
 			reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then((reaction) => {
+				clientLog.debug('Added a reaction to', postAuthor.toString() + '\'s', 'post');
 				return reply(null).code(204);
 			}).catch(e => utils.handleRequestError(postAuthor, e, clientLog, false, reply));
 		}).catch(e => {
 			if(e.isBoom) return reply(e);
 			return reply(Boom.wrap(e))
-		})
+		});
 	}
 }
 
@@ -145,29 +164,29 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 	let username = utils.getUsername(request);
 	let user = await utils.getUser(username);
+
+	serverLog.debug('Adding reaction on post', request.params.timestamp);
+
 	let instance: sequelize.Sequelize;
 
 	try { instance = SequelizeWrapper.getInstance(username); }
 	catch(e) { throw Boom.notFound(); }
 
 	let friend: User;
+	let author: User;
 
 	instance.model('post').findById(request.params.timestamp)
 	.then(async (post: sequelize.Instance<Post>) => {
-		if(!post) throw Boom.notFound();
+		if(!post) {
+			serverLog.debug('Post does not exist');
+			throw Boom.notFound()
+		}
 
 		let privacy: Privacy = Privacy[<string>post.get('privacy')];
 
-		let author: User;
 		// Commenting on a public post requires info on the author as identification
 		// isn't required
 		if(privacy === Privacy.public) {
-			let schema = commons.user.required().label('Reaction author')
-			let err;
-			if(err = Joi.validate(request.payload.author, schema).error) {
-				throw Boom.badRequest(err);
-			}
-
 			// No need to check if we know the author if its a friend
 			if(request.query.idToken && request.query.signature) {
 				try {
@@ -188,6 +207,12 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 					throw e;
 				}				
 			} else {
+				let schema = commons.user.required().label('Reaction author')
+				let err;
+				if(err = Joi.validate(request.payload.author, schema).error) {
+					throw Boom.badRequest(err);
+				}
+
 				author = new User(request.payload.author);
 				// Check if we know the author
 				let knownAuthor = !!(await instance.model('profile').count({where: {
@@ -205,7 +230,6 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 				
 				// TODO: Ask the server for confirmation on the addition
 			}
-
 		} else {
 			if(!request.query.idToken) throw Boom.notFound();
 
@@ -230,6 +254,14 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 
 		let timestamp = (new Date()).getTime()
 
+		serverLog.debug('Identified the reaction author as', author.toString());
+
+		return reacted(parseInt(request.params.timestamp), author);
+	}).then((hasReacted) => {
+		if(hasReacted) {
+			serverLog.debug('User has already reacted to this post');
+			throw Boom.conflict();
+		}
 		return instance.model('reaction').create({
 			creationTs: request.params.timestamp,
 			username: author.username,
