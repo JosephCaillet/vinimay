@@ -22,6 +22,12 @@
 		<ion-icon name="refresh"></ion-icon>
 		{{ 'p.refresh' | translate }}
 	</button>
+
+	<ion-refresher #refresher (ionRefresh)="refreshPost($event)">
+		<ion-refresher-content [refreshingText]=" 'p.refreshing' | translate" refreshingSpinner="circles" [pullingText]=" 'p.pull_to_refresh' | translate ">
+		</ion-refresher-content>
+	</ion-refresher>
+
 	<post-component #postComponent *ngFor="let post of posts"
 		[post]="post" [user]="user"
 		(postDeleted)="deletePost($event, postComponent)">

@@ -31,12 +31,18 @@ export class PostsPage {
 		this.user = this.navParams.data
 	}
 
-	retrievePost() {
+	retrievePost(done: Function = () => {}) {
 		this.api.getV1ClientPosts().subscribe((data) => {
 			this.posts = data.posts
+			done()
 		}, (err) => {
 			console.error(err)
+			done()
 		})
+	}
+
+	refreshPost(refresher) {
+		this.retrievePost(() => refresher.complete())
 	}
 
 	createPost() {
