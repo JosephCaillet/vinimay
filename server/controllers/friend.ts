@@ -11,6 +11,18 @@ import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
 import {username} from '../utils/username';
 
+const printit = require('printit');
+
+const clientLog = printit({
+	prefix: 'Client:Friends',
+	date: true
+});
+
+const serverLog = printit({
+	prefix: 'Server:Friends',
+	date: true
+});
+
 export function get(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
 	instance.model('friend').findAll({

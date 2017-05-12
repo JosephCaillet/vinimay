@@ -6,7 +6,7 @@ const commons = require("./commons");
 const utils = require("./serverUtils");
 const log = require('printit')({
     date: true,
-    prefix: 'comments utils'
+    prefix: 'Utils:Reactions'
 });
 function createRemoteReaction(author, user, timestamp, idtoken, sigtoken) {
     return new Promise((ok, ko) => {
@@ -36,7 +36,8 @@ function createRemoteReaction(author, user, timestamp, idtoken, sigtoken) {
             uri: url,
             headers: { 'Content-Type': 'application/json' },
             body: body,
-            json: true
+            json: true,
+            timeout: commons.settings.timeout
         })
             .then((response) => {
             log.debug('Created a reaction on', user.toString());
@@ -72,7 +73,8 @@ function deleteRemoteReaction(postAuthor, tsPost, reactionAuthor, idtoken, sigto
             body: {
                 author: reactionAuthor.toString()
             },
-            json: true
+            json: true,
+            timeout: commons.settings.timeout
         })
             .then((response) => {
             log.debug('Deleted a reaction on', postAuthor.toString());

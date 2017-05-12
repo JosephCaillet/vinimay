@@ -20,7 +20,7 @@ import {VinimayError} from './vinimayError';
 
 const log = require('printit')({
 	date: true,
-	prefix: 'posts utils'
+	prefix: 'Utils:Posts'
 });
 
 export function processPost(arg: Post | Post[], request: h.Request, username: string): Promise<Post | Post[] | undefined> {
@@ -183,7 +183,7 @@ function processPostAnon(arg: Post | Post[], request: h.Request, username: strin
 
 
 export function retrieveRemotePosts(source: User, params: any, idtoken?: string, sigtoken?: string): Promise<Post[]> {
-	return new Promise<Post[]>((ok, ko) => {
+	return new Promise<Post[]>((resolve, reject) => {
 		if(idtoken) params.idToken = idtoken;
 		let url = utils.getGetRequestUrl(source, '/v1/server/posts', params, sigtoken);
 
@@ -193,11 +193,15 @@ export function retrieveRemotePosts(source: User, params: any, idtoken?: string,
 
 		log.debug('Requesting GET ' + url);
 
-		request.get(url)
+		request.get(url, {timeout: commons.settings.timeout})
 		.then((response) => {
-			log.debug('Received ' + JSON.parse(response).length + ' posts from ' + source);
-			ok(JSON.parse(response));
-		}).catch(ko);
+			let posts = JSON.parse(response);
+			log.debug('Received ' + posts.length + ' posts from ' + source);
+			for(let i in posts) {
+				posts[i].author = source.toString();
+			}
+			resolve(posts);
+		}).catch(reject);
 	})
 }
 
@@ -222,7 +226,7 @@ export function retrieveRemotePost(source: User, timestamp: any, idtoken?: strin
 
 		log.debug('Requesting GET ' + url);
 
-		request.get(url)
+		request.get(url, {timeout: commons.settings.timeout})
 		.then((response) => {
 			log.debug('Received a post from ' + source);
 			ok(JSON.parse(response));

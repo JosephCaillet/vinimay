@@ -20,9 +20,16 @@ import * as postUtils from '../utils/postUtils';
 
 import {username} from '../utils/username';
 
-const log = require('printit')({
+const printit = require('printit');
+
+const clientLog = printit({
 	date: true,
-	prefix: 'posts'
+	prefix: 'Client:Posts'
+});
+
+const serverLog = printit({
+	date: true,
+	prefix: 'Server:Posts'
 });
 
 export let postSchema = j.object({
@@ -46,16 +53,21 @@ export let responseSchema = j.object({
 
 
 export function get(request: h.Request, reply: h.IReply) {
+	clientLog.debug('Getting posts');
+
 	let instance = SequelizeWrapper.getInstance(username);
 	let options = <s.FindOptions>getOptions(request.query);
 	// We cast directly as post, so we don't need getters and setters
 	options.raw = true;
 
 	instance.model('post').findAll(options).then((posts: Post[]) => {
+		clientLog.debug('Got', posts.length, 'local posts');
+		let failures: Array<string> = new Array<string>();
 		instance.model('user').findOne().then(async (user: s.Instance<any>) => {
 			for(let i in posts) {
 				let post: Post = posts[i];
 				let author = new User(username, user.get('url'));
+				clientLog.debug('Got current local user', author.toString());
 				post.author = author.toString();
 				try {
 					post.comments = await comments.count(post.creationTs);
@@ -73,24 +85,30 @@ export function get(request: h.Request, reply: h.IReply) {
 					{status: Status[Status.following]}
 				]
 			}}).then(async (friends: s.Instance<any>[]) => {
-				let failures: Array<string> = new Array<string>();
+				clientLog.debug('Got', friends.length, 'friends to request');
+				let promises = new Array<Promise<Post[]>>();
 				for(let i in friends) {
-					let friend = new User(friends[i].get('username'), friends[i].get('url'));
-					// We need a copy of the object, and not a referece to it
-					let params = Object.assign({}, request.query);
-					let fPosts: Post[];
-					try {
-						fPosts = await postUtils.retrieveRemotePosts(friend, params, friends[i].get('id_token'), friends[i].get('signature_token'));
-					} catch(e) {
-						utils.handleRequestError(friend, e, log, true);
-						failures.push(friend.toString());
-						continue;
-					}
-					for(let j in fPosts) {
-						fPosts[j].author = friend.toString();
-					}
-					posts = posts.concat(fPosts);
+					promises.push(new Promise((resolve, reject) => {						
+						let friend = new User(friends[i].get('username'), friends[i].get('url'));
+						clientLog.debug('Requesting posts from', friend.toString());
+						// We need a copy of the object, and not a referece to it
+						let params = Object.assign({}, request.query);
+						postUtils.retrieveRemotePosts(friend,
+							params, friends[i].get('id_token'), 
+							friends[i].get('signature_token')
+						).then((response) => {
+							posts = posts.concat(response);
+							resolve();
+						}).catch((e) => {
+							utils.handleRequestError(friend, e, clientLog, true);
+							failures.push(friend.toString());
+							resolve();
+						});
+					}))
 				}
+				return Promise.all(promises);
+			}).then(() => {
+				clientLog.debug('Retrieved all posts')
 				posts.sort((a, b) => b.creationTs - a.creationTs);
 				// We'll have more posts than requested, so we truncate the array
 				if(request.query.nb) posts = posts.slice(0, request.query.nb);
@@ -99,14 +117,16 @@ export function get(request: h.Request, reply: h.IReply) {
 					posts: posts,
 					failures: failures
 				};
-				if(failures.length) rep.failures = failures;
-				return commons.checkAndSendSchema(rep, responseSchema, log, reply);
+				clientLog.debug('Sent', posts.length, 'posts to client, with', failures.length, 'failures')
+				return commons.checkAndSendSchema(rep, responseSchema, clientLog, reply);
 			}).catch(e => reply(b.wrap(e)));
 		}).catch(e => reply(b.wrap(e)));
 	}).catch(e => reply(b.wrap(e)));
 }
 
 export async function getSingle(request: h.Request, reply: h.IReply) {
+	clientLog.debug('Getting post', request.params.timestamp);
+
 	let instance: s.Sequelize;
 
 	try {
@@ -119,8 +139,10 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 	let author = new User(request.params.user);
 
 	instance.model('user').findOne().then((user: s.Instance<any>) => {
+		clientLog.debug('Got current local user', author.toString());
 		// Check if the post is local or not
 		if(!user.get('url').localeCompare(author.instance)) {
+			clientLog.debug('Post is local');
 			// We don't support multi-user instances yet
 			instance.model('post').findById(request.params.timestamp).then(async (res: s.Instance<Post>) => {
 				if(!res) return reply(b.notFound());
@@ -135,9 +157,10 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 				} catch(e) {
 					return reply(b.wrap(e));
 				}
-				commons.checkAndSendSchema(post, postSchema, log, reply);
+				commons.checkAndSendSchema(post, postSchema, clientLog, reply);
 			}).catch(e => reply(b.wrap(e)));
 		} else {
+			clientLog.debug('Post is remote');
 			instance.model('friend').findOne({ where: {
 				username: author.username,
 				url: author.instance
@@ -152,14 +175,16 @@ export async function getSingle(request: h.Request, reply: h.IReply) {
 				}
 				// We want to retrieve only one post at a given timestamp
 				postUtils.retrieveRemotePost(author, request.params.timestamp, idtoken, sigtoken).then((post: Post) => {
-					return commons.checkAndSendSchema(post, postSchema, log, reply);
-				}).catch(e => utils.handleRequestError(author, e, log, false, reply));
+					clientLog.debug('Got post');
+					return commons.checkAndSendSchema(post, postSchema, clientLog, reply);
+				}).catch(e => utils.handleRequestError(author, e, clientLog, false, reply));
 			}).catch(e => reply(b.wrap(e)));
 		}
 	}).catch(e => reply(b.wrap(e)));
 }
 
 export function create(request: h.Request, reply: h.IReply) {
+	clientLog.debug('Creating post');
 	// Javascript's timestamp is in miliseconds. We want it in seconds.
 	let ts = (new Date()).getTime();
 	let post: Post = {
@@ -174,8 +199,10 @@ export function create(request: h.Request, reply: h.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
 	instance.model('post').create(post).then(async (res: s.Instance<Post>) => {
 		let created = res.get({ plain: true });
+		clientLog.debug('Created post', created.creationTs);
 		instance.model('user').findOne().then(async (user: s.Instance<any>) => {
 			created.author = new User(username, user.get('url')).toString();
+			clientLog.debug('Got current local user', created.author);
 			try {
 				created.comments = await comments.count(created.creationTs);
 				created.reactions = await reactions.count(created.creationTs);
@@ -185,46 +212,49 @@ export function create(request: h.Request, reply: h.IReply) {
 			} catch(e) {
 				return reply(b.wrap(e));
 			}
-
-			return commons.checkAndSendSchema(created, postSchema, log, reply);
+			return commons.checkAndSendSchema(created, postSchema, clientLog, reply);
 		}).catch(e => reply(b.wrap(e)));
 	}).catch(e => reply(b.wrap(e)));
 }
 
 export async function del(request: h.Request, reply: h.IReply) {
+	clientLog.debug('Deleting post', request.params.timestamp)
 	let instance: s.Sequelize;
 	let user: User;
 
 	try {
 		user = await utils.getUser(username);
+		clientLog.debug('Got current local user', user.toString());
 		instance = SequelizeWrapper.getInstance(user.username);
 	} catch(e) {
 		// If the user doesn't exist, we return an error
 		return reply(b.badRequest(e));
 	}
 
-	instance.model('user').findOne().then((res: s.Instance<any>) => {
-		// Check if instance domain matches
-		if(res.get('url').localeCompare(user.instance)) {
-			return reply(b.unauthorized());
+	// Run the query
+	instance.model('post').destroy({ where: {
+		creationTs: request.params.timestamp
+	}}).then((nb) => {
+		if(!nb) {
+			clientLog.debug('No post deleted')
+			return reply(b.notFound());
 		}
-		// Run the query
-		instance.model('post').destroy({ where: {
-			creationTs: request.params.timestamp
-		}}).then((nb) => {
-			if(!nb) return reply(b.notFound());
-			return reply(null).code(204);
-		}).catch(e => reply(b.wrap(e)));
+		clientLog.debug('Deleted post')
+		return reply(null).code(204);
 	}).catch(e => reply(b.wrap(e)));
 }
 
 export async function serverGet(request: h.Request, reply: h.IReply) {
+	serverLog.debug('Getting posts');
 	let username = utils.getUsername(request);
 	let instance: s.Sequelize;
 
 	// Check if the user exists (the wrapper will return an error if not)
 	try { instance = SequelizeWrapper.getInstance(username); } 
-	catch(e) { return reply(b.notFound(e)); }
+	catch(e) {
+		serverLog.debug('Cannot find user');
+		return reply(b.notFound(e));
+	}
 
 	let options = <s.FindOptions>getOptions(request.query);
 	// We cast directly as post, so we don't need getters and setters
@@ -238,11 +268,14 @@ export async function serverGet(request: h.Request, reply: h.IReply) {
 	or.push({ privacy: Privacy[Privacy.public] });
 
 	if(request.query.idToken && request.query.signature) {
+		serverLog.debug('Trying to authenticate');
+
 		let friend: any;
 		try {
 			friend = await utils.getFriendByToken(username, request.query.idToken);
 		} catch(e) {
 			if(e instanceof VinimayError) {
+				serverLog.debug('Couldn\'t find friend');
 				return reply(b.unauthorized(e.message));
 			}
 			return reply(b.wrap(e));
@@ -256,9 +289,13 @@ export async function serverGet(request: h.Request, reply: h.IReply) {
 
 	instance.model('post').findAll(options).then(async (posts: Post[]) => {
 		let res: Post | Post[] | undefined;
+		serverLog.debug('Processing local posts');
 		return postUtils.processPost(posts, request, username);
 	}).then((res) => {
-		if(res) return commons.checkAndSendSchema(res, postsArray, log, reply);
+		// Forcing the cast so we can log the number of posts
+		res = res as Post[];
+		serverLog.debug(res.length, 'posts sent')
+		if(res) return commons.checkAndSendSchema(res, postsArray, serverLog, reply);
 		else return reply(b.unauthorized());
 	}).catch(e => {
 		if(e instanceof VinimayError) {
@@ -269,12 +306,16 @@ export async function serverGet(request: h.Request, reply: h.IReply) {
 }
 
 export function serverGetSingle(request: h.Request, reply: h.IReply) {
+	serverLog.debug('Getting post', request.params.timestamp);
 	let username = utils.getUsername(request);
 	let instance: s.Sequelize;
 
 	// Check if the user exists (the wrapper will return an error if not)
 	try { instance = SequelizeWrapper.getInstance(username); } 
-	catch(e) { return reply(b.notFound(e)); }
+	catch(e) {
+		serverLog.debug('Couldn\'t find local user');
+		return reply(b.notFound(e));
+	}
 
 	instance.model('post').findById(request.params.timestamp, {
 		raw: true
@@ -284,6 +325,7 @@ export function serverGetSingle(request: h.Request, reply: h.IReply) {
 		// isn't authorised to display it
 		if(!post) return reply(b.notFound());
 		let res: Post | Post[] | undefined;
+		serverLog.debug('Processing post');
 		try { res = await postUtils.processPost(post, request, username); }
 		catch(e) {
 			if(e instanceof VinimayError) {
@@ -291,7 +333,8 @@ export function serverGetSingle(request: h.Request, reply: h.IReply) {
 			}
 			return reply(b.wrap(e))
 		}
-		if(res) return commons.checkAndSendSchema(res, postSchema, log, reply);
+		serverLog.debug('Post sent')
+		if(res) return commons.checkAndSendSchema(res, postSchema, serverLog, reply);
 		else reply(b.notFound());
 	}).catch(e => reply(b.wrap(e)));
 }

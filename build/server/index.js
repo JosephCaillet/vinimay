@@ -6,7 +6,7 @@ const pkg = require('../../package.json');
 const printit = require('printit');
 const log = printit({
     date: true,
-    prefix: 'hapi'
+    prefix: 'Vinimay'
 });
 let debug = {};
 if (process.env.DEBUG) {

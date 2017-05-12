@@ -21,7 +21,7 @@ import {VinimayError} from './vinimayError';
 
 const log = require('printit')({
 	date: true,
-	prefix: 'comments utils'
+	prefix: 'Utils:Reactions'
 });
 
 export function createRemoteReaction(author: User, user: User, timestamp: number, idtoken, sigtoken): Promise<Comment> {
@@ -56,7 +56,8 @@ export function createRemoteReaction(author: User, user: User, timestamp: number
 			uri: url,
 			headers: { 'Content-Type': 'application/json' },
 			body: body,
-			json: true
+			json: true,
+			timeout: commons.settings.timeout
 		})
 		.then((response) => {
 			log.debug('Created a reaction on', user.toString());
@@ -95,7 +96,8 @@ export function deleteRemoteReaction(postAuthor: User, tsPost: number, reactionA
 			body: {
 				author: reactionAuthor.toString()
 			},
-			json: true
+			json: true,
+			timeout: commons.settings.timeout
 		})
 		.then((response) => {
 			log.debug('Deleted a reaction on', postAuthor.toString());
