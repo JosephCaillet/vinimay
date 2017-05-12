@@ -13,7 +13,7 @@ const friends_1 = require("../models/friends");
 const vinimayError_1 = require("./vinimayError");
 const log = require('printit')({
     date: true,
-    prefix: 'posts utils'
+    prefix: 'Utils:Posts'
 });
 function processPost(arg, request, username) {
     return new Promise(async (ok, ko) => {

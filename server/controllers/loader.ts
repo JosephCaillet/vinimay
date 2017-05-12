@@ -3,7 +3,7 @@ import * as url from 'url';
 
 const routes = require('./routes');
 const log = require('printit')({
-	prefix: 'router',
+	prefix: 'Router',
 	date: true
 })
 

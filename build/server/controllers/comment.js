@@ -12,8 +12,13 @@ const postUtils = require("../utils/postUtils");
 const commentsUtils = require("../utils/commentUtils");
 const utils = require("../utils/serverUtils");
 const commons = require("../utils/commons");
-const log = require('printit')({
-    prefix: 'comments',
+const printit = require('printit');
+const clientLog = printit({
+    prefix: 'Client:Comments',
+    date: true
+});
+const serverLog = printit({
+    prefix: 'Server:Comments',
     date: true
 });
 exports.commentSchema = Joi.object({
@@ -78,7 +83,7 @@ async function get(request, reply) {
                     authenticated: true,
                     comments: res
                 };
-                return commons.checkAndSendSchema(rep, exports.commentsSchema, log, reply);
+                return commons.checkAndSendSchema(rep, exports.commentsSchema, clientLog, reply);
             }).catch(e => reply(Boom.wrap(e)));
         }
         else {
@@ -100,8 +105,8 @@ async function get(request, reply) {
                         authenticated: true,
                         comments: comments
                     };
-                    return commons.checkAndSendSchema(rep, exports.commentsSchema, log, reply);
-                }).catch(e => utils.handleRequestError(author, e, log, false, reply));
+                    return commons.checkAndSendSchema(rep, exports.commentsSchema, clientLog, reply);
+                }).catch(e => utils.handleRequestError(author, e, clientLog, false, reply));
             }).catch(e => reply(Boom.wrap(e)));
         }
     }).catch(e => reply(Boom.wrap(e)));
@@ -146,7 +151,7 @@ async function add(request, reply) {
                 author: author.toString(),
                 content: comment.get('content')
             };
-            return commons.checkAndSendSchema(res, exports.commentSchema, log, reply);
+            return commons.checkAndSendSchema(res, exports.commentSchema, clientLog, reply);
         }).catch(e => reply(Boom.wrap(e)));
     }
     else {
@@ -164,8 +169,8 @@ async function add(request, reply) {
             }
             let timestamp = parseInt(request.params.timestamp);
             commentsUtils.createRemoteComment(author, postAuthor, timestamp, request.payload.content, idtoken, sigtoken).then((comment) => {
-                return commons.checkAndSendSchema(comment, exports.commentSchema, log, reply);
-            }).catch(e => utils.handleRequestError(postAuthor, e, log, false, reply));
+                return commons.checkAndSendSchema(comment, exports.commentSchema, clientLog, reply);
+            }).catch(e => utils.handleRequestError(postAuthor, e, clientLog, false, reply));
         }).catch(e => reply(Boom.wrap(e)));
     }
 }
@@ -219,7 +224,7 @@ async function del(request, reply) {
             commentsUtils.deleteRemoteComment(author, tsPost, tsComment, idtoken, sigtoken)
                 .then(() => {
                 return reply(null).code(204);
-            }).catch(e => utils.handleRequestError(author, e, log, false, reply));
+            }).catch(e => utils.handleRequestError(author, e, clientLog, false, reply));
         }).catch(e => reply(Boom.wrap(e)));
     }
 }
@@ -288,7 +293,7 @@ async function serverGet(request, reply) {
                 content: comment.content
             });
         }
-        return commons.checkAndSendSchema(res, exports.commentsArray, log, reply);
+        return commons.checkAndSendSchema(res, exports.commentsArray, serverLog, reply);
     }).catch(e => {
         if (e.isBoom)
             return reply(e);
@@ -400,7 +405,7 @@ async function serverAdd(request, reply) {
             author: author.toString(),
             content: comment.get('content')
         };
-        return commons.checkAndSendSchema(res, exports.commentSchema, log, reply);
+        return commons.checkAndSendSchema(res, exports.commentSchema, serverLog, reply);
     }).catch(e => {
         if (e.isBoom)
             return reply(e);

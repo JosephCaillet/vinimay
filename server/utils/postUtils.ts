@@ -20,7 +20,7 @@ import {VinimayError} from './vinimayError';
 
 const log = require('printit')({
 	date: true,
-	prefix: 'posts utils'
+	prefix: 'Utils:Posts'
 });
 
 export function processPost(arg: Post | Post[], request: h.Request, username: string): Promise<Post | Post[] | undefined> {

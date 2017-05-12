@@ -19,8 +19,15 @@ import * as commentsUtils from '../utils/commentUtils';
 import * as utils from '../utils/serverUtils'
 import * as commons from '../utils/commons'
 
-const log = require('printit')({
-	prefix: 'comments',
+const printit = require('printit');
+
+const clientLog = printit({
+	prefix: 'Client:Comments',
+	date: true
+});
+
+const serverLog = printit({
+	prefix: 'Server:Comments',
 	date: true
 });
 
@@ -92,7 +99,7 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 					authenticated: true, // TODO: Change hard-coded value
 					comments: res
 				};
-				return commons.checkAndSendSchema(rep, commentsSchema, log, reply);
+				return commons.checkAndSendSchema(rep, commentsSchema, clientLog, reply);
 			}).catch(e => reply(Boom.wrap(e)));
 		} else {
 			instance.model('friend').findOne({ where: {
@@ -113,8 +120,8 @@ export async function get(request: Hapi.Request, reply: Hapi.IReply) {
 						authenticated: true,
 						comments: comments
 					};
-					return commons.checkAndSendSchema(rep, commentsSchema, log, reply)
-				}).catch(e => utils.handleRequestError(author, e, log, false, reply));
+					return commons.checkAndSendSchema(rep, commentsSchema, clientLog, reply)
+				}).catch(e => utils.handleRequestError(author, e, clientLog, false, reply));
 			}).catch(e => reply(Boom.wrap(e)));
 		}
 	}).catch(e => reply(Boom.wrap(e)));
@@ -165,7 +172,7 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 				author: author.toString(),
 				content: comment.get('content')
 			};
-			return commons.checkAndSendSchema(res, commentSchema, log, reply);
+			return commons.checkAndSendSchema(res, commentSchema, clientLog, reply);
 		}).catch(e => reply(Boom.wrap(e)))
 	} else {
 		instance.model('friend').findOne({ where: {
@@ -182,8 +189,8 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 			}
 			let timestamp = parseInt(request.params.timestamp);
 			commentsUtils.createRemoteComment(author, postAuthor, timestamp, request.payload.content, idtoken, sigtoken).then((comment: Comment) => {
-				return commons.checkAndSendSchema(comment, commentSchema, log, reply);
-			}).catch(e => utils.handleRequestError(postAuthor, e, log, false, reply));
+				return commons.checkAndSendSchema(comment, commentSchema, clientLog, reply);
+			}).catch(e => utils.handleRequestError(postAuthor, e, clientLog, false, reply));
 		}).catch(e => reply(Boom.wrap(e)));
 	}
 }
@@ -240,7 +247,7 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 			commentsUtils.deleteRemoteComment(author, tsPost, tsComment, idtoken, sigtoken)
 			.then(() => {
 				return reply(null).code(204);
-			}).catch(e => utils.handleRequestError(author, e, log, false, reply));
+			}).catch(e => utils.handleRequestError(author, e, clientLog, false, reply));
 		}).catch(e => reply(Boom.wrap(e)));
 	}
 }
@@ -307,7 +314,7 @@ export async function serverGet(request: Hapi.Request, reply: Hapi.IReply) {
 				content: comment.content
 			});
 		}
-		return commons.checkAndSendSchema(res, commentsArray, log, reply)
+		return commons.checkAndSendSchema(res, commentsArray, serverLog, reply)
 	}).catch(e => {
 		if(e.isBoom) return reply(e);
 		return reply(Boom.wrap(e))
@@ -419,7 +426,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 			author: author.toString(),
 			content: comment.get('content')
 		};
-		return commons.checkAndSendSchema(res, commentSchema, log, reply);
+		return commons.checkAndSendSchema(res, commentSchema, serverLog, reply);
 	}).catch(e => {
 		if(e.isBoom) return reply(e);
 		return reply(Boom.wrap(e))

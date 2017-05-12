@@ -16,11 +16,11 @@ const username_1 = require("../utils/username");
 const printit = require('printit');
 const clientLog = printit({
     date: true,
-    prefix: 'client:posts'
+    prefix: 'Client:Posts'
 });
 const serverLog = printit({
     date: true,
-    prefix: 'server:posts'
+    prefix: 'Server:Posts'
 });
 exports.postSchema = j.object({
     "creationTs": j.number().min(1).required().description('Post creation timestamp'),

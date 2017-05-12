@@ -21,7 +21,7 @@ import {VinimayError} from './vinimayError';
 
 const log = require('printit')({
 	date: true,
-	prefix: 'comments utils'
+	prefix: 'Utils:Comments'
 });
 
 export function retrieveRemoteComments(source: User, timestamp: number, params: any, idtoken?: string, sigtoken?: string): Promise<Comment[]> {

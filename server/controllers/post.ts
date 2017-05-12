@@ -24,12 +24,12 @@ const printit = require('printit');
 
 const clientLog = printit({
 	date: true,
-	prefix: 'client:posts'
+	prefix: 'Client:Posts'
 });
 
 const serverLog = printit({
 	date: true,
-	prefix: 'server:posts'
+	prefix: 'Server:Posts'
 });
 
 export let postSchema = j.object({

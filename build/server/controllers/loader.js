@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const routes = require('./routes');
 const log = require('printit')({
-    prefix: 'router',
+    prefix: 'Router',
     date: true
 });
 function loadRoutes(server) {

@@ -7,6 +7,15 @@ const users_1 = require("../models/users");
 // Import the DB wrapper
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
 const username_1 = require("../utils/username");
+const printit = require('printit');
+const clientLog = printit({
+    prefix: 'Client:Friends',
+    date: true
+});
+const serverLog = printit({
+    prefix: 'Server:Friends',
+    date: true
+});
 function get(request, reply) {
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     instance.model('friend').findAll({

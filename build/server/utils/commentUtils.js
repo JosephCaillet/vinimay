@@ -6,7 +6,7 @@ const commons = require("./commons");
 const utils = require("./serverUtils");
 const log = require('printit')({
     date: true,
-    prefix: 'comments utils'
+    prefix: 'Utils:Comments'
 });
 function retrieveRemoteComments(source, timestamp, params, idtoken, sigtoken) {
     return new Promise((ok, ko) => {

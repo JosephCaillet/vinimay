@@ -14,8 +14,15 @@ import * as utils from '../utils/serverUtils';
 import * as postUtils from '../utils/postUtils';
 import * as reactionUtils from '../utils/reactionUtils';
 
-const log = require('printit')({
-	prefix: 'reactions',
+const printit = require('printit');
+
+const clientLog = printit({
+	prefix: 'Client:Reactions',
+	date: true
+});
+
+const serverLog = printit({
+	prefix: 'Server:Reactions',
 	date: true
 });
 
@@ -76,7 +83,7 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 			let timestamp = parseInt(request.params.timestamp);
 			reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then((reaction) => {
 				return reply(null).code(204);
-			}).catch(e => utils.handleRequestError(postAuthor, e, log, false, reply));
+			}).catch(e => utils.handleRequestError(postAuthor, e, clientLog, false, reply));
 		}).catch(e => {
 			if(e.isBoom) return reply(e);
 			return reply(Boom.wrap(e))
@@ -130,7 +137,7 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 			reactionUtils.deleteRemoteReaction(author, tsPost, user, idtoken, sigtoken)
 			.then(() => {
 				return reply(null).code(204);
-			}).catch(e => utils.handleRequestError(author, e, log, false, reply));
+			}).catch(e => utils.handleRequestError(author, e, clientLog, false, reply));
 		});
 	}
 }
@@ -230,7 +237,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 		})
 	}).then((reaction: sequelize.Instance<any>) => {
 		let author = new User(reaction.get('username'), reaction.get('url'));
-		return commons.checkAndSendSchema(author.toString(), commons.user, log, reply);
+		return commons.checkAndSendSchema(author.toString(), commons.user, serverLog, reply);
 	}).catch(e => {
 		if(e.isBoom) return reply(e);
 		return reply(Boom.wrap(e))

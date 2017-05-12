@@ -21,7 +21,7 @@ import {VinimayError} from './vinimayError';
 
 const log = require('printit')({
 	date: true,
-	prefix: 'comments utils'
+	prefix: 'Utils:Reactions'
 });
 
 export function createRemoteReaction(author: User, user: User, timestamp: number, idtoken, sigtoken): Promise<Comment> {

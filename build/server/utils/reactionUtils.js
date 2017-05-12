@@ -6,7 +6,7 @@ const commons = require("./commons");
 const utils = require("./serverUtils");
 const log = require('printit')({
     date: true,
-    prefix: 'comments utils'
+    prefix: 'Utils:Reactions'
 });
 function createRemoteReaction(author, user, timestamp, idtoken, sigtoken) {
     return new Promise((ok, ko) => {
