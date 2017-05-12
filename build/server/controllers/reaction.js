@@ -257,6 +257,7 @@ async function serverAdd(request, reply) {
         });
     }).then((reaction) => {
         let author = new users_1.User(reaction.get('username'), reaction.get('url'));
+        serverLog.debug('Created reaction for user', author.toString());
         return commons.checkAndSendSchema(author.toString(), commons.user, serverLog, reply);
     }).catch(e => {
         if (e.isBoom)

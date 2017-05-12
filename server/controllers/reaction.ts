@@ -269,6 +269,7 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 		})
 	}).then((reaction: sequelize.Instance<any>) => {
 		let author = new User(reaction.get('username'), reaction.get('url'));
+		serverLog.debug('Created reaction for user', author.toString());
 		return commons.checkAndSendSchema(author.toString(), commons.user, serverLog, reply);
 	}).catch(e => {
 		if(e.isBoom) return reply(e);
