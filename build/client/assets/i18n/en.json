@@ -9,6 +9,7 @@
 	"p": {
 		"title": "Posts",
 		"creation": "Create post",
+		"refresh": "Refresh",
 		"edit": "Edit",
 		"delete": "Delete",
 		"reaction": "Like",

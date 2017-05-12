@@ -52,3 +52,4 @@ build_client.sh
 
 # Settings
 settings.json
+build/client/config.json
