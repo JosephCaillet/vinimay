@@ -10,6 +10,8 @@
 		"title": "Posts",
 		"creation": "Create post",
 		"refresh": "Refresh",
+		"refreshing": "Refreshing...",
+		"pull_to_refresh": "Pull to refresh",
 		"edit": "Edit",
 		"delete": "Delete",
 		"reaction": "Like",

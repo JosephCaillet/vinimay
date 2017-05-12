@@ -18,12 +18,12 @@
 		<ion-icon name="create"></ion-icon>
 		{{ 'p.creation' | translate }}
 	</button>
-	<button ion-button icon-left (click)="retrievePost()" center>
+	<button *ngIf="plt.is('core')" ion-button icon-left (click)="retrievePost()" center>
 		<ion-icon name="refresh"></ion-icon>
 		{{ 'p.refresh' | translate }}
 	</button>
 
-	<ion-refresher #refresher (ionRefresh)="refreshPost($event)">
+	<ion-refresher #refresher (ionRefresh)="refreshPost($event)" *ngIf="!plt.is('core')">
 		<ion-refresher-content [refreshingText]=" 'p.refreshing' | translate" refreshingSpinner="circles" [pullingText]=" 'p.pull_to_refresh' | translate ">
 		</ion-refresher-content>
 	</ion-refresher>

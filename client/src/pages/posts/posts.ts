@@ -1,6 +1,6 @@
 import { V1Service } from '../../providers/apiClient/api/v1.service';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, AlertController, Platform } from 'ionic-angular';
 import { PostsArray, Post, User } from "../../providers/apiClient/index";
 import { PostModal } from "../../components/post-modal/post-modal";
 import { TranslateService } from "@ngx-translate/core";
@@ -25,7 +25,8 @@ export class PostsPage {
 	constructor(
 		public navCtrl: NavController, public navParams: NavParams,
 		public api: V1Service, public modCtrl: ModalController,
-		private alertCtrl: AlertController, private tr: TranslateService
+		private alertCtrl: AlertController, private tr: TranslateService,
+		public plt: Platform
 	) {
 		this.retrievePost()
 		this.user = this.navParams.data
