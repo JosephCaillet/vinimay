@@ -18,6 +18,10 @@
 		<ion-icon name="create"></ion-icon>
 		{{ 'p.creation' | translate }}
 	</button>
+	<button ion-button icon-left (click)="retrievePost()" center>
+		<ion-icon name="refresh"></ion-icon>
+		{{ 'p.refresh' | translate }}
+	</button>
 	<post-component #postComponent *ngFor="let post of posts"
 		[post]="post" [user]="user"
 		(postDeleted)="deletePost($event, postComponent)">
