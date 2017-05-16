@@ -4,11 +4,11 @@ VALUES('bob', 'Hello, I''m Bob', 'localhost:3001');
 INSERT INTO user(username, url, password, salt)
 VALUES('bob', 'localhost:3001', 'hash', 'salt');
 
-INSERT INTO profile(username, url, description)
-VALUES('alice', 'localhost:3000', 'Hello, I''m Alice');
-
-INSERT INTO friend(username, url, id_token, signature_token, status)
-VALUES('alice', 'localhost:3000', 'idtoken', 'sigtoken', 'accepted');
+-- INSERT INTO profile(username, url, description)
+-- VALUES('alice', 'localhost:3000', 'Hello, I''m Alice');
+-- 
+-- INSERT INTO friend(username, url, id_token, signature_token, status)
+-- VALUES('alice', 'localhost:3000', 'idtoken', 'sigtoken', 'accepted');
 
 --INSERT INTO post VALUES(1493825863396,1493825863396,'Hello Alice :-)','friends');
 --INSERT INTO post VALUES(1493825860663,1493825860663,'Hello myself :-)','private');

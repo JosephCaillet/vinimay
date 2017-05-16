@@ -4,7 +4,7 @@
 
 echo 'Building'
 
-rm -rf build
+rm -rf build/server
 tsc -p server
 
 if [[ $? -eq 1 ]]; then
@@ -16,7 +16,7 @@ fi
 ./starTestInstances.sh start
 
 # Let the servers start
-sleep 2
+sleep 4
 
 # Check if newman is here
 which newman > /dev/null 2>&1
