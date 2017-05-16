@@ -40,6 +40,7 @@ export class CommentsComponent {
 		this.api.postV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs, { "content": this.commentForm.value.comment })
 			.subscribe((data) => {
 				this.commentForm.controls['comment'].setValue('')
+				this.post.comments++
 				this.comments.push(data)
 			}, (err) => {
 				console.error(err)

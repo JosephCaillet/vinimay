@@ -2,7 +2,7 @@
 <ion-list [class.deletedComment]="deleted" #commentsList>
 	<div *ngFor="let comment of comments">
 		<ion-row>
-			<ion-col>{{ comment.author.split('@')[0] }} <i>@{{ comment.author.split('@')[1] }}</i></ion-col>
+			<ion-col>{{ comment.author.split('@')[0] }}<i>@{{ comment.author.split('@')[1] }}</i></ion-col>
 			<ion-col>
 				<ion-note>
 					<ion-icon name="calendar">&nbsp;&nbsp;</ion-icon>
