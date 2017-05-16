@@ -8,6 +8,7 @@ const users_1 = require("../models/users");
 // Import the DB wrapper
 const sequelizeWrapper_1 = require("../utils/sequelizeWrapper");
 const username_1 = require("../utils/username");
+const commons = require("../utils/commons");
 const utils = require("../utils/serverUtils");
 const friendUtils = require("../utils/friendUtils");
 const printit = require('printit');
@@ -72,7 +73,13 @@ async function create(request, reply) {
         case Type.following:
             clientLog.debug('Following', user.toString());
             friendUtils.create(friends_1.Status.following, user, username_1.username)
-                .then(() => reply(null).code(204)).catch((e) => {
+                .then((description) => {
+                let res = {
+                    user: user.toString(),
+                    description: description
+                };
+                return commons.checkAndSendSchema(res, exports.friendSchema, clientLog, reply);
+            }).catch((e) => {
                 if (e.isBoom)
                     return reply(e);
                 return utils.handleRequestError(user, e, clientLog, false, reply);
@@ -84,7 +91,13 @@ async function create(request, reply) {
                 if (!current)
                     throw Boom.notFound();
                 return friendUtils.befriend(user, current);
-            }).then(() => reply(null).code(204)).catch((e) => {
+            }).then((description) => {
+                let res = {
+                    user: user.toString(),
+                    description: description
+                };
+                return commons.checkAndSendSchema(res, exports.friendSchema, clientLog, reply);
+            }).catch((e) => {
                 if (e.isBoom)
                     return reply(e);
                 return utils.handleRequestError(user, e, clientLog, false, reply);
@@ -110,7 +123,13 @@ function saveFriendRequest(request, reply) {
         return reply(Boom.notFound(e));
     }
     friendUtils.create(friends_1.Status.incoming, from, username)
-        .then(() => reply(null).code(200))
+        .then((description) => {
+        let res = {
+            user: from.toString(),
+            description: description
+        };
+        return commons.checkAndSendSchema(res, exports.friendSchema, serverLog, reply);
+    })
         .catch((e) => {
         if (e.isBoom)
             return reply(e);
@@ -119,7 +138,7 @@ function saveFriendRequest(request, reply) {
 }
 exports.saveFriendRequest = saveFriendRequest;
 exports.friendSchema = Joi.object({
-    user: Joi.string().required().description('User (formatted as `username@instance-domain.tld`)'),
+    user: commons.user.required().description('User (formatted as `username@instance-domain.tld`)'),
     description: Joi.string().description('User description')
 }).label('Friend');
 exports.friendSentSchema = Joi.object({

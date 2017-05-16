@@ -25,6 +25,7 @@ function create(status, user, username, token) {
     log.debug('Creating row for', user.toString(), 'with status', friends_1.Status[status]);
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
     return new Promise((resolve, reject) => {
+        let description = null;
         getAll(user, username).then((friend) => {
             if (friend) {
                 log.debug('Friend exists, upgrading it');
@@ -34,6 +35,7 @@ function create(status, user, username, token) {
         }).then((userData) => {
             // Check if we resolved from save() or getRemoteUserData()
             if (!userData.upgraded) {
+                description = userData.description;
                 return profileExists(user, username).then((exists) => {
                     if (exists)
                         return Promise.resolve(true);
@@ -67,7 +69,7 @@ function create(status, user, username, token) {
                 log.debug('Skipping creation');
                 return Promise.resolve();
             }
-        }).then(() => resolve()).catch(reject);
+        }).then(() => resolve(description)).catch(reject);
     });
 }
 exports.create = create;
@@ -107,29 +109,34 @@ function profileExists(user, username) {
 }
 exports.profileExists = profileExists;
 function befriend(user, currentUser) {
-    let url = path.join(user.toString(), '/v1/server/friends');
-    let protocol;
-    if (commons.settings.forceHttp || url.indexOf('localhost') > -1)
-        protocol = 'http://';
-    else
-        protocol = 'https://';
-    url = protocol + url;
-    // token is a 64-byte long alphanumeric string (so 32-byte long in hexa)
-    let token = crypto.randomBytes(32).toString('hex');
-    // Store the request on our side
-    return create(friends_1.Status.pending, user, currentUser.username, token)
-        .then(() => {
-        return request({
-            method: 'POST',
-            uri: url,
-            headers: { 'Content-Type': 'application/json' },
-            body: {
-                from: currentUser.toString(),
-                tempToken: token
-            },
-            json: true,
-            timeout: commons.settings.timeout
-        });
+    return new Promise((resolve, reject) => {
+        let url = path.join(user.toString(), '/v1/server/friends');
+        let protocol;
+        if (commons.settings.forceHttp || url.indexOf('localhost') > -1)
+            protocol = 'http://';
+        else
+            protocol = 'https://';
+        url = protocol + url;
+        // token is a 64-byte long alphanumeric string (so 32-byte long in hexa)
+        let token = crypto.randomBytes(32).toString('hex');
+        let description = null;
+        // Store the request on our side
+        return create(friends_1.Status.pending, user, currentUser.username, token)
+            .then((desc) => {
+            description = desc;
+            log.debug('User description is', description);
+            return request({
+                method: 'POST',
+                uri: url,
+                headers: { 'Content-Type': 'application/json' },
+                body: {
+                    from: currentUser.toString(),
+                    tempToken: token
+                },
+                json: true,
+                timeout: commons.settings.timeout
+            });
+        }).then(() => resolve(description)).catch(reject);
     });
 }
 exports.befriend = befriend;

@@ -34,11 +34,12 @@ export function getAll(user: User, username: string): Promise<sequelize.Instance
 	});
 }
 
-export function create(status: Status, user: User, username: string, token?: string): Promise<null> {
+export function create(status: Status, user: User, username: string, token?: string): Promise<string | null> {
 	log.debug('Creating row for', user.toString(), 'with status', Status[status]);
 	let instance = SequelizeWrapper.getInstance(username);
 
-	return new Promise<null>((resolve, reject) => {
+	return new Promise<string | null>((resolve, reject) => {
+		let description: string | null = null;
 		getAll(user, username).then((friend) => {
 			if(friend) {
 				log.debug('Friend exists, upgrading it');
@@ -48,6 +49,7 @@ export function create(status: Status, user: User, username: string, token?: str
 		}).then((userData) => {
 			// Check if we resolved from save() or getRemoteUserData()
 			if(!userData.upgraded) {
+				description = userData.description;
 				return profileExists(user, username).then((exists) => {
 					if(exists) return Promise.resolve(true);
 					log.debug('Creating the profile');
@@ -77,7 +79,7 @@ export function create(status: Status, user: User, username: string, token?: str
 				log.debug('Skipping creation')
 				return Promise.resolve();
 			}
-		}).then(() => resolve()).catch(reject);
+		}).then(() => resolve(description)).catch(reject);
 	})
 }
 
@@ -122,32 +124,38 @@ export function profileExists(user: User, username: string): Promise<boolean> {
 	});
 }
 
-export function befriend(user: User, currentUser: User): Promise<any> {
-	let url = path.join(user.toString(), '/v1/server/friends');
+export function befriend(user: User, currentUser: User): Promise<string | null> {
+	return new Promise<string | null>((resolve, reject) => {
+		let url = path.join(user.toString(), '/v1/server/friends');
+		
+		let protocol: string;
+		if(commons.settings.forceHttp || url.indexOf('localhost') > -1) protocol = 'http://';
+		else protocol = 'https://';
+		
+		url = protocol + url;
+		
+		// token is a 64-byte long alphanumeric string (so 32-byte long in hexa)
+		let token = crypto.randomBytes(32).toString('hex');
 
-	let protocol: string;
-	if(commons.settings.forceHttp || url.indexOf('localhost') > -1) protocol = 'http://';
-	else protocol = 'https://';
-	
-	url = protocol + url;
-
-	// token is a 64-byte long alphanumeric string (so 32-byte long in hexa)
-	let token = crypto.randomBytes(32).toString('hex');
-
-	// Store the request on our side
-	return create(Status.pending, user, currentUser.username, token)
-	.then(() => {
-		return request({
-			method: 'POST',
-			uri: url,
-			headers: { 'Content-Type': 'application/json' },
-			body: {
-				from: currentUser.toString(),
-				tempToken: token
-			},
-			json: true,
-			timeout: commons.settings.timeout
-		});
+		let description: string | null = null;
+		
+		// Store the request on our side
+		return create(Status.pending, user, currentUser.username, token)
+		.then((desc) => {
+			description = desc;
+			log.debug('User description is', description)
+			return request({
+				method: 'POST',
+				uri: url,
+				headers: { 'Content-Type': 'application/json' },
+				body: {
+					from: currentUser.toString(),
+					tempToken: token
+				},
+				json: true,
+				timeout: commons.settings.timeout
+			});
+		}).then(() => resolve(description)).catch(reject);
 	});
 }
 

@@ -86,7 +86,13 @@ export async function create(request: Hapi.Request, reply: Hapi.IReply) {
 		case Type.following:
 			clientLog.debug('Following', user.toString());
 			friendUtils.create(Status.following, user, username)
-			.then(() => reply(null).code(204)).catch((e) => {
+			.then((description) => {
+				let res = {
+					user: user.toString(),
+					description: description
+				};
+				return commons.checkAndSendSchema(res, friendSchema, clientLog, reply);
+			}).catch((e) => {
 				if(e.isBoom) return reply(e);
 				return utils.handleRequestError(user, e, clientLog, false, reply);
 			});
@@ -96,7 +102,13 @@ export async function create(request: Hapi.Request, reply: Hapi.IReply) {
 			utils.getUser(username).then((current) => {
 				if(!current) throw Boom.notFound();
 				return friendUtils.befriend(user, current);
-			}).then(() => reply(null).code(204)).catch((e) => {
+			}).then((description) => {
+				let res = {
+					user: user.toString(),
+					description: description
+				};
+				return commons.checkAndSendSchema(res, friendSchema, clientLog, reply)
+			}).catch((e) => {
 				if(e.isBoom) return reply(e);
 				return utils.handleRequestError(user, e, clientLog, false, reply);
 			});
@@ -121,7 +133,13 @@ export function saveFriendRequest(request: Hapi.Request, reply: Hapi.IReply) {
 	}
 
 	friendUtils.create(Status.incoming, from, username)
-	.then(() => reply(null).code(200))
+	.then((description) => {
+		let res = {
+			user: from.toString(),
+			description: description
+		};
+		return commons.checkAndSendSchema(res, friendSchema, serverLog, reply);
+	})
 	.catch((e) => {
 		if(e.isBoom) return reply(e);
 		return reply(Boom.wrap(e))
@@ -130,7 +148,7 @@ export function saveFriendRequest(request: Hapi.Request, reply: Hapi.IReply) {
 
 
 export let friendSchema = Joi.object({
-	user: Joi.string().required().description('User (formatted as `username@instance-domain.tld`)'),
+	user: commons.user.required().description('User (formatted as `username@instance-domain.tld`)'),
 	description: Joi.string().description('User description')
 }).label('Friend');
 
