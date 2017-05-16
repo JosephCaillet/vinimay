@@ -2,7 +2,7 @@
 <ion-header>
 	<ion-navbar>
 		<ion-buttons start>
-			<button ion-button icon-only (click)="dismiss(null)">
+			<button ion-button icon-only (click)="dismiss(false)">
         <ion-icon name="close"></ion-icon>
       </button>
 		</ion-buttons>
@@ -15,7 +15,7 @@
 		<div padding>
 			<h1>{{ 'f.add.modal.url' | translate }}</h1>
 			<ion-item>
-				<ion-input #urlInput type="email" [placeholder]="'f.add.modal.url_placeholder' | translate" formControlName="url"></ion-input>
+				<ion-input #urlInput type="url" [placeholder]="'f.add.modal.url_placeholder' | translate" formControlName="to"></ion-input>
 			</ion-item>
 		</div>
 
@@ -24,15 +24,15 @@
 				<h1>{{ 'f.add.modal.type' | translate }}</h1>
 				<ion-item>
 					<ion-label>{{ 'f.add.modal.friend' | translate }}</ion-label>
-					<ion-radio value="friend" (ionSelect)="relationType = $event"></ion-radio>
+					<ion-radio [value]="TypeEnum.Friend" (ionSelect)="relationType = TypeEnum.Friend"></ion-radio>
 				</ion-item>
 				<ion-item>
 					<ion-label>{{ 'f.add.modal.follow' | translate }}</ion-label>
-					<ion-radio value="follow" (ionSelect)="relationType = $event"></ion-radio>
+					<ion-radio [value]="TypeEnum.Following" (ionSelect)="relationType = TypeEnum.Following"></ion-radio>
 				</ion-item>
 			</ion-list>
 		</div>
 
-		<button ion-button full type="submit" [disabled]="!addProfileForm.valid">{{ relationType == 'friend' ? ('f.add.modal.submit_friend' | translate) : ('f.add.modal.submit_follow' | translate) }}</button>
+		<button ion-button full type="submit" [disabled]="!addProfileForm.valid">{{ relationType == TypeEnum.Friend ? ('f.add.modal.submit_friend' | translate) : ('f.add.modal.submit_follow' | translate) }}</button>
 	</form>
 </ion-content>

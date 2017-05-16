@@ -47,7 +47,7 @@ export class PostsPage {
 	}
 
 	createPost() {
-		let modal = this.modCtrl.create(PostModal, null, { showBackdrop: false, enableBackdropDismiss: false })
+		let modal = this.modCtrl.create(PostModal, null)
 		modal.onDidDismiss((post) => {
 			if (post) {
 				this.posts.unshift(post)

@@ -42,7 +42,12 @@ export class FriendsPage {
 	}
 
 	addProfile() {
-		let itGo = this.modCtrl.create(AddProfileModal, null, { showBackdrop: false, enableBackdropDismiss: false })
+		let itGo = this.modCtrl.create(AddProfileModal, null)
+		itGo.onDidDismiss(friendRequest => {
+			if(friendRequest) {
+
+			}
+		})
 		itGo.present()
 	}
 
