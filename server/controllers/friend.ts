@@ -87,10 +87,10 @@ export async function create(request: Hapi.Request, reply: Hapi.IReply) {
 			clientLog.debug('Following', user.toString());
 			friendUtils.create(Status.following, user, username)
 			.then((description) => {
-				let res = {
-					user: user.toString(),
-					description: description
+				let res: any = {
+					user: user.toString()
 				};
+				if(description) res.description = description;
 				return commons.checkAndSendSchema(res, friendSchema, clientLog, reply);
 			}).catch((e) => {
 				if(e.isBoom) return reply(e);
@@ -103,10 +103,10 @@ export async function create(request: Hapi.Request, reply: Hapi.IReply) {
 				if(!current) throw Boom.notFound();
 				return friendUtils.befriend(user, current);
 			}).then((description) => {
-				let res = {
-					user: user.toString(),
-					description: description
+				let res: any = {
+					user: user.toString()
 				};
+				if(description) res.description = description;
 				return commons.checkAndSendSchema(res, friendSchema, clientLog, reply)
 			}).catch((e) => {
 				if(e.isBoom) return reply(e);
@@ -134,10 +134,10 @@ export function saveFriendRequest(request: Hapi.Request, reply: Hapi.IReply) {
 
 	friendUtils.create(Status.incoming, from, username)
 	.then((description) => {
-		let res = {
-			user: from.toString(),
-			description: description
+		let res: any = {
+			user: from.toString()
 		};
+		if(description) res.description = description;
 		return commons.checkAndSendSchema(res, friendSchema, serverLog, reply);
 	})
 	.catch((e) => {

@@ -75,9 +75,10 @@ async function create(request, reply) {
             friendUtils.create(friends_1.Status.following, user, username_1.username)
                 .then((description) => {
                 let res = {
-                    user: user.toString(),
-                    description: description
+                    user: user.toString()
                 };
+                if (description)
+                    res.description = description;
                 return commons.checkAndSendSchema(res, exports.friendSchema, clientLog, reply);
             }).catch((e) => {
                 if (e.isBoom)
@@ -93,9 +94,10 @@ async function create(request, reply) {
                 return friendUtils.befriend(user, current);
             }).then((description) => {
                 let res = {
-                    user: user.toString(),
-                    description: description
+                    user: user.toString()
                 };
+                if (description)
+                    res.description = description;
                 return commons.checkAndSendSchema(res, exports.friendSchema, clientLog, reply);
             }).catch((e) => {
                 if (e.isBoom)
@@ -125,9 +127,10 @@ function saveFriendRequest(request, reply) {
     friendUtils.create(friends_1.Status.incoming, from, username)
         .then((description) => {
         let res = {
-            user: from.toString(),
-            description: description
+            user: from.toString()
         };
+        if (description)
+            res.description = description;
         return commons.checkAndSendSchema(res, exports.friendSchema, serverLog, reply);
     })
         .catch((e) => {
