@@ -5,7 +5,7 @@ const posts = require("./post");
 const comments = require("./comment");
 const reactions = require("./reaction");
 const user = require("./user");
-const friend = require("./friend");
+const friends = require("./friend");
 const commons = require("../utils/commons");
 const postUrlSchema = Joi.object({
     user: commons.user.required().description('The post\'s author, identified as `username@instance-domain.tld`'),
@@ -231,13 +231,47 @@ module.exports = {
             get: {
                 description: 'Retrieve all friend requests',
                 notes: 'Retrieve all friend requests (accepted, incoming and sent). Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-4).',
-                handler: friend.get,
+                handler: friends.get,
                 plugins: { 'hapi-swagger': { responses: {
                             '200': {
                                 description: 'A list of friend requests',
-                                schema: friend.friendsSchema
+                                schema: friends.friendsSchema
                             }
                         } }
+                }
+            },
+            post: {
+                description: 'Create a friend/following request',
+                notes: 'Create a friend request or follow a given user',
+                handler: friends.create,
+                validate: {
+                    payload: Joi.object({
+                        to: commons.user.required().description('Request recipient'),
+                        type: Joi.string().valid('friend', 'following').required().description('Type of request')
+                    }).label('Friend input')
+                },
+                plugins: { 'hapi-swagger': { responses: {
+                            '204': { description: 'The request creation has been accepted by the server and will be processed' },
+                            '409': { description: 'A request already exists for this user' }
+                        } } }
+            }
+        },
+        '/server/friends': {
+            post: {
+                description: 'Save friend request',
+                notes: 'Receive friend request and save it in the database as incoming',
+                handler: friends.saveFriendRequest,
+                validate: { payload: Joi.object({
+                        from: commons.user.required().description('User the request is coming from'),
+                        tempToken: Joi.string().alphanum().required().description('Temporary token identifying the request')
+                    }).label('Friend request') },
+                plugins: {
+                    'hapi-swagger': {
+                        responses: {
+                            '200': { description: 'The request creation has been saved' },
+                            '409': { description: 'A request already exists for this user' }
+                        }
+                    }
                 }
             }
         },

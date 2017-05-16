@@ -3,6 +3,8 @@ export * from './commentInput';
 export * from './commentsArray';
 export * from './commentsResponse';
 export * from './friend';
+export * from './friendInput';
+export * from './friendRequest';
 export * from './friendSent';
 export * from './friends';
 export * from './friendsAccepted';

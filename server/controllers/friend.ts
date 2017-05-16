@@ -1,6 +1,9 @@
-import * as h from 'hapi';
-import * as s from 'sequelize';
-import * as j from 'joi';
+import * as path from 'path';
+import * as Hapi from 'hapi';
+import * as sequelize from 'sequelize';
+import * as Joi from 'joi';
+import * as Boom from 'boom';
+import * as request from 'request-promise-native';
 
 // Import the models
 import {Friend, OutgoingRequests, Status, Response} from '../models/friends';
@@ -10,6 +13,10 @@ import {User} from '../models/users'
 import {SequelizeWrapper} from '../utils/sequelizeWrapper';
 
 import {username} from '../utils/username';
+import * as commons from '../utils/commons';
+
+import * as utils from '../utils/serverUtils';
+import * as friendUtils from '../utils/friendUtils';
 
 const printit = require('printit');
 
@@ -23,14 +30,19 @@ const serverLog = printit({
 	date: true
 });
 
-export function get(request: h.Request, reply: h.IReply) {
+export enum Type {
+	friend,
+	following
+}
+
+export function get(request: Hapi.Request, reply: Hapi.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
 	instance.model('friend').findAll({
 		include: [{
 			model: instance.model('profile'),
 			attributes: ['description']
 		}]
-	}).then((users: s.Instance<any>[]) => {
+	}).then((users: sequelize.Instance<any>[]) => {
 		let response = new Response();
 
 		for(let i in users) {
@@ -60,23 +72,67 @@ export function get(request: h.Request, reply: h.IReply) {
 
 		reply(response);
 	}).catch((e) => {
-		reply(e);
+		reply(Boom.wrap(e));
 	});
 }
 
-export let friendSchema = j.object({
-	user: j.string().required().description('User (formatted as `username@instance-domain.tld`)'),
-	description: j.string().description('User description')
+export function create(request: Hapi.Request, reply: Hapi.IReply) {
+	let instance = SequelizeWrapper.getInstance(username);
+
+	let user = new User(request.payload.to);
+	let type: Type = Type[<string>request.payload.type];
+
+	switch(type) {
+		case Type.following:
+			clientLog.debug('Following', user.toString());
+			friendUtils.create(Status.following, user, username)
+			.then(() => reply(null).code(204)).catch((e) => {
+				if(e.isBoom) return reply(e);
+				return reply(Boom.wrap(e))
+			});
+			break;
+		case Type.friend:
+			clientLog.debug('Asking', user.toString(), 'to be our friend')
+			break;
+		default:
+			reply(Boom.badRequest());
+	}
+}
+
+export function saveFriendRequest(request: Hapi.Request, reply: Hapi.IReply) {
+	let username = utils.getUsername(request);
+	let from = new User(request.payload.from);
+
+	let instance: sequelize.Sequelize;
+	// Check if the user exists (the wrapper will return an error if not)
+	try { instance = SequelizeWrapper.getInstance(username); } 
+	catch(e) {
+		serverLog.debug('Couldn\'t find local user');
+		return reply(Boom.notFound(e));
+	}
+
+	friendUtils.create(Status.incoming, from, username)
+	.then(() => reply(null).code(200))
+	.catch((e) => {
+		if(e.isBoom) return reply(e);
+		return reply(Boom.wrap(e))
+	});
+}
+
+
+export let friendSchema = Joi.object({
+	user: Joi.string().required().description('User (formatted as `username@instance-domain.tld`)'),
+	description: Joi.string().description('User description')
 }).label('Friend');
 
-export let friendSentSchema = j.object({
-	user: j.string().required().description('User (formatted as `username@instance-domain.tld`)'),
-	status: j.string().required().valid('pending', 'declined').description('Request status (pending or refused)')
+export let friendSentSchema = Joi.object({
+	user: Joi.string().required().description('User (formatted as `username@instance-domain.tld`)'),
+	status: Joi.string().required().valid('pending', 'declined').description('Request status (pending or refused)')
 }).label('FriendSent');
 
-export let friendsSchema = j.object({
-	accepted: j.array().required().items(friendSchema).label('FriendsAccepted').description('Accepted friend requests'),
-	incoming: j.array().required().items(friendSchema).label('FriendsReceived').description('Incoming friend requests'),
-	sent: j.array().required().items(friendSentSchema).label('FriendsSent').description('Sent (pending) friend requests'),
-	following: j.array().required().items(friendSchema).label('FriendsFollowings').description('People followed by the user'),
+export let friendsSchema = Joi.object({
+	accepted: Joi.array().required().items(friendSchema).label('FriendsAccepted').description('Accepted friend requests'),
+	incoming: Joi.array().required().items(friendSchema).label('FriendsReceived').description('Incoming friend requests'),
+	sent: Joi.array().required().items(friendSentSchema).label('FriendsSent').description('Sent (pending) friend requests'),
+	following: Joi.array().required().items(friendSchema).label('FriendsFollowings').description('People followed by the user'),
 }).label('Friends');

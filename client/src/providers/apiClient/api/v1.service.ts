@@ -22,6 +22,8 @@ import { Comment } from '../model/comment';
 import { CommentInput } from '../model/commentInput';
 import { CommentsArray } from '../model/commentsArray';
 import { CommentsResponse } from '../model/commentsResponse';
+import { FriendInput } from '../model/friendInput';
+import { FriendRequest } from '../model/friendRequest';
 import { Friends } from '../model/friends';
 import { Post } from '../model/post';
 import { PostInput } from '../model/postInput';
@@ -313,6 +315,22 @@ export class V1Service {
     }
 
     /**
+     * Create a friend/following request
+     * Create a friend request or follow a given user
+     * @param body 
+     */
+    public postV1ClientFriends(body?: FriendInput, extraHttpRequestParams?: any): Observable<{}> {
+        return this.postV1ClientFriendsWithHttpInfo(body, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
      * @param body 
@@ -354,6 +372,22 @@ export class V1Service {
      */
     public postV1ClientPostsUserTimestampReactions(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<{}> {
         return this.postV1ClientPostsUserTimestampReactionsWithHttpInfo(user, timestamp, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Save friend request
+     * Receive friend request and save it in the database as incoming
+     * @param body 
+     */
+    public postV1ServerFriends(body?: FriendRequest, extraHttpRequestParams?: any): Observable<string> {
+        return this.postV1ServerFriendsWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -1006,6 +1040,41 @@ export class V1Service {
     }
 
     /**
+     * Create a friend/following request
+     * Create a friend request or follow a given user
+     * @param body 
+     */
+    public postV1ClientFriendsWithHttpInfo(body?: FriendInput, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/friends';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
      * Create a post
      * Creates a post, provided the necessary information is present. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#creation).
      * @param body 
@@ -1118,6 +1187,41 @@ export class V1Service {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Post,
             headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Save friend request
+     * Receive friend request and save it in the database as incoming
+     * @param body 
+     */
+    public postV1ServerFriendsWithHttpInfo(body?: FriendRequest, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/friends';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Post,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:true
         });
