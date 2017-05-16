@@ -12,7 +12,7 @@ if [[ $? -eq 1 ]]; then
 	exit 1
 fi
 
-./resetdb.sh
+VINIMAY_ENV=test ./resetdb.sh
 ./starTestInstances.sh start
 
 # Let the servers start
