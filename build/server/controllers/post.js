@@ -64,11 +64,11 @@ function get(request, reply) {
                     return reply(b.wrap(e));
                 }
             }
+            // Get all friends for which a row has been created by us
+            // This means that every friend except for accepted will behave
+            // like following
             instance.model('friend').findAll({ where: {
-                    $or: [
-                        { status: friends_1.Status[friends_1.Status.accepted] },
-                        { status: friends_1.Status[friends_1.Status.following] }
-                    ]
+                    status: { $ne: friends_1.Status[friends_1.Status.incoming] }
                 } }).then(async (friends) => {
                 clientLog.debug('Got', friends.length, 'friends to request');
                 let promises = new Array();

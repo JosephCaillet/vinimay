@@ -79,11 +79,11 @@ export function get(request: h.Request, reply: h.IReply) {
 					return reply(b.wrap(e));
 				}
 			}
+			// Get all friends for which a row has been created by us
+			// This means that every friend except for accepted will behave
+			// like following
 			instance.model('friend').findAll({ where: {
-				$or: [
-					{status: Status[Status.accepted]},
-					{status: Status[Status.following]}
-				]
+				status: { $ne: Status[Status.incoming] }
 			}}).then(async (friends: s.Instance<any>[]) => {
 				clientLog.debug('Got', friends.length, 'friends to request');
 				let promises = new Array<Promise<Post[]>>();
