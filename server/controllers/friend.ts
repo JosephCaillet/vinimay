@@ -3,7 +3,6 @@ import * as Hapi from 'hapi';
 import * as sequelize from 'sequelize';
 import * as Joi from 'joi';
 import * as Boom from 'boom';
-import * as request from 'request-promise-native';
 
 // Import the models
 import {Friend, OutgoingRequests, Status, Response} from '../models/friends';
@@ -36,6 +35,7 @@ export enum Type {
 }
 
 export function get(request: Hapi.Request, reply: Hapi.IReply) {
+	clientLog.debug('Getting list of friends');
 	let instance = SequelizeWrapper.getInstance(username);
 	instance.model('friend').findAll({
 		include: [{
@@ -76,7 +76,7 @@ export function get(request: Hapi.Request, reply: Hapi.IReply) {
 	});
 }
 
-export function create(request: Hapi.Request, reply: Hapi.IReply) {
+export async function create(request: Hapi.Request, reply: Hapi.IReply) {
 	let instance = SequelizeWrapper.getInstance(username);
 
 	let user = new User(request.payload.to);
@@ -88,11 +88,18 @@ export function create(request: Hapi.Request, reply: Hapi.IReply) {
 			friendUtils.create(Status.following, user, username)
 			.then(() => reply(null).code(204)).catch((e) => {
 				if(e.isBoom) return reply(e);
-				return reply(Boom.wrap(e))
+				return utils.handleRequestError(user, e, clientLog, false, reply);
 			});
 			break;
 		case Type.friend:
-			clientLog.debug('Asking', user.toString(), 'to be our friend')
+			clientLog.debug('Asking', user.toString(), 'to be our friend');
+			utils.getUser(username).then((current) => {
+				if(!current) throw Boom.notFound();
+				return friendUtils.befriend(user, current);
+			}).then(() => reply(null).code(204)).catch((e) => {
+				if(e.isBoom) return reply(e);
+				return utils.handleRequestError(user, e, clientLog, false, reply);
+			});
 			break;
 		default:
 			reply(Boom.badRequest());
@@ -102,6 +109,8 @@ export function create(request: Hapi.Request, reply: Hapi.IReply) {
 export function saveFriendRequest(request: Hapi.Request, reply: Hapi.IReply) {
 	let username = utils.getUsername(request);
 	let from = new User(request.payload.from);
+	let tempToken = request.payload.tempToken;
+	serverLog.debug('Got friend request from', from.toString(), 'with tempToken', tempToken);
 
 	let instance: sequelize.Sequelize;
 	// Check if the user exists (the wrapper will return an error if not)

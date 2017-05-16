@@ -25,6 +25,7 @@ var Type;
     Type[Type["following"] = 1] = "following";
 })(Type = exports.Type || (exports.Type = {}));
 function get(request, reply) {
+    clientLog.debug('Getting list of friends');
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     instance.model('friend').findAll({
         include: [{
@@ -63,7 +64,7 @@ function get(request, reply) {
     });
 }
 exports.get = get;
-function create(request, reply) {
+async function create(request, reply) {
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username_1.username);
     let user = new users_1.User(request.payload.to);
     let type = Type[request.payload.type];
@@ -74,11 +75,20 @@ function create(request, reply) {
                 .then(() => reply(null).code(204)).catch((e) => {
                 if (e.isBoom)
                     return reply(e);
-                return reply(Boom.wrap(e));
+                return utils.handleRequestError(user, e, clientLog, false, reply);
             });
             break;
         case Type.friend:
             clientLog.debug('Asking', user.toString(), 'to be our friend');
+            utils.getUser(username_1.username).then((current) => {
+                if (!current)
+                    throw Boom.notFound();
+                return friendUtils.befriend(user, current);
+            }).then(() => reply(null).code(204)).catch((e) => {
+                if (e.isBoom)
+                    return reply(e);
+                return utils.handleRequestError(user, e, clientLog, false, reply);
+            });
             break;
         default:
             reply(Boom.badRequest());
@@ -88,6 +98,8 @@ exports.create = create;
 function saveFriendRequest(request, reply) {
     let username = utils.getUsername(request);
     let from = new users_1.User(request.payload.from);
+    let tempToken = request.payload.tempToken;
+    serverLog.debug('Got friend request from', from.toString(), 'with tempToken', tempToken);
     let instance;
     // Check if the user exists (the wrapper will return an error if not)
     try {
