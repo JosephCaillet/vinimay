@@ -750,7 +750,7 @@
 									"tests[\"Post has a reactions count\"] = typeof responseJSON.reactions === 'number';",
 									"tests[\"Post has a privacy setting\"] = !!responseJSON.privacy;",
 									"tests[\"Post has a reacted info\"] == typeof responseJSON.reacted === 'boolean';",
-									"tests[\"Post is shared with friends\"] = !responseJSON.privacy.localeCompare(\"friends\");",
+									"tests[\"Post is shared with friends\"] = responseJSON.privacy === 'friends';",
 									"tests[\"Post has 8 keys\"] = Object.keys(responseJSON).length === 8;",
 									"tests[\"Post matches the input data\"] = JSON.stringify({",
 									"    content: responseJSON.content,",

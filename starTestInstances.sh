@@ -1,15 +1,15 @@
 #!/bin/bash
 if [[ $1 = "start" ]]; then
 	echo "Starting Alice's server..."
-	npm run start:alice > /dev/null 2>&1 &
+	npm run start:alice &
 	echo $! > alice.pid
 	
 	echo "Starting Bob's server..."
-	npm run start:bob > /dev/null 2>&1 &
+	npm run start:bob &
 	echo $! > bob.pid
 	
 	echo "Starting Frank's server..."
-	npm run start:frank > /dev/null 2>&1 &
+	npm run start:frank &
 	echo $! > frank.pid
 elif [[ $1 = "stop" ]]; then
 	echo "Stopping Alice's server..."
