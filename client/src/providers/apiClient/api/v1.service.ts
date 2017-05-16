@@ -22,6 +22,7 @@ import { Comment } from '../model/comment';
 import { CommentInput } from '../model/commentInput';
 import { CommentsArray } from '../model/commentsArray';
 import { CommentsResponse } from '../model/commentsResponse';
+import { Friend } from '../model/friend';
 import { FriendInput } from '../model/friendInput';
 import { FriendRequest } from '../model/friendRequest';
 import { Friends } from '../model/friends';
@@ -319,7 +320,7 @@ export class V1Service {
      * Create a friend request or follow a given user
      * @param body 
      */
-    public postV1ClientFriends(body?: FriendInput, extraHttpRequestParams?: any): Observable<{}> {
+    public postV1ClientFriends(body?: FriendInput, extraHttpRequestParams?: any): Observable<Friend> {
         return this.postV1ClientFriendsWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
@@ -386,7 +387,7 @@ export class V1Service {
      * Receive friend request and save it in the database as incoming
      * @param body 
      */
-    public postV1ServerFriends(body?: FriendRequest, extraHttpRequestParams?: any): Observable<string> {
+    public postV1ServerFriends(body?: FriendRequest, extraHttpRequestParams?: any): Observable<Friend> {
         return this.postV1ServerFriendsWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
