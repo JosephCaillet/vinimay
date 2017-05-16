@@ -251,7 +251,10 @@ module.exports = {
                     }).label('Friend input')
                 },
                 plugins: { 'hapi-swagger': { responses: {
-                            '204': { description: 'The request creation has been accepted by the server and will be processed' },
+                            '200': {
+                                description: 'The request creation has been accepted by the server and will be processed',
+                                schema: friends.friendSchema
+                            },
                             '409': { description: 'A request already exists for this user' }
                         } } }
             }
@@ -268,7 +271,10 @@ module.exports = {
                 plugins: {
                     'hapi-swagger': {
                         responses: {
-                            '200': { description: 'The request creation has been saved' },
+                            '200': {
+                                description: 'The request creation has been accepted by the server and will be processed',
+                                schema: friends.friendSchema
+                            },
                             '409': { description: 'A request already exists for this user' }
                         }
                     }
