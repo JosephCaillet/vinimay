@@ -12,14 +12,14 @@ if [[ $1 = "start" ]]; then
 	npm run start:frank &
 	echo $! > frank.pid
 elif [[ $1 = "stop" ]]; then
-	echo "Stopping Alice's server..."
-	kill $(cat alice.pid)
+	kill -9 $(cat alice.pid)
+	echo "Stopped Alice's server"
 	
-	echo "Stopping Bob's server..."
-	kill $(cat bob.pid)
+	kill -9 $(cat bob.pid)
+	echo "Stopped Bob's server"
 	
-	echo "Stopping Frank's server..."
-	kill $(cat frank.pid)
+	kill -9 $(cat frank.pid)
+	echo "Stopped Frank's server"
 elif [[ $1 = "clean" ]]; then
 	rm alice.pid
 	rm bob.pid

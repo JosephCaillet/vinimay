@@ -33,6 +33,8 @@ codes="$codes $?"
 # So we need to restart the servers with newly-generated databases
 ./starTestInstances.sh stop
 ./starTestInstances.sh clean
+# Let the servers stop
+sleep 2
 
 ./resetdb.sh
 ./starTestInstances.sh start
