@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const Boom = require("boom");
 const request = require("request-promise-native");
 const commons = require("./commons");
+const utils = require("./serverUtils");
 const sequelizeWrapper_1 = require("./sequelizeWrapper");
 const friends_1 = require("../models/friends");
 const log = require('printit')({
@@ -26,7 +27,13 @@ function create(status, user, username, token) {
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
     return new Promise((resolve, reject) => {
         let description = null;
-        getAll(user, username).then((friend) => {
+        utils.getUser(username).then((current) => {
+            if (current.username === user.username && current.instance === user.instance) {
+                log.debug('User is trying to follow/befriend itself');
+                throw Boom.forbidden();
+            }
+            return getAll(user, username);
+        }).then((friend) => {
             if (friend) {
                 log.debug('Friend exists, upgrading it');
                 return upgrade(friend, status);

@@ -258,6 +258,7 @@ module.exports = {
 						description: 'The request creation has been accepted by the server and will be processed',
 						schema: friends.friendSchema
 					},
+					'403': { description: 'The user is trying to follow/befriend itself' },
 					'409': { description: 'A request already exists for this user' }
 				}}}
 			}
@@ -278,6 +279,7 @@ module.exports = {
 								description: 'The request creation has been accepted by the server and will be processed',
 								schema: friends.friendSchema
 							},
+							'403': { description: 'The user is trying to follow/befriend itself' },
 							'409': { description: 'A request already exists for this user' }
 						}
 					}

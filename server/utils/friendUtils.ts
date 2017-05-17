@@ -40,7 +40,13 @@ export function create(status: Status, user: User, username: string, token?: str
 
 	return new Promise<string | null>((resolve, reject) => {
 		let description: string | null = null;
-		getAll(user, username).then((friend) => {
+		utils.getUser(username).then((current) => {
+			if(current.username === user.username && current.instance === user.instance) {
+				log.debug('User is trying to follow/befriend itself');
+				throw Boom.forbidden();
+			}
+			return getAll(user, username);
+		}).then((friend) => {
 			if(friend) {
 				log.debug('Friend exists, upgrading it');
 				return upgrade(friend, status);
