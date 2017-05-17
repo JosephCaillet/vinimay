@@ -38,8 +38,8 @@ export class AddProfileModal {
 				"to": this.addProfileForm.controls['to'].value,
 				"type": this.addProfileForm.controls['type'].value
 			}
-			this.api.postV1ClientFriends(friendRequest).subscribe(() => {
-				this.viewCtrl.dismiss(friendRequest)
+			this.api.postV1ClientFriends(friendRequest).subscribe(friend => {
+				this.viewCtrl.dismiss(friendRequest, friend)//todo: display message if add friend and user is followed, and if not in followinf his public post will be followed.
 			}, err => {
 				console.error(err)
 			})

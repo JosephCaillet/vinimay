@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ModalController, AlertController } from 'ionic-angular';
 import { AddProfileModal } from '../../components/add-profile-modal/add-profile-modal';
 import { V1Service } from '../../providers/apiClient/api/v1.service';
-import { FriendSent, Friends, Friend } from "../../providers/apiClient/index";
+import { FriendSent, Friends, Friend, FriendInput } from "../../providers/apiClient/index";
 import { TranslateService } from "@ngx-translate/core";
 /**
  * Generated class for the Friends page.
@@ -38,14 +38,25 @@ export class FriendsPage {
 	}
 
 	ionViewDidLoad() {
-		console.log('ionViewDidLoad Friends');
 	}
 
 	addProfile() {
 		let itGo = this.modCtrl.create(AddProfileModal, null)
-		itGo.onDidDismiss(friendRequest => {
-			if(friendRequest) {
+		itGo.onDidDismiss((friendRequest: FriendInput, friend: Friend) => {
+			if (friendRequest) {
+				console.log("data:");
+				console.log(friendRequest)
+				console.log(friend)
+				if (friendRequest.type == FriendInput.TypeEnum.Following) {
+					this.friends.following.push(friend)
+				} else {
+					let friendSent: FriendSent = { "user": friend.user, "status": FriendSent.StatusEnum.Pending }
 
+					this.friends.sent = this.friends.sent.filter(friendSentInArray => { return friendSentInArray.user != friendSent.user })
+
+					this.friends.sent.push(friendSent)
+					this.friends.following = this.friends.following.filter(friendInArray => { return friendInArray.user != friendSent.user })
+				}
 			}
 		})
 		itGo.present()
@@ -58,12 +69,12 @@ export class FriendsPage {
 			buttons: [
 				{
 					text: this.tr.instant('global.yes'),
-					handler: () => {}
+					handler: () => { }
 				},
 				{
 					text: this.tr.instant('global.no'),
 					role: 'cancel',
-					handler: () => {}
+					handler: () => { }
 				}
 			]
 		})
@@ -92,7 +103,7 @@ export class FriendsPage {
 			buttons: [
 				{
 					text: this.tr.instant('global.yes'),
-					handler: () => {}
+					handler: () => { }
 				},
 				{
 					text: this.tr.instant('global.no'),
@@ -110,7 +121,7 @@ export class FriendsPage {
 			buttons: [
 				{
 					text: this.tr.instant('global.yes'),
-					handler: () => {}
+					handler: () => { }
 				},
 				{
 					text: this.tr.instant('global.no'),
