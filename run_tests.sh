@@ -1,5 +1,16 @@
 #!/bin/bash
 
+reset() {
+	./starTestInstances.sh stop > /dev/null 2>&1
+	./starTestInstances.sh clean > /dev/null 2>&1
+
+	./resetdb.sh
+	./starTestInstances.sh start
+
+	# Let the servers start
+	sleep 4
+}
+
 # Build
 
 echo 'Building'
@@ -12,14 +23,7 @@ if [[ $? -eq 1 ]]; then
 	exit 1
 fi
 
-VINIMAY_ENV=test ./resetdb.sh
-./starTestInstances.sh start
-
-# Let the servers start
-sleep 4
-
-# Check if newman is here
-which newman > /dev/null 2>&1
+VINIMAY_ENV=test reset
 
 codes=""
 
@@ -32,8 +36,12 @@ codes="$codes $?"
 newman run tests/reactions.json
 codes="$codes $?"
 
-./starTestInstances.sh stop
-./starTestInstances.sh clean
+# We need to switch to other SQL scripts, with no friends in them
+reset
+
+newman run tests/friends.json
+codes="$codes $?"
+
 
 if [[ $codes == *"1"* ]]; then
 	exit 1
