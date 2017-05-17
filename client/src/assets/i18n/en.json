@@ -4,7 +4,9 @@
 	"global": {
 		"yes": "Yes",
 		"no": "No",
-		"ok": "Ok"
+		"ok": "Ok",
+		"dismiss": "Dismiss",
+		"close": "Close"
 	},
 	"p": {
 		"title": "Posts",
