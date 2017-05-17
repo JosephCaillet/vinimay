@@ -1,16 +1,5 @@
 #!/bin/bash
 
-reset() {
-	./starTestInstances.sh stop > /dev/null 2>&1
-	./starTestInstances.sh clean > /dev/null 2>&1
-
-	./resetdb.sh
-	./starTestInstances.sh start
-
-	# Let the servers start
-	sleep 4
-}
-
 # Build
 
 echo 'Building'
@@ -23,7 +12,11 @@ if [[ $? -eq 1 ]]; then
 	exit 1
 fi
 
-VINIMAY_ENV=test reset
+VINIMAY_ENV=test ./resetdb.sh
+./starTestInstances.sh start
+
+# Let the servers start
+sleep 4
 
 codes=""
 
@@ -37,7 +30,15 @@ newman run tests/reactions.json
 codes="$codes $?"
 
 # We need to switch to other SQL scripts, with no friends in them
-reset
+# So we need to restart the servers with newly-generated databases
+./starTestInstances.sh stop
+./starTestInstances.sh clean
+
+./resetdb.sh
+./starTestInstances.sh start
+
+# Let the servers start
+sleep 4
 
 newman run tests/friends.json
 codes="$codes $?"
