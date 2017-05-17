@@ -15,8 +15,6 @@ fi
 VINIMAY_ENV=test ./resetdb.sh
 ./starTestInstances.sh start
 
-# Let the servers start
-sleep 4
 
 echo 'Alice:' $(cat alice.pid)
 echo 'Bob:' $(cat bob.pid)
@@ -46,9 +44,6 @@ lsof -i :3006
 
 ./resetdb.sh
 ./starTestInstances.sh start
-
-# Let the servers start
-sleep 4
 
 newman run tests/friends.json
 codes="$codes $?"
