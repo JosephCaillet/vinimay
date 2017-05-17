@@ -15,21 +15,16 @@ fi
 VINIMAY_ENV=test ./resetdb.sh
 ./starTestInstances.sh start
 
-
-echo 'Alice:' $(cat alice.pid)
-echo 'Bob:' $(cat bob.pid)
-echo 'Frank:' $(cat frank.pid)
-
 codes=""
 
-# newman run tests/me.json
-# codes="$codes $?"
-# newman run tests/posts.json
-# codes="$codes $?"
-# newman run tests/comments.json
-# codes="$codes $?"
-# newman run tests/reactions.json
-# codes="$codes $?"
+newman run tests/me.json
+codes="$codes $?"
+newman run tests/posts.json
+codes="$codes $?"
+newman run tests/comments.json
+codes="$codes $?"
+newman run tests/reactions.json
+codes="$codes $?"
 
 # We need to switch to other SQL scripts, with no friends in them
 # So we need to restart the servers with newly-generated databases

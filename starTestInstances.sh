@@ -1,8 +1,8 @@
 #!/bin/bash
 if [[ $1 = "start" ]]; then
-	npm run start:alice &
-	npm run start:bob &
-	npm run start:frank &
+	npm run start:alice > /dev/null 2>&1 &
+	npm run start:bob > /dev/null 2>&1 &
+	npm run start:frank > /dev/null 2>&1 &
 
 	sleep 4
 
