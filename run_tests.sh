@@ -42,6 +42,8 @@ reset
 newman run tests/friends.json
 codes="$codes $?"
 
+./starTestInstances.sh stop
+./starTestInstances.sh clean
 
 if [[ $codes == *"1"* ]]; then
 	exit 1
