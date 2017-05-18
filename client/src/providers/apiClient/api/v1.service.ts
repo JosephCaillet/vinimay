@@ -210,9 +210,10 @@ export class V1Service {
      * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
      * @param from Most recent timestamp
      * @param nb Number of posts to retrieve
+     * @param author The author to target
      */
-    public getV1ClientPosts(from?: number, nb?: number, extraHttpRequestParams?: any): Observable<PostsResponse> {
-        return this.getV1ClientPostsWithHttpInfo(from, nb, extraHttpRequestParams)
+    public getV1ClientPosts(from?: number, nb?: number, author?: string, extraHttpRequestParams?: any): Observable<PostsResponse> {
+        return this.getV1ClientPostsWithHttpInfo(from, nb, author, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -249,6 +250,22 @@ export class V1Service {
      */
     public getV1ClientPostsUserTimestampComments(user: string, timestamp: number, from?: number, nb?: number, extraHttpRequestParams?: any): Observable<CommentsResponse> {
         return this.getV1ClientPostsUserTimestampCommentsWithHttpInfo(user, timestamp, from, nb, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Retrieve data on a given user user
+     * Retrieve data on a given user user.
+     * @param user The user to retrieve data from
+     */
+    public getV1ClientUserUser(user: string, extraHttpRequestParams?: any): Observable<User> {
+        return this.getV1ClientUserUserWithHttpInfo(user, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -753,8 +770,9 @@ export class V1Service {
      * Retrieve all posts or using filters. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#retrieval-1).
      * @param from Most recent timestamp
      * @param nb Number of posts to retrieve
+     * @param author The author to target
      */
-    public getV1ClientPostsWithHttpInfo(from?: number, nb?: number, extraHttpRequestParams?: any): Observable<Response> {
+    public getV1ClientPostsWithHttpInfo(from?: number, nb?: number, author?: string, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/v1/client/posts';
 
         let queryParameters = new URLSearchParams();
@@ -766,6 +784,10 @@ export class V1Service {
 
         if (nb !== undefined) {
             queryParameters.set('nb', <any>nb);
+        }
+
+        if (author !== undefined) {
+            queryParameters.set('author', <any>author);
         }
 
 
@@ -864,6 +886,43 @@ export class V1Service {
             queryParameters.set('nb', <any>nb);
         }
 
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Get,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Retrieve data on a given user user
+     * Retrieve data on a given user user.
+     * @param user The user to retrieve data from
+     */
+    public getV1ClientUserUserWithHttpInfo(user: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/user/${user}'
+                    .replace('${' + 'user' + '}', String(user));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling getV1ClientUserUser.');
+        }
 
         // to determine the Accept header
         let produces: string[] = [
