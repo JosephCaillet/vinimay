@@ -12,7 +12,7 @@ const log = require('printit')({
     prefix: 'Utils:Friends',
     date: true
 });
-function getAll(user, username) {
+function getFriend(user, username) {
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
     return new Promise((resolve, reject) => {
         instance.model('friend').findOne({ where: {
@@ -21,7 +21,7 @@ function getAll(user, username) {
             } }).then((friend) => resolve(friend)).catch(reject);
     });
 }
-exports.getAll = getAll;
+exports.getFriend = getFriend;
 function create(status, user, username, token) {
     log.debug('Creating row for', user.toString(), 'with status', friends_1.Status[status]);
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
@@ -32,7 +32,7 @@ function create(status, user, username, token) {
                 log.debug('User is trying to follow/befriend itself');
                 throw Boom.forbidden();
             }
-            return getAll(user, username);
+            return getFriend(user, username);
         }).then((friend) => {
             if (friend) {
                 log.debug('Friend exists, upgrading it');
@@ -160,3 +160,4 @@ function getRemoteUserData(user) {
         timeout: commons.settings.timeout
     });
 }
+exports.getRemoteUserData = getRemoteUserData;
