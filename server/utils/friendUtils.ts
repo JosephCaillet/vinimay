@@ -23,7 +23,7 @@ const log = require('printit')({
 });
 
 
-export function getAll(user: User, username: string): Promise<sequelize.Instance<any>> {
+export function getFriend(user: User, username: string): Promise<sequelize.Instance<any>> {
 	let instance = SequelizeWrapper.getInstance(username);
 
 	return new Promise<sequelize.Instance<any>>((resolve, reject) => {
@@ -45,7 +45,7 @@ export function create(status: Status, user: User, username: string, token?: str
 				log.debug('User is trying to follow/befriend itself');
 				throw Boom.forbidden();
 			}
-			return getAll(user, username);
+			return getFriend(user, username);
 		}).then((friend) => {
 			if(friend) {
 				log.debug('Friend exists, upgrading it');
@@ -165,7 +165,7 @@ export function befriend(user: User, currentUser: User): Promise<string | null> 
 	});
 }
 
-function getRemoteUserData(user: User): request.RequestPromise {
+export function getRemoteUserData(user: User): request.RequestPromise {
 	let url = path.join(user.instance, '/v1/client/me');
 
 	let protocol: string;
