@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, AlertController, LoadingController } from 'ionic-angular';
 import { AddProfileModal } from '../../components/add-profile-modal/add-profile-modal';
 import { V1Service } from '../../providers/apiClient/api/v1.service';
 import { FriendSent, Friends, Friend, FriendInput } from "../../providers/apiClient/index";
@@ -28,12 +28,20 @@ export class FriendsPage {
 	constructor(
 		public navCtrl: NavController, public navParams: NavParams,
 		public modCtrl: ModalController, public api: V1Service,
-		public alertCtrl: AlertController, public tr: TranslateService
+		public alertCtrl: AlertController, public tr: TranslateService,
+		private loadingCtrl: LoadingController
 	) {
+		let loading = loadingCtrl.create(
+			{ "content": tr.instant('f.loading') }
+		)
+		loading.present();
+
 		api.getV1ClientFriends().subscribe((data) => {
 			this.friends = data
+			loading.dismiss()
 		}, (err) => {
 			console.error(err)
+			loading.dismiss()
 		})
 	}
 

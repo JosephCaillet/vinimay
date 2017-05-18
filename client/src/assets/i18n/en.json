@@ -10,6 +10,7 @@
 	},
 	"p": {
 		"title": "Posts",
+		"loading": "Loading posts...",
 		"creation": "Create post",
 		"refresh": "Refresh",
 		"refreshing": "Refreshing...",
@@ -42,6 +43,7 @@
 	},
 	"f": {
 		"title": "Friends",
+		"loading": "Loading friends...",
 		"add": {
 			"title": "Add friend",
 			"modal": {
@@ -92,5 +94,8 @@
 	},
 	"m": {
 		"title": "Me"
+	},
+	"h": {
+		"loading": "Loading profile data..."
 	}
 }
