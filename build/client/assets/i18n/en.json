@@ -4,10 +4,13 @@
 	"global": {
 		"yes": "Yes",
 		"no": "No",
-		"ok": "Ok"
+		"ok": "Ok",
+		"dismiss": "Dismiss",
+		"close": "Close"
 	},
 	"p": {
 		"title": "Posts",
+		"loading": "Loading posts...",
 		"creation": "Create post",
 		"refresh": "Refresh",
 		"refreshing": "Refreshing...",
@@ -40,6 +43,7 @@
 	},
 	"f": {
 		"title": "Friends",
+		"loading": "Loading friends...",
 		"add": {
 			"title": "Add friend",
 			"modal": {
@@ -90,5 +94,8 @@
 	},
 	"m": {
 		"title": "Me"
+	},
+	"h": {
+		"loading": "Loading profile data..."
 	}
 }
