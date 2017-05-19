@@ -52,9 +52,6 @@ export class FriendsPage {
 		let itGo = this.modCtrl.create(AddProfileModal, null)
 		itGo.onDidDismiss((friendRequest: FriendInput, friend: Friend) => {
 			if (friendRequest) {
-				console.log("data:");
-				console.log(friendRequest)
-				console.log(friend)
 				if (friendRequest.type == FriendInput.TypeEnum.Following) {
 					this.friends.following.push(friend)
 				} else {
