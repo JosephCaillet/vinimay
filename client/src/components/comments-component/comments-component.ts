@@ -32,6 +32,9 @@ export class CommentsComponent {
 		this.api.getV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs).subscribe((data) => {
 			this.comments = data.comments
 		}, (err) => {
+			//500 yolo
+			//404 post inexistant ou user inexistant
+			//503 serveur non joignable
 			console.error(err)
 		})
 	}
@@ -43,6 +46,9 @@ export class CommentsComponent {
 				this.post.comments++
 				this.comments.push(data)
 			}, (err) => {
+				//500 yolo
+				//404 post inexistant ou user inexistant
+				//503 serveur non joignable
 				console.error(err)
 			})
 	}
@@ -51,6 +57,7 @@ export class CommentsComponent {
 		this.api.deleteV1ClientPostsUserTimestampCommentsCommenttimestamp(
 			this.post.author, this.post.creationTs, commentToDelete.creationTs)
 			.subscribe(() => {
+				this.post.comments--
 				let index = this.comments.indexOf(commentToDelete)
 				this.commentList.nativeElement.children[index].classList.add('deletedComment')
 
@@ -60,6 +67,9 @@ export class CommentsComponent {
 					})
 				}, 500)
 			}, err => {
+				//500 yolo
+				//404 post inexistant, user inexistant, ou commentaire non existant
+				//503 serveur non joignable
 				console.error(err)
 			})
 	}
