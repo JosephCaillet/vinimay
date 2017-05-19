@@ -5,13 +5,14 @@ const crypto = require("crypto");
 const Boom = require("boom");
 const request = require("request-promise-native");
 const commons = require("./commons");
+const utils = require("./serverUtils");
 const sequelizeWrapper_1 = require("./sequelizeWrapper");
 const friends_1 = require("../models/friends");
 const log = require('printit')({
     prefix: 'Utils:Friends',
     date: true
 });
-function getAll(user, username) {
+function getFriend(user, username) {
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
     return new Promise((resolve, reject) => {
         instance.model('friend').findOne({ where: {
@@ -20,13 +21,19 @@ function getAll(user, username) {
             } }).then((friend) => resolve(friend)).catch(reject);
     });
 }
-exports.getAll = getAll;
+exports.getFriend = getFriend;
 function create(status, user, username, token) {
     log.debug('Creating row for', user.toString(), 'with status', friends_1.Status[status]);
     let instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
     return new Promise((resolve, reject) => {
         let description = null;
-        getAll(user, username).then((friend) => {
+        utils.getUser(username).then((current) => {
+            if (current.username === user.username && current.instance === user.instance) {
+                log.debug('User is trying to follow/befriend itself');
+                throw Boom.forbidden();
+            }
+            return getFriend(user, username);
+        }).then((friend) => {
             if (friend) {
                 log.debug('Friend exists, upgrading it');
                 return upgrade(friend, status);
@@ -153,3 +160,4 @@ function getRemoteUserData(user) {
         timeout: commons.settings.timeout
     });
 }
+exports.getRemoteUserData = getRemoteUserData;

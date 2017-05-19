@@ -57,6 +57,26 @@ module.exports = {
                 }
             }
         },
+        '/client/user/{user}': {
+            get: {
+                description: 'Retrieve data on a given user user',
+                notes: 'Retrieve data on a given user user.',
+                handler: user.getRemote,
+                validate: { params: {
+                        user: commons.user.required().description('The user to retrieve data from')
+                    } },
+                plugins: {
+                    'hapi-swagger': {
+                        responses: {
+                            '200': {
+                                description: 'Data on the current user',
+                                schema: user.schema
+                            }
+                        }
+                    }
+                }
+            }
+        },
         '/client/posts': {
             get: {
                 description: 'Retrieve posts',
@@ -64,7 +84,8 @@ module.exports = {
                 handler: posts.get,
                 validate: { query: {
                         from: Joi.number().optional().min(1).description('Most recent timestamp'),
-                        nb: Joi.number().optional().min(1).description('Number of posts to retrieve')
+                        nb: Joi.number().optional().min(1).description('Number of posts to retrieve'),
+                        author: commons.user.optional().description('The author to target')
                     } },
                 plugins: {
                     'hapi-swagger': {
@@ -255,6 +276,7 @@ module.exports = {
                                 description: 'The request creation has been accepted by the server and will be processed',
                                 schema: friends.friendSchema
                             },
+                            '403': { description: 'The user is trying to follow/befriend itself' },
                             '409': { description: 'A request already exists for this user' }
                         } } }
             }
@@ -275,6 +297,7 @@ module.exports = {
                                 description: 'The request creation has been accepted by the server and will be processed',
                                 schema: friends.friendSchema
                             },
+                            '403': { description: 'The user is trying to follow/befriend itself' },
                             '409': { description: 'A request already exists for this user' }
                         }
                     }

@@ -1097,6 +1097,125 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Get posts from Bob",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an array\"] = responseJSON.posts instanceof Array;",
+									"tests[\"Array in response is not empty\"] = responseJSON.posts.length === 2;",
+									"",
+									"let onlyBob = true;",
+									"for(let i in responseJSON.posts) {",
+									"    let post = responseJSON.posts[i];",
+									"    if(post.author !== 'bob@localhost:3001') {",
+									"        onlyBob = false;",
+									"    }",
+									"}",
+									"",
+									"tests[\"Posts are only Bob's\"] = onlyBob;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?author=bob@localhost:3001",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1 post from Bob (using nb)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an array\"] = responseJSON.posts instanceof Array;",
+									"tests[\"Array contains one post\"] = responseJSON.posts.length === 1;",
+									"tests[\"Post is the friends one\"] = responseJSON.posts[0].creationTs === parseInt(globals.friendFriendsTs);",
+									"tests[\"Post is Bob's\"] = responseJSON.posts[0].author === 'bob@localhost:3001';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?author=bob@localhost:3001&nb=1",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get 1 post from Bob (using from)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an array\"] = responseJSON.posts instanceof Array;",
+									"tests[\"Array contains one post\"] = responseJSON.posts.length === 1;",
+									"tests[\"Post is the public one\"] = responseJSON.posts[0].creationTs === parseInt(globals.friendPublicTs);",
+									"tests[\"Post is Bob's\"] = responseJSON.posts[0].author === 'bob@localhost:3001';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?author=bob@localhost:3001&from={{friendPublicTs}}",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -1291,6 +1410,72 @@
 					],
 					"request": {
 						"url": "alice@localhost:3000/v1/client/posts?nb=foobar",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non existing author",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 503 Service Unavailable\"] = responseCode.code === 503;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?author=foo@bar.baz",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Invalid author",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400 Bad Request\"] = responseCode.code === 400;",
+									"tests[\"Error is about the user\"] = responseJSON.validation.keys.includes('author');",
+									"tests[\"Error is about the missing @\"] = responseJSON.message.includes('required pattern: /.+@.+/');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts?author=foobar.baz",
 						"method": "GET",
 						"header": [
 							{
