@@ -119,19 +119,6 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 		return reply(Boom.wrap(e));
 	}
 
-	let postExists: boolean;		
-	try {
-		postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
-	} catch(e) {
-		return reply(Boom.wrap(e));
-	}
-	
-	if(!postExists) {
-		clientLog.debug('Post does not exist');
-		return reply(Boom.notFound())
-	};
-
-
 	let user = await utils.getUser(username);
 	let author = new User(request.params.user);
 
@@ -139,6 +126,17 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 
 	// Is the post local
 	if(!user.instance.localeCompare(author.instance)) {
+		let postExists: boolean;		
+		try {
+			postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
+		} catch(e) {
+			return reply(Boom.wrap(e));
+		}
+		
+		if(!postExists) {
+			clientLog.debug('Post does not exist');
+			return reply(Boom.notFound())
+		};
 		// Is the post from the current user
 		if(!user.username.localeCompare(author.username)) {
 			instance.model('reaction').destroy({ where: {
@@ -297,17 +295,24 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 	let instance: sequelize.Sequelize;
 
 	try { instance = SequelizeWrapper.getInstance(username); }
-	catch(e) { return reply(Boom.notFound()) }
+	catch(e) {
+		serverLog.debug('Could not find the local user');
+		return reply(Boom.notFound());
+	}
 
 	let reaction: sequelize.Instance<any>;
 	let reactionAuthor = new User(request.payload.author);
+	serverLog.debug('Deleting reaction from', reactionAuthor.toString(), 'on', request.params.timestamp);
 	
 	instance.model('reaction').findOne({ where: {
 			url: reactionAuthor.instance,
 			username: reactionAuthor.username,
 			creationTs: request.params.timestamp
 	}}).then((res: sequelize.Instance<any>) => {
-		if(!res) throw Boom.notFound();
+		if(!res) {
+			serverLog.debug('Could not find the reaction');
+			throw Boom.notFound();
+		}
 		reaction = res;
 
 		// No need to verify if the author's here if we have an idtoken
@@ -323,7 +328,10 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 	}).then((friend) => {
 		// If we don't know the user, it may be someone trying to exploit the
 		// API to retrieve posts
-		if(!friend) throw Boom.notFound();
+		if(!friend) {
+			serverLog.debug('Could not find the remote user in the database');
+			throw Boom.notFound();
+		}
 		// Check if the author is a friend. If so, we verify the signature
 		if(friend && friend.id_token && friend.signature_token) {
 			let url = user + request.path;

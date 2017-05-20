@@ -108,23 +108,23 @@ async function del(request, reply) {
     catch (e) {
         return reply(Boom.wrap(e));
     }
-    let postExists;
-    try {
-        postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
-    }
-    catch (e) {
-        return reply(Boom.wrap(e));
-    }
-    if (!postExists) {
-        clientLog.debug('Post does not exist');
-        return reply(Boom.notFound());
-    }
-    ;
     let user = await utils.getUser(username_1.username);
     let author = new users_1.User(request.params.user);
     let tsPost = parseInt(request.params.timestamp);
     // Is the post local
     if (!user.instance.localeCompare(author.instance)) {
+        let postExists;
+        try {
+            postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
+        }
+        catch (e) {
+            return reply(Boom.wrap(e));
+        }
+        if (!postExists) {
+            clientLog.debug('Post does not exist');
+            return reply(Boom.notFound());
+        }
+        ;
         // Is the post from the current user
         if (!user.username.localeCompare(author.username)) {
             instance.model('reaction').destroy({ where: {
@@ -287,17 +287,21 @@ async function serverDel(request, reply) {
         instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
     }
     catch (e) {
+        serverLog.debug('Could not find the local user');
         return reply(Boom.notFound());
     }
     let reaction;
     let reactionAuthor = new users_1.User(request.payload.author);
+    serverLog.debug('Deleting reaction from', reactionAuthor.toString(), 'on', request.params.timestamp);
     instance.model('reaction').findOne({ where: {
             url: reactionAuthor.instance,
             username: reactionAuthor.username,
             creationTs: request.params.timestamp
         } }).then((res) => {
-        if (!res)
+        if (!res) {
+            serverLog.debug('Could not find the reaction');
             throw Boom.notFound();
+        }
         reaction = res;
         // No need to verify if the author's here if we have an idtoken
         if (request.query.idToken && request.query.signature) {
@@ -313,8 +317,10 @@ async function serverDel(request, reply) {
     }).then((friend) => {
         // If we don't know the user, it may be someone trying to exploit the
         // API to retrieve posts
-        if (!friend)
+        if (!friend) {
+            serverLog.debug('Could not find the remote user in the database');
             throw Boom.notFound();
+        }
         // Check if the author is a friend. If so, we verify the signature
         if (friend && friend.id_token && friend.signature_token) {
             let url = user + request.path;
