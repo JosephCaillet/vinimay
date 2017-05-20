@@ -243,6 +243,37 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Accept Alice's friend request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204 No Content\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends/alice@localhost:3000",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accepted\": true\n}"
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
