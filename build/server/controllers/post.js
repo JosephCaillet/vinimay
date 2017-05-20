@@ -259,7 +259,7 @@ async function del(request, reply) {
     }
     catch (e) {
         // If the user doesn't exist, we return an error
-        return reply(b.badRequest(e));
+        return reply(b.wrap(e));
     }
     // Run the query
     instance.model('post').destroy({ where: {

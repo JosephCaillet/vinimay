@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as crypto from 'crypto';
 
+import * as Hapi from 'hapi';
 import * as Boom from 'boom';
 import * as request from 'request-promise-native';
 import * as sequelize from 'sequelize';
@@ -22,6 +23,19 @@ const log = require('printit')({
 	date: true
 });
 
+interface AcceptationParams {
+	idDH: crypto.DiffieHellman,
+	sigDH: crypto.DiffieHellman,
+	tempToken: string,
+	idToken: string,
+	sigToken: string
+}
+
+interface OngoingAcceptations {
+	[user: string]: AcceptationParams
+}
+
+const acceptations: OngoingAcceptations = {};
 
 export function getFriend(user: User, username: string): Promise<sequelize.Instance<any>> {
 	let instance = SequelizeWrapper.getInstance(username);
@@ -49,7 +63,8 @@ export function create(status: Status, user: User, username: string, token?: str
 		}).then((friend) => {
 			if(friend) {
 				log.debug('Friend exists, upgrading it');
-				return upgrade(friend, status);
+				if(token) log.debug('Using token', token, 'for upgrade');
+				return upgrade(friend, status, false, token);
 			}
 			return getRemoteUserData(user);
 		}).then((userData) => {
@@ -78,14 +93,21 @@ export function create(status: Status, user: User, username: string, token?: str
 					url: user.instance,
 					status: Status[status]
 				};
-				if(token) friend.id_token = token;
-				log.debug('Creating the friend');
+				if(token) {
+					log.debug('Creating the friend request with token', token);
+					friend.id_token = token;
+				} else {
+					log.debug('Creating a row with no token');
+				}
 				return instance.model('friend').create(friend);
 			} else {
 				log.debug('Skipping creation')
 				return Promise.resolve();
 			}
-		}).then(() => resolve(description)).catch(reject);
+		}).then((friend) => {
+			if(friend) log.debug('Friend request created with token', friend.get('id_token'));
+			return resolve(description)
+		}).catch(reject);
 	})
 }
 
@@ -94,23 +116,27 @@ interface UpgradeRet {
 	instance: sequelize.Instance<any>
 };
 
-export function upgrade(user: sequelize.Instance<any>, newStatus: Status): Promise<UpgradeRet> {
+export function upgrade(user: sequelize.Instance<any>, newStatus: Status, force?: boolean, token?: string): Promise<UpgradeRet> {
 	return new Promise<UpgradeRet>((resolve, reject) => {
 		let friendStatus: Status = Status[<string>user.get('status')];
 
 		// If a friend exist, we check its status. We throw a conflict
 		// error if its already at the status we want to set it to,
 		// or if its status is "friend". Else we upgrade it to the given
-		// status.
-		if(newStatus === friendStatus 
+		// status. We can also force the upgrade (for example if we want to move
+		// a "pending" friend request to "accepted").
+		if((newStatus === friendStatus 
 			|| friendStatus === Status.accepted
-			|| friendStatus === Status.pending) {
+			|| friendStatus === Status.pending) && !force) {
 			log.debug('Friend already exists with status', Status[friendStatus] + ',', 'aborting without creating nor updating');
 			throw Boom.conflict();
 		}
 
 		user.set('status', Status[newStatus]);
+		if(token) user.set('id_token', token);
 		user.save().then((user) => {
+			let friend = new User(user.get('username'), user.get('url'));
+			log.debug('Upgraded', friend.toString(), 'with status', user.get('status'), 'and', user.get('id_token') || 'nothing', 'as token');
 			// Wrap the result so we can know it came from this function
 			resolve({
 				upgraded: true,
@@ -177,5 +203,211 @@ export function getRemoteUserData(user: User): request.RequestPromise {
 	return request.get(url, {
 		json: true,
 		timeout: commons.settings.timeout
+	});
+}
+
+export async function acceptFriendRequest(user: User, username: string): Promise<null> {
+	let friend = await getFriend(user, username);
+	let tempToken = friend.get('id_token');
+	if(acceptations[tempToken]) throw Boom.conflict();
+	acceptations[tempToken] = <AcceptationParams>{};
+	let acceptation = acceptations[tempToken];
+
+	return new Promise<null>((resolve, reject) => {
+		log.debug('Accepting friend request from', user.toString());
+
+		acceptation.idDH = crypto.createDiffieHellman(256);
+		acceptation.sigDH = crypto.createDiffieHellman(256);
+		
+		let id = {
+			generator: acceptation.idDH.getGenerator('hex'),
+			prime: acceptation.idDH.getPrime('hex'),
+			mod: acceptation.idDH.generateKeys('hex')
+		}
+		
+		let sig = {
+			generator: acceptation.sigDH.getGenerator('hex'),
+			prime: acceptation.sigDH.getPrime('hex'),
+			mod: acceptation.sigDH.generateKeys('hex')
+		}
+
+		let protocol: string
+		let url = path.join(user.toString(), '/v1/server/friends');
+		if(commons.settings.forceHttp || url.indexOf('localhost') > -1) protocol = 'http://';
+		else protocol = 'https://';
+
+		let friendInstance: sequelize.Instance<any>;
+
+		getFriend(user, username).then((friend) => {
+			friendInstance = friend;
+			if(!friendInstance || Status[<string>friendInstance.get('status')] !== Status.incoming) {
+				log.debug('Friend request does not exist');
+				delete acceptations[acceptation.tempToken];
+				throw Boom.notFound();
+			}
+			acceptation.tempToken = friendInstance.get('id_token')
+			let body = {
+				step: 1,
+				tempToken: acceptation.tempToken,
+				idTokenDh: id,
+				sigTokenDh: sig,
+			}
+			log.debug('Sending step 1');
+			return request({
+				method: 'PUT',
+				url: protocol + url,
+				body: body,
+				json: true,
+				headers: { 'Content-Type': 'application/json' },
+				timeout: commons.settings.timeout
+			});
+		}).then((keys) => {
+			log.debug('Got keys from', user.toString());
+			try {
+				acceptation.idToken = acceptation.idDH.computeSecret(keys.idTokenMod, 'hex', 'hex');
+				acceptation.sigToken = acceptation.sigDH.computeSecret(keys.sigTokenMod, 'hex', 'hex');
+			} catch(e) {
+				delete acceptations[acceptation.tempToken];
+				return reject(e);
+			}
+
+			log.debug('Computed idToken', acceptation.idToken, 'for', user.toString());
+			log.debug('Computed signature token', acceptation.sigToken, 'for', user.toString());
+
+			let body: any = {
+				step: 2,
+				tempToken: acceptation.tempToken,
+				idToken: acceptation.idToken
+			}
+
+			body.signature = utils.computeSignature('PUT', url, body, acceptation.sigToken);
+
+			return request({
+				method: 'PUT',
+				url: protocol + url,
+				body: body,
+				json: true,
+				headers: { 'Content-Type': 'application/json' },
+				timeout: commons.settings.timeout
+			});
+		}).then(() => {
+			return upgrade(friendInstance, Status.accepted, true)
+		}).then((upgraded) => {
+			// Update the tokens
+			let friendInstance = upgraded.instance;
+			friendInstance.set('id_token', acceptation.idToken);
+			friendInstance.set('signature_token', acceptation.sigToken);
+			return friendInstance.save();
+		}).then((updated) => {
+			delete acceptations[acceptation.tempToken];
+			return resolve();
+		}).catch(e => {
+			delete acceptations[acceptation.tempToken];
+			return reject(e);
+		});
+	});
+}
+
+export function handleStepOne(username: string, payload: any): Promise<{idTokenMod: string, sigTokenMod: string}> {
+	return new Promise<{idTokenMod: string, sigTokenMod: string}>(async (resolve, reject) => {
+		let friendInstance;
+		try {
+			friendInstance = await utils.getFriendByToken(username, payload.tempToken);
+		} catch(e) {
+			log.warn('Could not retrieve friend for token', payload.tempToken);
+			return reject(e);
+		}
+		let friend = new User(friendInstance.username, friendInstance.url);
+		
+		if(acceptations[payload.tempToken]) {
+			delete acceptations[payload.tempToken];
+			return reject(Boom.conflict());
+		}
+		log.debug('Received acceptation data (step 1) from', friend.toString());
+		
+		acceptations[payload.tempToken] = <AcceptationParams>{};
+		let acceptation = acceptations[payload.tempToken];
+		acceptation.tempToken = payload.tempToken;
+
+		try {
+			acceptation.idDH = crypto.createDiffieHellman(payload.idTokenDh.prime, 'hex', payload.idTokenDh.generator, 'hex');
+			acceptation.sigDH = crypto.createDiffieHellman(payload.sigTokenDh.prime, 'hex', payload.sigTokenDh.generator, 'hex');
+			acceptation.idDH.generateKeys();
+			acceptation.sigDH.generateKeys();
+			acceptation.idToken = acceptation.idDH.computeSecret(payload.idTokenDh.mod, 'hex', 'hex');
+			acceptation.sigToken = acceptation.sigDH.computeSecret(payload.sigTokenDh.mod, 'hex', 'hex');
+		} catch(e) {
+			delete acceptations[acceptation.tempToken];
+			return reject(e);
+		}
+
+		log.debug('Computed idToken', acceptation.idToken, 'for', friend.toString());
+		log.debug('Computed signature token', acceptation.sigToken, 'for', friend.toString());
+
+		resolve({
+			idTokenMod: acceptation.idDH.generateKeys('hex'),
+			sigTokenMod: acceptation.sigDH.generateKeys('hex')
+		});
+	});
+}
+
+export function handleStepTwo(user: User, payload: any): Promise<null> {
+	return new Promise<null>(async (resolve, reject) => {
+		let friendInstance;
+		try {
+			friendInstance = await utils.getFriendByToken(user.username, payload.tempToken);
+		} catch(e) {
+			log.warn('Could not retrieve friend for token', payload.tempToken);
+			return reject(e);
+		}
+		let friend = new User(friendInstance.username, friendInstance.url);
+
+		if(!acceptations[payload.tempToken]){
+			log.warn('Could not find previously in-memory stored data on the ongoing acceptation');
+			throw Boom.notFound();
+		 }
+		log.debug('Received acceptation data (step 2) from', friend.toString());
+
+		let acceptation = acceptations[payload.tempToken];
+
+		// Check idToken
+		if(payload.idToken !== acceptation.idToken){
+			log.warn('idToken did not match');
+			delete acceptations[acceptation.tempToken];
+			return reject(Boom.expectationFailed('idToken not matching', {field: 'idToken'}));
+		}
+
+		// Check signature
+		let params = Object.assign({}, payload);
+		let signature = payload.signature;
+		delete params.signature;
+		let url = path.join(user.toString(), '/v1/server/friends');
+		let computedSignature = utils.computeSignature('PUT', url, params, acceptation.sigToken);
+
+		if(computedSignature !== signature) {
+			log.warn('Signature did not match');
+			delete acceptations[acceptation.tempToken];
+			return reject(Boom.expectationFailed('Signature not matching', {field: 'signature'}));
+		}
+
+		log.debug('All data matching, updating the friend request from', friend.toString(), '(tempToken = ', acceptation.tempToken + ')');
+		SequelizeWrapper.getInstance(user.username).model('friend').findOne({ where: {
+			id_token: acceptation.tempToken
+		}}).then((friendInstance: sequelize.Instance<any>) => {
+			// Update the status
+			return upgrade(friendInstance, Status.accepted, true)
+		}).then((upgraded) => {
+			// Update the tokens
+			let friendInstance = upgraded.instance;
+			friendInstance.set('id_token', acceptation.idToken);
+			friendInstance.set('signature_token', acceptation.sigToken);
+			return friendInstance.save();
+		}).then((updated) => {
+			delete acceptations[acceptation.tempToken];
+			return resolve();
+		}).catch(e => {
+			delete acceptations[acceptation.tempToken];
+			return reject(e);
+		})
 	});
 }

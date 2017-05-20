@@ -110,6 +110,62 @@ async function create(request, reply) {
     }
 }
 exports.create = create;
+function updateRequest(request, reply) {
+    let friend = new users_1.User(request.params.user);
+    if (request.payload.accepted) {
+        clientLog.debug('Accepting friend request from', friend.toString());
+        friendUtils.acceptFriendRequest(friend, username_1.username)
+            .then(() => reply(null).code(204)).catch((e) => {
+            if (e.isBoom)
+                return reply(e);
+            else
+                return utils.handleRequestError(friend, e, clientLog, false, reply);
+        });
+    }
+    else if (!request.payload.accepted && typeof request.payload.accepted === 'boolean') {
+        return reply(Boom.notImplemented());
+    }
+    else {
+        return reply(Boom.badRequest());
+    }
+}
+exports.updateRequest = updateRequest;
+async function accept(request, reply) {
+    let username = await utils.getUsername(request);
+    let user = await utils.getUser(username);
+    let friendInstance;
+    try {
+        friendInstance = await utils.getFriendByToken(username, request.payload.tempToken);
+    }
+    catch (e) {
+        serverLog.warn('Could not retrieve friend for token', request.payload.tempToken);
+        return reply(Boom.notFound());
+    }
+    let friend = new users_1.User(friendInstance.username, friendInstance.url);
+    switch (request.payload.step) {
+        case 1:
+            friendUtils.handleStepOne(username, request.payload)
+                .then((mods) => commons.checkAndSendSchema(mods, exports.modsSchema, serverLog, reply))
+                .catch((e) => {
+                if (e.isBoom)
+                    return reply(e);
+                else
+                    return reply(Boom.wrap(e));
+            });
+            break;
+        case 2:
+            friendUtils.handleStepTwo(user, request.payload)
+                .then(() => reply(null).code(204))
+                .catch((e) => {
+                if (e.isBoom)
+                    return reply(e);
+                else
+                    return reply(Boom.wrap(e));
+            });
+            break;
+    }
+}
+exports.accept = accept;
 function saveFriendRequest(request, reply) {
     let username = utils.getUsername(request);
     let from = new users_1.User(request.payload.from);
@@ -124,7 +180,7 @@ function saveFriendRequest(request, reply) {
         serverLog.debug('Couldn\'t find local user');
         return reply(Boom.notFound(e));
     }
-    friendUtils.create(friends_1.Status.incoming, from, username)
+    friendUtils.create(friends_1.Status.incoming, from, username, tempToken)
         .then((description) => {
         let res = {
             user: from.toString()
@@ -154,3 +210,23 @@ exports.friendsSchema = Joi.object({
     sent: Joi.array().required().items(exports.friendSentSchema).label('FriendsSent').description('Sent (pending) friend requests'),
     following: Joi.array().required().items(exports.friendSchema).label('FriendsFollowings').description('People followed by the user'),
 }).label('Friends');
+exports.acceptationSchema = Joi.object({
+    step: Joi.number().valid(1, 2).required().description('The identifier of the step'),
+    tempToken: Joi.string().alphanum().required().description('The temporary token used during the transaction'),
+    idTokenDh: Joi.object({
+        generator: Joi.string().alphanum().required().description('The Diffie-Hellman generator'),
+        prime: Joi.string().alphanum().required().description('The Diffie-Hellman prime number'),
+        mod: Joi.string().alphanum().required().description('The Diffie-Hellman modulo')
+    }).when('step', { is: 1, then: Joi.required(), otherwise: Joi.forbidden() }).label('idToken DH').description('Diffie-Hellman for the idToken'),
+    sigTokenDh: Joi.object({
+        generator: Joi.string().alphanum().required().description('The Diffie-Hellman generator'),
+        prime: Joi.string().alphanum().required().description('The Diffie-Hellman prime number'),
+        mod: Joi.string().alphanum().required().description('The Diffie-Hellman modulo')
+    }).when('step', { is: 1, then: Joi.required(), otherwise: Joi.forbidden() }).label('idToken DH').description('Diffie-Hellman for the signature token'),
+    idToken: Joi.string().alphanum().when('step', { is: 2, then: Joi.required(), otherwise: Joi.forbidden() }).description('The computed idToken'),
+    signature: Joi.string().alphanum().when('step', { is: 2, then: Joi.required(), otherwise: Joi.forbidden() }).description('The signature computed with the computed signature token')
+}).label('Friend acceptation');
+exports.modsSchema = Joi.object({
+    idTokenMod: Joi.string().alphanum().required().description('Key for idToken'),
+    sigTokenMod: Joi.string().alphanum().required().description('Key for signature token')
+});

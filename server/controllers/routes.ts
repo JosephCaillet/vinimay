@@ -284,6 +284,21 @@ module.exports = {
 				}}}
 			}
 		},
+		'/client/friends/{user}': {
+			put: {
+				description: 'Accept or decline a friend request',
+				notes: 'Accept or decline a given friend request',
+				handler: friends.updateRequest,
+				validate: {
+					payload: Joi.object({
+						accepted: Joi.boolean().required().description('Set to true if the request is accepted, false if it is declined')
+					}).label('Friend request update input'),
+					params: {
+						user: commons.user.required().description('Friend request to update')
+					}
+				}
+			}
+		},
 		'/server/friends': {
 			post: {
 				description: 'Save friend request',
@@ -305,6 +320,12 @@ module.exports = {
 						}
 					}
 				}
+			},
+			put: {
+				description: 'Accept the friend request',
+				notes: 'Process the friend request acceptation as described at https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#accepting-the-request',
+				handler: friends.accept,
+				validate: { payload: friends.acceptationSchema }
 			}
 		},
 		'/server/posts': {

@@ -99,7 +99,7 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 			}
 			let timestamp = parseInt(request.params.timestamp);
 			clientLog.debug('Adding a reaction to', postAuthor.toString() + '\'s', 'post');
-			reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then((reaction) => {
+			reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then(() => {
 				clientLog.debug('Added a reaction to', postAuthor.toString() + '\'s', 'post');
 				return reply(null).code(204);
 			}).catch(e => utils.handleRequestError(postAuthor, e, clientLog, false, reply));
@@ -119,6 +119,19 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 		return reply(Boom.wrap(e));
 	}
 
+	let postExists: boolean;		
+	try {
+		postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
+	} catch(e) {
+		return reply(Boom.wrap(e));
+	}
+	
+	if(!postExists) {
+		clientLog.debug('Post does not exist');
+		return reply(Boom.notFound())
+	};
+
+
 	let user = await utils.getUser(username);
 	let author = new User(request.params.user);
 
@@ -133,12 +146,13 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 				username: author.username,
 				creationTs: request.params.timestamp
 			}}).then((destroyedRows: number) => {
-				// If no row was destroyed, 
+				// If no row was destroyed, it means the reaction didn't exist
+				// in the first place
 				if(!destroyedRows) return reply(Boom.notFound());
 				return reply(null).code(204);
 			});
 		} else {
-			// TODO: Suppoer multi-user
+			// TODO: Support multi-user
 		}
 	} else {
 		instance.model('friend').findOne({ where: {
