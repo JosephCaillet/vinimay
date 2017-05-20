@@ -274,6 +274,84 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Checking if acceptation has been saved",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array;",
+									"tests[\"The accepted array contains only one user\"] = responseJSON.accepted.length === 1;",
+									"tests[\"The user is Bob\"] = responseJSON.accepted[0].user === 'bob@localhost:3001';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if acceptation was saved by Bob",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array;",
+									"tests[\"The accepted array contains only one user\"] = responseJSON.accepted.length === 1;",
+									"tests[\"The user is Alice\"] = responseJSON.accepted[0].user === 'alice@localhost:3000';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -460,13 +538,13 @@
 									"var responseJSON = JSON.parse(responseBody);",
 									"",
 									"tests[\"Response code is 200\"] = responseCode.code === 200;",
-									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;",
+									"tests[\"Response contains an accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array;",
 									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
 									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
 									"tests[\"Response contains a sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array;",
-									"tests[\"The sent array contains only two users\"] = responseJSON.sent.length === 2;",
-									"tests[\"The new user is Frank\"] = responseJSON.sent[1].user === 'frank@localhost:3006';",
-									"tests[\"The request status is pending\"] = responseJSON.sent[1].status === 'pending';"
+									"tests[\"The sent array contains only one user\"] = responseJSON.sent.length === 1;",
+									"tests[\"The new user is Frank\"] = responseJSON.sent[0].user === 'frank@localhost:3006';",
+									"tests[\"The request status is pending\"] = responseJSON.sent[0].status === 'pending';"
 								]
 							}
 						}
@@ -511,7 +589,7 @@
 						}
 					],
 					"request": {
-						"url": "localhost:3001/v1/client/friends",
+						"url": "localhost:3006/v1/client/friends",
 						"method": "GET",
 						"header": [
 							{
