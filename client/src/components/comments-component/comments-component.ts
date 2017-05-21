@@ -25,7 +25,7 @@ export class CommentsComponent {
 	deleted = false
 
 	constructor(public dateFormater: DateFormaterService, private api: V1Service) {
-		this.commentForm = new FormGroup({ "comment": new FormControl('', Validators.required) })
+		this.commentForm = new FormGroup({ "comment": new FormControl('') })
 	}
 
 	ngOnInit() {

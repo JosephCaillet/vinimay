@@ -1,4 +1,4 @@
-import { IonicPage, ViewController } from 'ionic-angular';
+import { IonicPage, ViewController, LoadingController } from 'ionic-angular';
 import { Component, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { V1Service, FriendInput } from "../../providers/apiClient/index";
@@ -21,7 +21,7 @@ export class AddProfileModal {
 	addProfileForm: FormGroup
 	relationType = FriendInput.TypeEnum.Friend
 
-	constructor(private viewCtrl: ViewController, private api: V1Service) {
+	constructor(private viewCtrl: ViewController, private api: V1Service, private loadingCtrl: LoadingController) {
 		this.addProfileForm = new FormGroup({
 			"to": new FormControl('', Validators.compose([Validators.pattern(/.+@.+/), Validators.required])),
 			"type": new FormControl(FriendInput.TypeEnum.Friend, Validators.required)
@@ -34,13 +34,19 @@ export class AddProfileModal {
 
 	dismiss(sendRequest: boolean) {
 		if (sendRequest) {
+			let loading = this.loadingCtrl.create()
+			loading.present();
+
 			let friendRequest: FriendInput = {
 				"to": this.addProfileForm.controls['to'].value,
 				"type": this.addProfileForm.controls['type'].value
 			}
+
 			this.api.postV1ClientFriends(friendRequest).subscribe(friend => {
 				this.viewCtrl.dismiss(friendRequest, friend)//todo: display message if add friend and user is followed, and if not in followinf his public post will be followed.
+				loading.dismiss()
 			}, err => {
+				loading.dismiss()
 				console.error(err)
 			})
 
