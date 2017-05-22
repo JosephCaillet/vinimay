@@ -122,6 +122,74 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Delete the following",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204 No Content\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends/bob@localhost:3001",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accepted\": false\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if following is not here anymore",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
@@ -130,7 +198,43 @@
 			"description": "",
 			"item": [
 				{
-					"name": "Add Bob as friend",
+					"name": "Follow Bob",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains a valid user\"] = responseJSON.user.match(/.+@.+/);",
+									"tests[\"User is the one we follow\"] = responseJSON.user === 'bob@localhost:3001';",
+									"tests[\"Response contains a description\"] = !!responseJSON.description;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"following\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Upgrade Bob as friend",
 					"event": [
 						{
 							"listen": "test",
@@ -352,13 +456,698 @@
 						"description": ""
 					},
 					"response": []
+				},
+				{
+					"name": "Cancel the friendship",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204 No Content\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends/alice@localhost:3000",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accepted\": false\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if the request has been deleted by Bob",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if the cancelation was saved by Alice",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains a sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array;",
+									"tests[\"The sent array contains only one user\"] = responseJSON.sent.length === 1;",
+									"tests[\"The user is Bob\"] = responseJSON.sent[0].user === 'bob@localhost:3001';",
+									"tests[\"The request status is pending\"] = responseJSON.sent[0].status === 'declined';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete the declined request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204 No Content\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends/bob@localhost:3001",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accepted\": false\n}"
+						},
+						"description": ""
+					},
+					"response": []
 				}
 			]
 		},
 		{
-			"name": "3 - Conflicts",
+			"name": "3 - Declination",
 			"description": "",
 			"item": [
+				{
+					"name": "Add Bob as friend",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains a valid user\"] = responseJSON.user.match(/.+@.+/);",
+									"tests[\"User is the one we follow\"] = responseJSON.user === 'bob@localhost:3001';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if friend request is here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains a sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array;",
+									"tests[\"The sent array contains only one user\"] = responseJSON.sent.length === 1;",
+									"tests[\"The user is Bob\"] = responseJSON.sent[0].user === 'bob@localhost:3001';",
+									"tests[\"The request status is pending\"] = responseJSON.sent[0].status === 'pending';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if request was saved by Bob",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array;",
+									"tests[\"The incoming array contains only one user\"] = responseJSON.incoming.length === 1;",
+									"tests[\"The user is Alice\"] = responseJSON.incoming[0].user === 'alice@localhost:3000';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel the friendship",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204 No Content\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends/alice@localhost:3000",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accepted\": false\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if the request has been deleted by Bob",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if the cancelation was saved by Alice",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains a sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array;",
+									"tests[\"The sent array contains only one user\"] = responseJSON.sent.length === 1;",
+									"tests[\"The user is Bob\"] = responseJSON.sent[0].user === 'bob@localhost:3001';",
+									"tests[\"The request status is pending\"] = responseJSON.sent[0].status === 'declined';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete the declined request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204 No Content\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends/bob@localhost:3001",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accepted\": false\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4 - Cancelation",
+			"description": "",
+			"item": [
+				{
+					"name": "Add Bob as friend",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains a valid user\"] = responseJSON.user.match(/.+@.+/);",
+									"tests[\"User is the one we follow\"] = responseJSON.user === 'bob@localhost:3001';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if friend request is here",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains a sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array;",
+									"tests[\"The sent array contains only one user\"] = responseJSON.sent.length === 1;",
+									"tests[\"The user is Bob\"] = responseJSON.sent[0].user === 'bob@localhost:3001';",
+									"tests[\"The request status is pending\"] = responseJSON.sent[0].status === 'pending';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if request was saved by Bob",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array;",
+									"tests[\"The incoming array contains only one user\"] = responseJSON.incoming.length === 1;",
+									"tests[\"The user is Alice\"] = responseJSON.incoming[0].user === 'alice@localhost:3000';"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel the friendship",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204 No Content\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends/bob@localhost:3001",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accepted\": false\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if the request has been deleted by Bob",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Checking if the request has been deleted by Alice",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains an empty incoming array\"] = responseJSON.incoming && responseJSON.incoming instanceof Array && !responseJSON.incoming.length;",
+									"tests[\"Response contains an empty following array\"] = responseJSON.following && responseJSON.following instanceof Array && !responseJSON.following.length;",
+									"tests[\"Response contains an empty sent array\"] = responseJSON.sent && responseJSON.sent instanceof Array && !responseJSON.sent.length;",
+									"tests[\"Response contains an empty accepted array\"] = responseJSON.accepted && responseJSON.accepted instanceof Array && !responseJSON.accepted.length;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5 - Conflicts",
+			"description": "",
+			"item": [
+				{
+					"name": "Add Bob as friend",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response code is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"bob@localhost:3001\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Alice's friend request",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204 No Content\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3001/v1/client/friends/alice@localhost:3000",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"accepted\": true\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
 				{
 					"name": "Add Bob as friend",
 					"event": [
@@ -424,7 +1213,7 @@
 			]
 		},
 		{
-			"name": "4 - Profile exists",
+			"name": "6 - Profile exists",
 			"description": "",
 			"item": [
 				{
@@ -609,7 +1398,7 @@
 			]
 		},
 		{
-			"name": "5 - Self",
+			"name": "7 - Self",
 			"description": "",
 			"item": [
 				{
