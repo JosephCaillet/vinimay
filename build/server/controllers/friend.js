@@ -140,7 +140,7 @@ function del(request, reply) {
     let user = new users_1.User(request.params.user);
     clientLog.debug('Deleting declined request from', user.toString());
     friendUtils.getFriend(user, username_1.username).then((friend) => {
-        if (!friend || friend.get('status') !== friends_1.Status[friends_1.Status.declined] || friend.get('status') !== friends_1.Status[friends_1.Status.following]) {
+        if (!friend || (friend.get('status') !== friends_1.Status[friends_1.Status.declined] && friend.get('status') !== friends_1.Status[friends_1.Status.following])) {
             clientLog.debug('No request to delete');
             throw Boom.notFound();
         }

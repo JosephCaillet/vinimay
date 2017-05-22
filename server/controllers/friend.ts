@@ -142,7 +142,7 @@ export function del(request: Hapi.Request, reply: Hapi.IReply) {
 	let user = new User(request.params.user);
 	clientLog.debug('Deleting declined request from', user.toString());
 	friendUtils.getFriend(user, username).then((friend) => {
-		if(!friend || friend.get('status') !== Status[Status.declined] || friend.get('status') !== Status[Status.following]) {
+		if(!friend || (friend.get('status') !== Status[Status.declined] && friend.get('status') !== Status[Status.following])) {
 			clientLog.debug('No request to delete');
 			throw Boom.notFound();
 		}
