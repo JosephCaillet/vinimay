@@ -219,26 +219,28 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 					throw e;
 				}				
 			} else {
-				let schema = commons.user.required().label('Reaction author')
-				let err;
-				if(err = Joi.validate(request.payload.author, schema).error) {
-					throw Boom.badRequest(err);
-				}
-
-				author = new User(request.payload.author);
-				// Check if we know the author
-				let knownAuthor = !!(await instance.model('profile').count({where: {
-					url: author.instance,
-					username: author.username
-				}}));
-				
-				// If we don't know the author, save it
-				if(!knownAuthor) {
-					await instance.model('profile').create({
-						url: author.instance,
-						username: author.username
-					});
-				}
+				// let schema = commons.user.required().label('Reaction author')
+				// let err;
+				// if(err = Joi.validate(request.payload.author, schema).error) {
+				// 	throw Boom.badRequest(err);
+				// }
+				// 
+				// author = new User(request.payload.author);
+				// // Check if we know the author
+				// let knownAuthor = !!(await instance.model('profile').count({where: {
+				// 	url: author.instance,
+				// 	username: author.username
+				// }}));
+				// 
+				// // If we don't know the author, save it
+				// if(!knownAuthor) {
+				// 	await instance.model('profile').create({
+				// 		url: author.instance,
+				// 		username: author.username
+				// 	});
+				// }
+				serverLog.debug('Reactions on a posts are currently only supported between friends, even in public');
+				throw Boom.forbidden();
 				
 				// TODO: Ask the server for confirmation on the addition
 			}
@@ -342,6 +344,8 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 				throw Boom.unauthorized('WRONG_SIGNATURE');
 			}
 		} else {
+			serverLog.debug('Reactions on a posts are currently only supported between friends, even in public');
+			throw Boom.forbidden();
 			// TODO: Ask the reaction's author's server to confirm the deletion
 		}
 
