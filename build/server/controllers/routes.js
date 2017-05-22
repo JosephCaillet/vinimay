@@ -281,6 +281,29 @@ module.exports = {
                         } } }
             }
         },
+        '/client/friends/{user}': {
+            put: {
+                description: 'Accept or decline a friend request',
+                notes: 'Accept or decline a given friend request',
+                handler: friends.updateRequest,
+                validate: {
+                    payload: Joi.object({
+                        accepted: Joi.boolean().required().description('Set to true if the request is accepted, false if it is declined')
+                    }).label('Friend request update input'),
+                    params: {
+                        user: commons.user.required().description('Friend request to update')
+                    }
+                }
+            },
+            delete: {
+                description: 'Delete a declined friend request or a following',
+                notes: 'Delete a given declined friend request or a following',
+                handler: friends.del,
+                validate: { params: {
+                        user: commons.user.required().description('Friend request to update')
+                    } }
+            }
+        },
         '/server/friends': {
             post: {
                 description: 'Save friend request',
@@ -302,6 +325,21 @@ module.exports = {
                         }
                     }
                 }
+            },
+            put: {
+                description: 'Accept the friend request',
+                notes: 'Process the friend request acceptation as described at https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#accepting-the-request',
+                handler: friends.accept,
+                validate: { payload: friends.acceptationSchema }
+            },
+            delete: {
+                description: 'Decline/Cancel the friend request/the friendship',
+                notes: 'Depending on the context, decline or cancel a friend request, or cancel the friend relationship',
+                handler: friends.decline,
+                validate: { payload: Joi.object({
+                        token: Joi.string().alphanum().required().description('The token identifying the relationship'),
+                        signature: Joi.string().alphanum().optional().description('Request signature, required if the frienship was previously accepted')
+                    }).label('Deletion server input') }
             }
         },
         '/server/posts': {

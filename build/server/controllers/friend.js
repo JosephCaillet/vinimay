@@ -110,6 +110,137 @@ async function create(request, reply) {
     }
 }
 exports.create = create;
+function updateRequest(request, reply) {
+    let friend = new users_1.User(request.params.user);
+    if (request.payload.accepted) {
+        clientLog.debug('Accepting friend request from', friend.toString());
+        friendUtils.acceptFriendRequest(friend, username_1.username)
+            .then(() => reply(null).code(204)).catch((e) => {
+            if (e.isBoom)
+                return reply(e);
+            else
+                return utils.handleRequestError(friend, e, clientLog, false, reply);
+        });
+    }
+    else if (!request.payload.accepted && typeof request.payload.accepted === 'boolean') {
+        friendUtils.declineFriendRequest(friend, username_1.username)
+            .then(() => reply(null).code(204)).catch((e) => {
+            if (e.isBoom)
+                return reply(e);
+            else
+                return utils.handleRequestError(friend, e, clientLog, false, reply);
+        });
+    }
+    else {
+        return reply(Boom.badRequest());
+    }
+}
+exports.updateRequest = updateRequest;
+function del(request, reply) {
+    let user = new users_1.User(request.params.user);
+    clientLog.debug('Deleting declined request from', user.toString());
+    friendUtils.getFriend(user, username_1.username).then((friend) => {
+        if (!friend || (friend.get('status') !== friends_1.Status[friends_1.Status.declined] && friend.get('status') !== friends_1.Status[friends_1.Status.following])) {
+            clientLog.debug('No request to delete');
+            throw Boom.notFound();
+        }
+        return friend.destroy();
+    }).then(() => reply(null).code(204))
+        .catch((e) => {
+        if (e.isBoom)
+            return reply(e);
+        else
+            return reply(Boom.wrap(e));
+    });
+}
+exports.del = del;
+async function accept(request, reply) {
+    let username = utils.getUsername(request);
+    let user = await utils.getUser(username);
+    let friendInstance;
+    try {
+        friendInstance = await utils.getFriendByToken(username, request.payload.tempToken);
+    }
+    catch (e) {
+        serverLog.warn('Could not retrieve friend for token', request.payload.tempToken);
+        return reply(Boom.notFound());
+    }
+    let friend = new users_1.User(friendInstance.username, friendInstance.url);
+    switch (request.payload.step) {
+        case 1:
+            friendUtils.handleStepOne(username, request.payload)
+                .then((mods) => commons.checkAndSendSchema(mods, exports.modsSchema, serverLog, reply))
+                .catch((e) => {
+                if (e.isBoom)
+                    return reply(e);
+                else
+                    return reply(Boom.wrap(e));
+            });
+            break;
+        case 2:
+            friendUtils.handleStepTwo(user, request.payload)
+                .then(() => reply(null).code(204))
+                .catch((e) => {
+                if (e.isBoom)
+                    return reply(e);
+                else
+                    return reply(Boom.wrap(e));
+            });
+            break;
+    }
+}
+exports.accept = accept;
+function decline(request, reply) {
+    let username = utils.getUsername(request);
+    sequelizeWrapper_1.SequelizeWrapper.getInstance(username).model('friend').findOne({ where: {
+            id_token: request.payload.token
+        } }).then((friend) => {
+        let statuses = [
+            friends_1.Status[friends_1.Status.pending],
+            friends_1.Status[friends_1.Status.incoming],
+            friends_1.Status[friends_1.Status.accepted]
+        ];
+        if (!friend || statuses.indexOf(friend.get('status')) === -1) {
+            serverLog.warn('Could not retrieve friend for token', request.payload.token);
+            throw Boom.notFound();
+        }
+        let user = new users_1.User(friend.get('username'), friend.get('url'));
+        if (friend.get('status') === friends_1.Status[friends_1.Status.incoming]) {
+            serverLog.debug('Removing the friend request from', user.toString());
+            return friend.destroy();
+        }
+        else {
+            // If we're cancelling an existing relationship, we have to sign the
+            // request
+            if (friend.get('status') === friends_1.Status[friends_1.Status.accepted]) {
+                if (!request.payload.signature) {
+                    serverLog.debug('No signature provided');
+                    throw Boom.badRequest();
+                }
+                let url = username + '@' + request.info.host + request.url.path;
+                let signature = utils.computeSignature('DELETE', url, {
+                    token: request.payload.token
+                }, friend.get('signature_token'));
+                if (signature !== request.payload.signature) {
+                    serverLog.debug('Signature mismatch');
+                    throw Boom.unauthorized('WRONG_SIGNATURE');
+                }
+            }
+            serverLog.debug('Setting friend status to declined and removing tokens');
+            friend.set('id_token', null);
+            friend.set('signature_token', null);
+            friend.set('status', friends_1.Status[friends_1.Status.declined]);
+            return friend.save();
+        }
+    }).then(() => reply(null).code(204))
+        .catch((e) => {
+        if (e.isBoom)
+            return reply(e);
+        else
+            return reply(Boom.wrap(e));
+    });
+}
+exports.decline = decline;
 function saveFriendRequest(request, reply) {
     let username = utils.getUsername(request);
     let from = new users_1.User(request.payload.from);
@@ -124,7 +255,7 @@ function saveFriendRequest(request, reply) {
         serverLog.debug('Couldn\'t find local user');
         return reply(Boom.notFound(e));
     }
-    friendUtils.create(friends_1.Status.incoming, from, username)
+    friendUtils.create(friends_1.Status.incoming, from, username, tempToken)
         .then((description) => {
         let res = {
             user: from.toString()
@@ -154,3 +285,23 @@ exports.friendsSchema = Joi.object({
     sent: Joi.array().required().items(exports.friendSentSchema).label('FriendsSent').description('Sent (pending) friend requests'),
     following: Joi.array().required().items(exports.friendSchema).label('FriendsFollowings').description('People followed by the user'),
 }).label('Friends');
+exports.acceptationSchema = Joi.object({
+    step: Joi.number().valid(1, 2).required().description('The identifier of the step'),
+    tempToken: Joi.string().alphanum().required().description('The temporary token used during the transaction'),
+    idTokenDh: Joi.object({
+        generator: Joi.string().alphanum().required().description('The Diffie-Hellman generator'),
+        prime: Joi.string().alphanum().required().description('The Diffie-Hellman prime number'),
+        mod: Joi.string().alphanum().required().description('The Diffie-Hellman modulo')
+    }).when('step', { is: 1, then: Joi.required(), otherwise: Joi.forbidden() }).label('idToken DH').description('Diffie-Hellman for the idToken'),
+    sigTokenDh: Joi.object({
+        generator: Joi.string().alphanum().required().description('The Diffie-Hellman generator'),
+        prime: Joi.string().alphanum().required().description('The Diffie-Hellman prime number'),
+        mod: Joi.string().alphanum().required().description('The Diffie-Hellman modulo')
+    }).when('step', { is: 1, then: Joi.required(), otherwise: Joi.forbidden() }).label('idToken DH').description('Diffie-Hellman for the signature token'),
+    idToken: Joi.string().alphanum().when('step', { is: 2, then: Joi.required(), otherwise: Joi.forbidden() }).description('The computed idToken'),
+    signature: Joi.string().alphanum().when('step', { is: 2, then: Joi.required(), otherwise: Joi.forbidden() }).description('The signature computed with the computed signature token')
+}).label('Friend acceptation');
+exports.modsSchema = Joi.object({
+    idTokenMod: Joi.string().alphanum().required().description('Key for idToken'),
+    sigTokenMod: Joi.string().alphanum().required().description('Key for signature token')
+});

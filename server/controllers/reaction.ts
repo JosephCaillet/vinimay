@@ -99,7 +99,7 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 			}
 			let timestamp = parseInt(request.params.timestamp);
 			clientLog.debug('Adding a reaction to', postAuthor.toString() + '\'s', 'post');
-			reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then((reaction) => {
+			reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then(() => {
 				clientLog.debug('Added a reaction to', postAuthor.toString() + '\'s', 'post');
 				return reply(null).code(204);
 			}).catch(e => utils.handleRequestError(postAuthor, e, clientLog, false, reply));
@@ -126,6 +126,17 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 
 	// Is the post local
 	if(!user.instance.localeCompare(author.instance)) {
+		let postExists: boolean;		
+		try {
+			postExists = await postUtils.exists(username, parseInt(request.params.timestamp));
+		} catch(e) {
+			return reply(Boom.wrap(e));
+		}
+		
+		if(!postExists) {
+			clientLog.debug('Post does not exist');
+			return reply(Boom.notFound())
+		}
 		// Is the post from the current user
 		if(!user.username.localeCompare(author.username)) {
 			instance.model('reaction').destroy({ where: {
@@ -133,12 +144,13 @@ export async function del(request: Hapi.Request, reply: Hapi.IReply) {
 				username: author.username,
 				creationTs: request.params.timestamp
 			}}).then((destroyedRows: number) => {
-				// If no row was destroyed, 
+				// If no row was destroyed, it means the reaction didn't exist
+				// in the first place
 				if(!destroyedRows) return reply(Boom.notFound());
 				return reply(null).code(204);
 			});
 		} else {
-			// TODO: Suppoer multi-user
+			// TODO: Support multi-user
 		}
 	} else {
 		instance.model('friend').findOne({ where: {
@@ -207,26 +219,28 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 					throw e;
 				}				
 			} else {
-				let schema = commons.user.required().label('Reaction author')
-				let err;
-				if(err = Joi.validate(request.payload.author, schema).error) {
-					throw Boom.badRequest(err);
-				}
-
-				author = new User(request.payload.author);
-				// Check if we know the author
-				let knownAuthor = !!(await instance.model('profile').count({where: {
-					url: author.instance,
-					username: author.username
-				}}));
-				
-				// If we don't know the author, save it
-				if(!knownAuthor) {
-					await instance.model('profile').create({
-						url: author.instance,
-						username: author.username
-					});
-				}
+				// let schema = commons.user.required().label('Reaction author')
+				// let err;
+				// if(err = Joi.validate(request.payload.author, schema).error) {
+				// 	throw Boom.badRequest(err);
+				// }
+				// 
+				// author = new User(request.payload.author);
+				// // Check if we know the author
+				// let knownAuthor = !!(await instance.model('profile').count({where: {
+				// 	url: author.instance,
+				// 	username: author.username
+				// }}));
+				// 
+				// // If we don't know the author, save it
+				// if(!knownAuthor) {
+				// 	await instance.model('profile').create({
+				// 		url: author.instance,
+				// 		username: author.username
+				// 	});
+				// }
+				serverLog.debug('Reactions on a posts are currently only supported between friends, even in public');
+				throw Boom.forbidden();
 				
 				// TODO: Ask the server for confirmation on the addition
 			}
@@ -283,17 +297,24 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 	let instance: sequelize.Sequelize;
 
 	try { instance = SequelizeWrapper.getInstance(username); }
-	catch(e) { return reply(Boom.notFound()) }
+	catch(e) {
+		serverLog.debug('Could not find the local user');
+		return reply(Boom.notFound());
+	}
 
 	let reaction: sequelize.Instance<any>;
 	let reactionAuthor = new User(request.payload.author);
+	serverLog.debug('Deleting reaction from', reactionAuthor.toString(), 'on', request.params.timestamp);
 	
 	instance.model('reaction').findOne({ where: {
 			url: reactionAuthor.instance,
 			username: reactionAuthor.username,
 			creationTs: request.params.timestamp
 	}}).then((res: sequelize.Instance<any>) => {
-		if(!res) throw Boom.notFound();
+		if(!res) {
+			serverLog.debug('Could not find the reaction');
+			throw Boom.notFound();
+		}
 		reaction = res;
 
 		// No need to verify if the author's here if we have an idtoken
@@ -309,7 +330,10 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 	}).then((friend) => {
 		// If we don't know the user, it may be someone trying to exploit the
 		// API to retrieve posts
-		if(!friend) throw Boom.notFound();
+		if(!friend) {
+			serverLog.debug('Could not find the remote user in the database');
+			throw Boom.notFound();
+		}
 		// Check if the author is a friend. If so, we verify the signature
 		if(friend && friend.id_token && friend.signature_token) {
 			let url = user + request.path;
@@ -320,6 +344,8 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 				throw Boom.unauthorized('WRONG_SIGNATURE');
 			}
 		} else {
+			serverLog.debug('Reactions on a posts are currently only supported between friends, even in public');
+			throw Boom.forbidden();
 			// TODO: Ask the reaction's author's server to confirm the deletion
 		}
 

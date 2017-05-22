@@ -22,9 +22,12 @@ import { Comment } from '../model/comment';
 import { CommentInput } from '../model/commentInput';
 import { CommentsArray } from '../model/commentsArray';
 import { CommentsResponse } from '../model/commentsResponse';
+import { DeletionServerInput } from '../model/deletionServerInput';
 import { Friend } from '../model/friend';
+import { FriendAcceptation } from '../model/friendAcceptation';
 import { FriendInput } from '../model/friendInput';
 import { FriendRequest } from '../model/friendRequest';
+import { FriendRequestUpdateInput } from '../model/friendRequestUpdateInput';
 import { Friends } from '../model/friends';
 import { Post } from '../model/post';
 import { PostInput } from '../model/postInput';
@@ -87,6 +90,22 @@ export class V1Service {
     }
 
     /**
+     * Delete a declined friend request or a following
+     * Delete a given declined friend request or a following
+     * @param user Friend request to update
+     */
+    public deleteV1ClientFriendsUser(user: string, extraHttpRequestParams?: any): Observable<string> {
+        return this.deleteV1ClientFriendsUserWithHttpInfo(user, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Delete a single post
      * Delete a single post using its creation timestamp. Further documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#deletion).
      * @param timestamp The post&#39;s creation timestamp
@@ -128,6 +147,22 @@ export class V1Service {
      */
     public deleteV1ClientPostsUserTimestampReactions(user: string, timestamp: number, extraHttpRequestParams?: any): Observable<{}> {
         return this.deleteV1ClientPostsUserTimestampReactionsWithHttpInfo(user, timestamp, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
+     * Decline/Cancel the friend request/the friendship
+     * Depending on the context, decline or cancel a friend request, or cancel the friend relationship
+     * @param body 
+     */
+    public deleteV1ServerFriends(body?: DeletionServerInput, extraHttpRequestParams?: any): Observable<string> {
+        return this.deleteV1ServerFriendsWithHttpInfo(body, extraHttpRequestParams)
             .map((response: Response) => {
                 if (response.status === 204) {
                     return undefined;
@@ -454,6 +489,23 @@ export class V1Service {
     }
 
     /**
+     * Accept or decline a friend request
+     * Accept or decline a given friend request
+     * @param user Friend request to update
+     * @param body 
+     */
+    public putV1ClientFriendsUser(user: string, body?: FriendRequestUpdateInput, extraHttpRequestParams?: any): Observable<string> {
+        return this.putV1ClientFriendsUserWithHttpInfo(user, body, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+    /**
      * Update data on the current user
      * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
      * @param body 
@@ -469,6 +521,59 @@ export class V1Service {
             });
     }
 
+    /**
+     * Accept the friend request
+     * Process the friend request acceptation as described at https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#accepting-the-request
+     * @param body 
+     */
+    public putV1ServerFriends(body?: FriendAcceptation, extraHttpRequestParams?: any): Observable<string> {
+        return this.putV1ServerFriendsWithHttpInfo(body, extraHttpRequestParams)
+            .map((response: Response) => {
+                if (response.status === 204) {
+                    return undefined;
+                } else {
+                    return response.json();
+                }
+            });
+    }
+
+
+    /**
+     * Delete a declined friend request or a following
+     * Delete a given declined friend request or a following
+     * @param user Friend request to update
+     */
+    public deleteV1ClientFriendsUserWithHttpInfo(user: string, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/friends/${user}'
+                    .replace('${' + 'user' + '}', String(user));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling deleteV1ClientFriendsUser.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
 
     /**
      * Delete a single post
@@ -587,6 +692,41 @@ export class V1Service {
         let requestOptions: RequestOptionsArgs = new RequestOptions({
             method: RequestMethod.Delete,
             headers: headers,
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Decline/Cancel the friend request/the friendship
+     * Depending on the context, decline or cancel a friend request, or cancel the friend relationship
+     * @param body 
+     */
+    public deleteV1ServerFriendsWithHttpInfo(body?: DeletionServerInput, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/friends';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Delete,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
             search: queryParameters,
             withCredentials:true
         });
@@ -1397,12 +1537,88 @@ export class V1Service {
     }
 
     /**
+     * Accept or decline a friend request
+     * Accept or decline a given friend request
+     * @param user Friend request to update
+     * @param body 
+     */
+    public putV1ClientFriendsUserWithHttpInfo(user: string, body?: FriendRequestUpdateInput, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/client/friends/${user}'
+                    .replace('${' + 'user' + '}', String(user));
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+        // verify required parameter 'user' is not null or undefined
+        if (user === null || user === undefined) {
+            throw new Error('Required parameter user was null or undefined when calling putV1ClientFriendsUser.');
+        }
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
      * Update data on the current user
      * Update data on the current user. Full documentation is available [here](https://github.com/JosephCaillet/vinimay/wiki/Client-to-server-API#update).
      * @param body 
      */
     public putV1ClientMeWithHttpInfo(body?: UserDataInput, extraHttpRequestParams?: any): Observable<Response> {
         const path = this.basePath + '/v1/client/me';
+
+        let queryParameters = new URLSearchParams();
+        let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845
+
+
+        // to determine the Accept header
+        let produces: string[] = [
+        ];
+
+            
+        headers.set('Content-Type', 'application/json');
+
+        let requestOptions: RequestOptionsArgs = new RequestOptions({
+            method: RequestMethod.Put,
+            headers: headers,
+            body: body == null ? '' : JSON.stringify(body), // https://github.com/angular/angular/issues/10612
+            search: queryParameters,
+            withCredentials:true
+        });
+
+        // https://github.com/swagger-api/swagger-codegen/issues/4037
+        if (extraHttpRequestParams) {
+            requestOptions = (<any>Object).assign(requestOptions, extraHttpRequestParams);
+        }
+
+        return this.http.request(path, requestOptions);
+    }
+
+    /**
+     * Accept the friend request
+     * Process the friend request acceptation as described at https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#accepting-the-request
+     * @param body 
+     */
+    public putV1ServerFriendsWithHttpInfo(body?: FriendAcceptation, extraHttpRequestParams?: any): Observable<Response> {
+        const path = this.basePath + '/v1/server/friends';
 
         let queryParameters = new URLSearchParams();
         let headers = new Headers(this.defaultHeaders.toJSON()); // https://github.com/angular/angular/issues/6845

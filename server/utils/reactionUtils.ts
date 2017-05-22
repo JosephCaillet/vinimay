@@ -24,8 +24,8 @@ const log = require('printit')({
 	prefix: 'Utils:Reactions'
 });
 
-export function createRemoteReaction(author: User, user: User, timestamp: number, idtoken, sigtoken): Promise<Comment> {
-	return new Promise<Comment>((ok, ko) => {
+export function createRemoteReaction(author: User, user: User, timestamp: number, idtoken, sigtoken): Promise<any> {
+	return new Promise<any>((ok, ko) => {
 		let params: any = {
 			timestamp: timestamp,
 			author: author.toString()

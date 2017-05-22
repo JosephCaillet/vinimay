@@ -88,7 +88,7 @@ async function add(request, reply) {
             }
             let timestamp = parseInt(request.params.timestamp);
             clientLog.debug('Adding a reaction to', postAuthor.toString() + '\'s', 'post');
-            reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then((reaction) => {
+            reactionUtils.createRemoteReaction(author, postAuthor, timestamp, idtoken, sigtoken).then(() => {
                 clientLog.debug('Added a reaction to', postAuthor.toString() + '\'s', 'post');
                 return reply(null).code(204);
             }).catch(e => utils.handleRequestError(postAuthor, e, clientLog, false, reply));
@@ -113,6 +113,17 @@ async function del(request, reply) {
     let tsPost = parseInt(request.params.timestamp);
     // Is the post local
     if (!user.instance.localeCompare(author.instance)) {
+        let postExists;
+        try {
+            postExists = await postUtils.exists(username_1.username, parseInt(request.params.timestamp));
+        }
+        catch (e) {
+            return reply(Boom.wrap(e));
+        }
+        if (!postExists) {
+            clientLog.debug('Post does not exist');
+            return reply(Boom.notFound());
+        }
         // Is the post from the current user
         if (!user.username.localeCompare(author.username)) {
             instance.model('reaction').destroy({ where: {
@@ -120,14 +131,15 @@ async function del(request, reply) {
                     username: author.username,
                     creationTs: request.params.timestamp
                 } }).then((destroyedRows) => {
-                // If no row was destroyed, 
+                // If no row was destroyed, it means the reaction didn't exist
+                // in the first place
                 if (!destroyedRows)
                     return reply(Boom.notFound());
                 return reply(null).code(204);
             });
         }
         else {
-            // TODO: Suppoer multi-user
+            // TODO: Support multi-user
         }
     }
     else {
@@ -197,24 +209,28 @@ async function serverAdd(request, reply) {
                 }
             }
             else {
-                let schema = commons.user.required().label('Reaction author');
-                let err;
-                if (err = Joi.validate(request.payload.author, schema).error) {
-                    throw Boom.badRequest(err);
-                }
-                author = new users_1.User(request.payload.author);
-                // Check if we know the author
-                let knownAuthor = !!(await instance.model('profile').count({ where: {
-                        url: author.instance,
-                        username: author.username
-                    } }));
-                // If we don't know the author, save it
-                if (!knownAuthor) {
-                    await instance.model('profile').create({
-                        url: author.instance,
-                        username: author.username
-                    });
-                }
+                // let schema = commons.user.required().label('Reaction author')
+                // let err;
+                // if(err = Joi.validate(request.payload.author, schema).error) {
+                // 	throw Boom.badRequest(err);
+                // }
+                // 
+                // author = new User(request.payload.author);
+                // // Check if we know the author
+                // let knownAuthor = !!(await instance.model('profile').count({where: {
+                // 	url: author.instance,
+                // 	username: author.username
+                // }}));
+                // 
+                // // If we don't know the author, save it
+                // if(!knownAuthor) {
+                // 	await instance.model('profile').create({
+                // 		url: author.instance,
+                // 		username: author.username
+                // 	});
+                // }
+                serverLog.debug('Reactions on a posts are currently only supported between friends, even in public');
+                throw Boom.forbidden();
                 // TODO: Ask the server for confirmation on the addition
             }
         }
@@ -274,17 +290,21 @@ async function serverDel(request, reply) {
         instance = sequelizeWrapper_1.SequelizeWrapper.getInstance(username);
     }
     catch (e) {
+        serverLog.debug('Could not find the local user');
         return reply(Boom.notFound());
     }
     let reaction;
     let reactionAuthor = new users_1.User(request.payload.author);
+    serverLog.debug('Deleting reaction from', reactionAuthor.toString(), 'on', request.params.timestamp);
     instance.model('reaction').findOne({ where: {
             url: reactionAuthor.instance,
             username: reactionAuthor.username,
             creationTs: request.params.timestamp
         } }).then((res) => {
-        if (!res)
+        if (!res) {
+            serverLog.debug('Could not find the reaction');
             throw Boom.notFound();
+        }
         reaction = res;
         // No need to verify if the author's here if we have an idtoken
         if (request.query.idToken && request.query.signature) {
@@ -300,8 +320,10 @@ async function serverDel(request, reply) {
     }).then((friend) => {
         // If we don't know the user, it may be someone trying to exploit the
         // API to retrieve posts
-        if (!friend)
+        if (!friend) {
+            serverLog.debug('Could not find the remote user in the database');
             throw Boom.notFound();
+        }
         // Check if the author is a friend. If so, we verify the signature
         if (friend && friend.id_token && friend.signature_token) {
             let url = user + request.path;
@@ -313,6 +335,8 @@ async function serverDel(request, reply) {
             }
         }
         else {
+            serverLog.debug('Reactions on a posts are currently only supported between friends, even in public');
+            throw Boom.forbidden();
             // TODO: Ask the reaction's author's server to confirm the deletion
         }
         // Check if the user is the reaction's author
