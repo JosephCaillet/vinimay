@@ -323,6 +323,15 @@ module.exports = {
                 notes: 'Process the friend request acceptation as described at https://github.com/JosephCaillet/vinimay/wiki/Server-to-server-API#accepting-the-request',
                 handler: friends.accept,
                 validate: { payload: friends.acceptationSchema }
+            },
+            delete: {
+                description: 'Decline/Cancel the friend request/the friendship',
+                notes: 'Depending on the context, decline or cancel a friend request, or cancel the friend relationship',
+                handler: friends.decline,
+                validate: { payload: Joi.object({
+                        token: Joi.string().alphanum().required().description('The token identifying the relationship'),
+                        signature: Joi.string().alphanum().optional().description('Request signature, required if the frienship was previously accepted')
+                    }).label('Deletion server input') }
             }
         },
         '/server/posts': {

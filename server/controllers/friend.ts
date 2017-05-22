@@ -126,16 +126,20 @@ export function updateRequest(request: Hapi.Request, reply: Hapi.IReply) {
 		.then(() => reply(null).code(204)).catch((e) => {
 			if(e.isBoom) return reply(e);
 			else return utils.handleRequestError(friend, e, clientLog, false, reply);
-		})
+		});
 	} else if(!request.payload.accepted && typeof request.payload.accepted === 'boolean') {
-		return reply(Boom.notImplemented());
+		friendUtils.declineFriendRequest(friend, username)
+		.then(() => reply(null).code(204)).catch((e) => {
+			if(e.isBoom) return reply(e);
+			else return utils.handleRequestError(friend, e, clientLog, false, reply);
+		});
 	} else {
 		return reply(Boom.badRequest());
 	}
 }
 
 export async function accept(request: Hapi.Request, reply: Hapi.IReply) {
-	let username = await utils.getUsername(request);
+	let username = utils.getUsername(request);
 	let user = await utils.getUser(username);
 	let friendInstance;
 	try {
@@ -164,6 +168,59 @@ export async function accept(request: Hapi.Request, reply: Hapi.IReply) {
 			});
 			break;
 	}
+}
+
+export function decline(request: Hapi.Request, reply: Hapi.IReply) {
+	let username = utils.getUsername(request);
+	SequelizeWrapper.getInstance(username).model('friend').findOne({where: {
+		id_token: request.payload.token
+	}}).then((friend: sequelize.Instance<any>): any => {
+		let statuses = [
+			Status[Status.pending],
+			Status[Status.incoming],
+			Status[Status.accepted]
+		];
+
+		if(!friend || statuses.indexOf(friend.get('status')) === -1) {
+			serverLog.warn('Could not retrieve friend for token', request.payload.token);
+			throw Boom.notFound();
+		}
+
+		let user = new User(friend.get('username'), friend.get('url'));
+
+		if(friend.get('status') === Status[Status.incoming]) {
+			serverLog.debug('Removing the friend request from', user.toString());
+			return friend.destroy();
+		} else {
+			// If we're cancelling an existing relationship, we have to sign the
+			// request
+			if(friend.get('status') === Status[Status.accepted]) {
+				if(!request.payload.signature) {
+					serverLog.debug('No signature provided');
+					throw Boom.badRequest();
+				}
+
+				let url = username + '@' + request.info.host + request.url.path;
+				let signature = utils.computeSignature('DELETE', url, {
+					token: request.payload.token
+				}, friend.get('signature_token'));
+
+				if(signature !== request.payload.signature) {
+					serverLog.debug('Signature mismatch');
+					throw Boom.unauthorized('WRONG_SIGNATURE');
+				}
+			}
+			serverLog.debug('Setting friend status to declined and removing tokens');
+			friend.set('id_token', null);
+			friend.set('signature_token', null);
+			friend.set('status', Status[Status.declined]);
+			return friend.save();
+		}
+	}).then(() => reply(null).code(204))
+	.catch((e) => {
+		if(e.isBoom) return reply(e);
+		else return reply(Boom.wrap(e));
+	});
 }
 
 export function saveFriendRequest(request: Hapi.Request, reply: Hapi.IReply) {

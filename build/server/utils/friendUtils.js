@@ -326,7 +326,7 @@ function handleStepTwo(user, payload) {
         let friend = new users_1.User(friendInstance.username, friendInstance.url);
         if (!acceptations[payload.tempToken]) {
             log.warn('Could not find previously in-memory stored data on the ongoing acceptation');
-            throw Boom.notFound();
+            return reject(Boom.notFound());
         }
         log.debug('Received acceptation data (step 2) from', friend.toString());
         let acceptation = acceptations[payload.tempToken];
@@ -369,3 +369,53 @@ function handleStepTwo(user, payload) {
     });
 }
 exports.handleStepTwo = handleStepTwo;
+// Removes the friend request on the requesting server and sets it as declined on
+// the requested server (except for pending)
+function declineFriendRequest(user, username) {
+    return new Promise(async (resolve, reject) => {
+        log.debug('Starting friendship decline/cancel process for', user.toString());
+        let friend;
+        try {
+            friend = await getFriend(user, username);
+        }
+        catch (e) {
+            log.warn('Could not find friend request for', user.toString());
+            return reject(Boom.notFound());
+        }
+        let protocol;
+        let url = path.join(user.toString(), '/v1/server/friends');
+        if (commons.settings.forceHttp || url.indexOf('localhost') > -1)
+            protocol = 'http://';
+        else
+            protocol = 'https://';
+        let statuses = [
+            friends_1.Status[friends_1.Status.pending],
+            friends_1.Status[friends_1.Status.incoming],
+            friends_1.Status[friends_1.Status.accepted]
+        ];
+        if (statuses.indexOf(friend.get('status')) === -1) {
+            log.warn('Trying to decline a non existing request');
+            return reject(Boom.notFound());
+        }
+        let body = {
+            token: friend.get('id_token')
+        };
+        if (friend.get('status') === friends_1.Status[friends_1.Status.accepted]) {
+            log.debug('We are cancelling a relationship and signing the request');
+            // If we're cancelling an existing relationship, we have to sign the
+            // request
+            body.signature = utils.computeSignature('DELETE', url, body, friend.get('signature_token'));
+        }
+        request({
+            method: 'DELETE',
+            url: protocol + url,
+            body: body,
+            json: true,
+            headers: { 'Content-Type': 'application/json' },
+            timeout: commons.settings.timeout
+        }).then(() => {
+            return friend.destroy();
+        }).then(() => resolve()).catch(reject);
+    });
+}
+exports.declineFriendRequest = declineFriendRequest;

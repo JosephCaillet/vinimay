@@ -124,7 +124,6 @@ async function del(request, reply) {
             clientLog.debug('Post does not exist');
             return reply(Boom.notFound());
         }
-        ;
         // Is the post from the current user
         if (!user.username.localeCompare(author.username)) {
             instance.model('reaction').destroy({ where: {
