@@ -382,6 +382,10 @@ function declineFriendRequest(user, username) {
             log.warn('Could not find friend request for', user.toString());
             return reject(Boom.notFound());
         }
+        if (!friend) {
+            log.warn('Could not find friend request for', user.toString());
+            return reject(Boom.notFound());
+        }
         let protocol;
         let url = path.join(user.toString(), '/v1/server/friends');
         if (commons.settings.forceHttp || url.indexOf('localhost') > -1)

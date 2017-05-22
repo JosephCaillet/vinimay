@@ -138,6 +138,23 @@ export function updateRequest(request: Hapi.Request, reply: Hapi.IReply) {
 	}
 }
 
+export function del(request: Hapi.Request, reply: Hapi.IReply) {
+	let user = new User(request.params.user);
+	clientLog.debug('Deleting declined request from', user.toString());
+	friendUtils.getFriend(user, username).then((friend) => {
+		if(!friend || friend.get('status') !== Status[Status.declined] || friend.get('status') !== Status[Status.following]) {
+			clientLog.debug('No request to delete');
+			throw Boom.notFound();
+		}
+
+		return friend.destroy();
+	}).then(() => reply(null).code(204))
+	.catch((e) => {
+		if(e.isBoom) return reply(e);
+		else return reply(Boom.wrap(e));
+	});
+}
+
 export async function accept(request: Hapi.Request, reply: Hapi.IReply) {
 	let username = utils.getUsername(request);
 	let user = await utils.getUser(username);

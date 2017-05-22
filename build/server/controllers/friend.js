@@ -136,6 +136,24 @@ function updateRequest(request, reply) {
     }
 }
 exports.updateRequest = updateRequest;
+function del(request, reply) {
+    let user = new users_1.User(request.params.user);
+    clientLog.debug('Deleting declined request from', user.toString());
+    friendUtils.getFriend(user, username_1.username).then((friend) => {
+        if (!friend || friend.get('status') !== friends_1.Status[friends_1.Status.declined] || friend.get('status') !== friends_1.Status[friends_1.Status.following]) {
+            clientLog.debug('No request to delete');
+            throw Boom.notFound();
+        }
+        return friend.destroy();
+    }).then(() => reply(null).code(204))
+        .catch((e) => {
+        if (e.isBoom)
+            return reply(e);
+        else
+            return reply(Boom.wrap(e));
+    });
+}
+exports.del = del;
 async function accept(request, reply) {
     let username = utils.getUsername(request);
     let user = await utils.getUser(username);

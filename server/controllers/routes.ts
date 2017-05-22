@@ -297,6 +297,14 @@ module.exports = {
 						user: commons.user.required().description('Friend request to update')
 					}
 				}
+			},
+			delete: {
+				description: 'Delete a declined friend request or a following',
+				notes: 'Delete a given declined friend request or a following',
+				handler: friends.del,
+				validate: { params: {
+					user: commons.user.required().description('Friend request to update')
+				}}
 			}
 		},
 		'/server/friends': {
