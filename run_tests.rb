@@ -3,7 +3,7 @@ require 'open3'
 puts 'Building'
 
 `rm -rf build/server`
-`tsc -p server`
+puts `tsc -p server`
 
 if $?.exitstatus > 0
 	puts "Build failed"
@@ -49,7 +49,6 @@ def run_servers(tests)
 	ths.each { |thr| thr.join }
 end
 
-puts `ls`
 puts `VINIMAY_ENV=test ./resetdb.sh #{$users.join(" ")}`
 
 run_servers([ "me", "posts", "comments", "reactions" ])
