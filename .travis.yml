@@ -2,6 +2,6 @@ language: node_js
 node_js:
   - 7
 
-before_install:
+before_script:
   - npm install -g tsc newman --silent
   - cp settings.example.json settings.json
