@@ -49,7 +49,8 @@ def run_servers(tests)
 	ths.each { |thr| thr.join }
 end
 
-puts `VINIMAY_ENV=test ./resetdb.sh #{$users.join(" ")}`
+# puts `VINIMAY_ENV=test ./resetdb.sh #{$users.join(" ")}`
+puts `./resetdb.sh`
 
 run_servers([ "me", "posts", "comments", "reactions" ])
 
