@@ -49,7 +49,6 @@ def run_servers(tests)
 	ths.each { |thr| thr.join }
 end
 
-puts `pwd`
 puts `./resetdb.sh #{$users.join(" ")} --test`
 
 run_servers([ "me", "posts", "comments", "reactions" ])

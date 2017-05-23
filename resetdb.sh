@@ -12,18 +12,18 @@ for arg in $@; do
 	fi
 done
 
-if [[ $dir != "test" ]]; then
+if [[ $dir != "tests" ]]; then
 	echo "Detected development environment"
 	dir="dev"
 fi
 
 if [ $users -gt 0 ]; then
-	users=$args
+	db=$args
 else
-	users=$(find db/scripts/$dir -name "*.sql" -printf "%f\n" | cut -d. -f1)
+	db=$(find db/scripts/$dir -name "*.sql" -printf "%f\n" | cut -d. -f1)
 fi
 
-for user in $users; do
+for user in $db; do
 	if [ -f db/$user.db ]; then
 		rm db/$user.db
 	fi
