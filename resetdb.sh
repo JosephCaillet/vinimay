@@ -1,15 +1,24 @@
 #!/bin/bash
 
-if [[ $VINIMAY_ENV = "test" ]]; then
-	echo "Detected tests environment"
-	dir="tests"
-else
+users=0
+
+for arg in $@; do
+	if [[ $arg == "--test" ]]; then
+		echo "Detected tests environment"
+		dir="tests"
+	else
+		args="$args $arg"
+		((users++))
+	fi
+done
+
+if [[ $dir != "test" ]]; then
 	echo "Detected development environment"
 	dir="dev"
 fi
 
-if [ $# -gt 0 ]; then
-	users=$@
+if [ $users -gt 0 ]; then
+	users=$args
 else
 	users=$(find db/scripts/$dir -name "*.sql" -printf "%f\n" | cut -d. -f1)
 fi

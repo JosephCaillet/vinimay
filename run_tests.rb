@@ -26,7 +26,7 @@ def run_servers(tests)
 	started = []
 	$users.each do |user|
 		ths << Thread.new do
-			Open3.popen3("DEBUG=true npm run start:#{user}") do |stdin, stdout, stderr, thread|
+			Open3.popen3("npm run start:#{user}") do |stdin, stdout, stderr, thread|
 				puts "Starting server for #{user} with PID #{thread.pid}"
 				while line=stdout.gets do
 					if line =~ /Server running at/
@@ -50,7 +50,7 @@ def run_servers(tests)
 end
 
 puts `pwd`
-# puts `VINIMAY_ENV=test ./resetdb.sh #{$users.join(" ")}`
+puts `./resetdb.sh #{$users.join(" ")} --test`
 
 run_servers([ "me", "posts", "comments", "reactions" ])
 
