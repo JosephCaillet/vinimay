@@ -15,7 +15,9 @@ else
 fi
 
 for user in $users; do
-	rm db/$user.db > /dev/null 2>&1
+	if [ -f db/$user.db ]; then
+		rm db/$user.db
+	fi
 	cat db/scripts/initdb.sql | sqlite3 db/$user.db
 	echo "Database $user created with structure"
 	cat db/scripts/$dir/$user.sql | sqlite3 db/$user.db
