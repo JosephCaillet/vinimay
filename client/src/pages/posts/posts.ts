@@ -74,7 +74,6 @@ export class PostsPage {
 						this.api.deleteV1ClientPostsTimestamp(deletedPost.creationTs).subscribe(() => {
 							postComponent.deleted = true
 							setTimeout(() => {
-								console.log(this.posts)
 								this.posts = this.posts.filter((post) => {
 									return post.creationTs != deletedPost.creationTs
 								})
