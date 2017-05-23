@@ -53,6 +53,8 @@ puts `./resetdb.sh #{$users.join(" ")} --test`
 
 run_servers([ "me", "posts", "comments", "reactions" ])
 
+puts `Resetting databases...`
+
 puts `./resetdb.sh #{$users.join(" ")}`
 
 run_servers([ "friends" ])
