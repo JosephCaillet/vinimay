@@ -38,6 +38,7 @@ def run_servers(tests)
 							started.each do |pid|
 								puts "Killing process #{pid}"
 								Process.kill(:SIGINT, pid)
+								puts `ps -ef | grep build`
 							end
 						end
 					end
