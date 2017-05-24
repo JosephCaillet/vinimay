@@ -28,6 +28,11 @@ def run_servers(tests)
 		ths << Thread.new do
 			Open3.popen3("npm run start:#{user}") do |stdin, stdout, stderr, thread|
 				puts "Starting server for #{user} with PID #{thread.pid}"
+				Thread.new do
+					while line=stderr.gets
+						puts line
+					end
+				end
 				while line=stdout.gets do
 					if line =~ /Server running at/
 						started << thread.pid;
@@ -35,10 +40,15 @@ def run_servers(tests)
 						if started.length == $users.length
 							puts "All servers running!"
 							run_tests(tests)
-							ths.each do |thr|
-								puts "Killing process #{thr.pid}"
-								thr.kill
+							border = $users.length - 1
+							for i in 0..border do
+								pid = started[i]
+								Process.kill(:SIGINT, pid)
+								puts "Killed process #{pid}"
+								thr = ths[i]
+								thr.exit unless thr == Thread.current
 							end
+							Thread.current.exit
 						end
 					end
 				end
@@ -52,8 +62,6 @@ end
 puts `./resetdb.sh #{$users.join(" ")} --test`
 
 run_servers([ "me", "posts", "comments", "reactions" ])
-
-puts `Resetting databases...`
 
 puts `./resetdb.sh #{$users.join(" ")}`
 
