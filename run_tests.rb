@@ -35,6 +35,8 @@ def run_servers(tests)
 				end
 				while line=stdout.gets do
 					if line =~ /Server running at/
+						puts `ps -ef | grep "build/server"`
+						puts `ps -ef | grep "npm"`
 						started << thread.pid;
 						puts "#{started.length}/#{$users.length} servers started"
 						if started.length == $users.length
