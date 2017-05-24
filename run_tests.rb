@@ -50,6 +50,7 @@ def run_servers(tests)
 								thr = ths[i]
 								thr.exit unless thr == Thread.current
 							end
+							puts "Exiting current thread"
 							Thread.current.exit
 						end
 					end
