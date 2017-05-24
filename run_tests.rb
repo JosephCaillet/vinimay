@@ -35,10 +35,9 @@ def run_servers(tests)
 						if started.length == $users.length
 							puts "All servers running!"
 							run_tests(tests)
-							started.each do |pid|
-								puts "Killing process #{pid}"
-								Process.kill(:SIGINT, pid)
-								puts `ps -ef | grep build`
+							ths.each do |thr|
+								puts "Killing process #{thr.pid}"
+								thr.kill
 							end
 						end
 					end
