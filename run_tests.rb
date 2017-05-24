@@ -26,7 +26,7 @@ def run_servers(tests)
 	started = []
 	$users.each do |user|
 		ths << Thread.new do
-			Open3.popen3("npm run start:#{user}") do |stdin, stdout, stderr, thread|
+			Open3.popen3("bash -c \"npm run start:#{user}\"") do |stdin, stdout, stderr, thread|
 				puts "Starting server for #{user} with PID #{thread.pid}"
 				Thread.new do
 					while line=stderr.gets
