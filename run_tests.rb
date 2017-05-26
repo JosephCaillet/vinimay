@@ -1,7 +1,5 @@
 require 'open3'
 
-puts `echo $SHELL`
-
 puts 'Building'
 
 `rm -rf build/server`
@@ -51,7 +49,7 @@ def run_servers(tests)
 								thr.exit unless thr == Thread.current
 							end
 							puts "Exiting current thread"
-							exit
+							Thread.exit
 						end
 					end
 				end
@@ -62,12 +60,8 @@ def run_servers(tests)
 	ths.each { |thr| thr.join }
 end
 
-puts `./resetdb.sh #{$users.join(" ")} --test`
-
-run_servers([ "me", "posts", "comments", "reactions" ])
-
 puts `./resetdb.sh #{$users.join(" ")}`
 
-run_servers([ "friends" ])
+run_servers([ "friends", "me", "posts", "comments", "reactions" ])
 
 exit !$error

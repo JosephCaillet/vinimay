@@ -2,7 +2,7 @@
 	"variables": [],
 	"info": {
 		"name": "Friends",
-		"_postman_id": "49f98e5c-9c7b-4988-28b4-628437533762",
+		"_postman_id": "9067bee1-b415-75ba-1a79-4ef9e503cbd6",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
@@ -1393,6 +1393,48 @@
 						"body": {
 							"mode": "raw",
 							"raw": "{\n\t\"to\": \"alice@localhost:3000\",\n\t\"type\": \"friend\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8 - After",
+			"description": "",
+			"item": [
+				{
+					"name": "Follow Frank",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response code is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains a valid user\"] = responseJSON.user.match(/.+@.+/);",
+									"tests[\"User is the one we follow\"] = responseJSON.user === 'frank@localhost:3006';",
+									"tests[\"Response contains a description\"] = !!responseJSON.description;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "localhost:3000/v1/client/friends",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"to\": \"frank@localhost:3006\",\n\t\"type\": \"following\"\n}"
 						},
 						"description": ""
 					},
