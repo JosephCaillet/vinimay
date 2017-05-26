@@ -51,7 +51,7 @@ def run_servers(tests)
 								thr.exit unless thr == Thread.current
 							end
 							puts "Exiting current thread"
-							Thread.current.exit
+							exit
 						end
 					end
 				end
