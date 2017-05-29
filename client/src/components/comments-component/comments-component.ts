@@ -2,7 +2,7 @@ import { Comment } from '../../providers/apiClient/model/comment';
 import { User } from '../../providers/apiClient/model/user';
 import { Component, Input, ViewChild } from '@angular/core';
 import { Post, CommentsArray, V1Service } from "../../providers/apiClient/index";
-import { FormGroup, FormControl, Validators } from "@angular/forms";
+import { FormGroup, FormControl } from "@angular/forms";
 import { DateFormaterService } from "../../providers/date-formater";
 
 /**
