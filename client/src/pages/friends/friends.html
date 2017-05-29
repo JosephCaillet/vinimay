@@ -15,6 +15,11 @@
 
 <ion-content padding>
 
+	<button ion-button icon-left (click)="refreshFriend()" center>
+		<ion-icon name="refresh"></ion-icon>
+		{{ 'p.refresh' | translate }}
+	</button>
+
 	<h1>{{'f.add.title' | translate}}</h1>
 	<button ion-button icon-left (click)="addProfile()">
 		<ion-icon name="person-add"></ion-icon>
@@ -93,7 +98,7 @@
 				<ion-icon name="more"></ion-icon>
 				{{ 'f.following.details' | translate}}
 		</button>
-		<button ion-button icon-left small color="danger" (click)="removeFriend(follow)">
+		<button ion-button icon-left small color="danger" (click)="removeFollowing(follow)">
 			<ion-icon name="trash"></ion-icon>
 			{{ 'f.following.remove' | translate}}
 		</button>

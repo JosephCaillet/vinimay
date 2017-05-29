@@ -31,17 +31,24 @@ export class FriendsPage {
 		public alertCtrl: AlertController, public tr: TranslateService,
 		private loadingCtrl: LoadingController
 	) {
-		let loading = loadingCtrl.create(
-			{ "content": tr.instant('f.loading') }
+		this.refreshFriend()
+	}
+
+	refreshFriend(done: Function = () => { }) {
+		let loading = this.loadingCtrl.create(
+			{ "content": this.tr.instant('f.loading') }
 		)
 		loading.present();
 
-		api.getV1ClientFriends().subscribe((data) => {
+		this.api.getV1ClientFriends().subscribe((data) => {
 			this.friends = data
 			loading.dismiss()
+			done()
 		}, (err) => {
+			//500 yolo
 			console.error(err)
 			loading.dismiss()
+			done()
 		})
 	}
 
@@ -73,13 +80,20 @@ export class FriendsPage {
 			message: this.tr.instant('f.sent.modal.cancel_message', { user: friend.user }),
 			buttons: [
 				{
-					text: this.tr.instant('global.yes'),
-					handler: () => { }
+					text: this.tr.instant('global.no'),
+					role: 'cancel'
 				},
 				{
-					text: this.tr.instant('global.no'),
-					role: 'cancel',
-					handler: () => { }
+					text: this.tr.instant('global.yes'),
+					handler: () => {
+						this.api.putV1ClientFriendsUser(friend.user, { "accepted": false }).subscribe(() => {
+							this.friends.sent = this.friends.sent.filter(f => {
+								return f.user != friend.user
+							})
+						}, err => {
+							console.error(err)
+						})
+					}
 				}
 			]
 		})
@@ -87,6 +101,23 @@ export class FriendsPage {
 	}
 
 	hideRejectedSentRequest(friend: FriendSent) {
+		this.api.deleteV1ClientFriendsUser(friend.user).subscribe(() => {
+			this.friends.sent = this.friends.sent.filter(f => {
+				return f.user != friend.user
+			})
+		}, err => {
+			console.error(err)
+		})
+	}
+
+	removeFollowing(friend: FriendSent) {//todo: confirmation modal
+		this.api.deleteV1ClientFriendsUser(friend.user).subscribe(() => {
+			this.friends.following = this.friends.following.filter(f => {
+				return f.user != friend.user
+			})
+		}, err => {
+			console.error(err)
+		})
 	}
 
 	showFriendDetails(friend: Friend) {
@@ -99,6 +130,14 @@ export class FriendsPage {
 	}
 
 	acceptFriendRequest(friend: Friend) {
+		this.api.putV1ClientFriendsUser(friend.user, { "accepted": true }).subscribe(() => {
+			this.friends.incoming = this.friends.incoming.filter(f => {
+				return f.user != friend.user
+			})
+			this.friends.accepted.push({ "user": friend.user, "description": friend.description })
+		}, err => {
+			console.error(err)
+		})
 	}
 
 	declineFriendRequest(friend: Friend) {
@@ -107,12 +146,20 @@ export class FriendsPage {
 			message: this.tr.instant('f.received.modal.decline_message', { user: friend.user }),
 			buttons: [
 				{
-					text: this.tr.instant('global.yes'),
-					handler: () => { }
-				},
-				{
 					text: this.tr.instant('global.no'),
 					role: 'cancel'
+				},
+				{
+					text: this.tr.instant('global.yes'),
+					handler: () => {
+						this.api.putV1ClientFriendsUser(friend.user, { "accepted": false }).subscribe(() => {
+							this.friends.incoming = this.friends.incoming.filter(f => {
+								return f.user != friend.user
+							})
+						}, err => {
+							console.error(err)
+						})
+					}
 				}
 			]
 		})
@@ -125,12 +172,20 @@ export class FriendsPage {
 			message: this.tr.instant('f.friend.modal.remove_message', { user: friend.user }),
 			buttons: [
 				{
-					text: this.tr.instant('global.yes'),
-					handler: () => { }
-				},
-				{
 					text: this.tr.instant('global.no'),
 					role: 'cancel'
+				},
+				{
+					text: this.tr.instant('global.yes'),
+					handler: () => {
+						this.api.putV1ClientFriendsUser(friend.user, { "accepted": false }).subscribe(() => {
+							this.friends.accepted = this.friends.accepted.filter(f => {
+								return f.user != friend.user
+							})
+						}, err => {
+							console.error(err)
+						})
+					}
 				}
 			]
 		})
