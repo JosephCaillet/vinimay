@@ -46,6 +46,10 @@ export class AddProfileModal {
 				this.viewCtrl.dismiss(friendRequest, friend)//todo: display message if add friend and user is followed, and if not in followinf his public post will be followed.
 				loading.dismiss()
 			}, err => {
+				//503 serveur pas joingnable
+				//404 user existe pas sur le serveur
+				//403 ajout de sois même
+				//500 erreur serveur non ident
 				loading.dismiss()
 				console.error(err)
 			})

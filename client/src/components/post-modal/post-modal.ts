@@ -50,6 +50,7 @@ export class PostModal {
 				this.viewCtrl.dismiss(post)
 			}, (err) => {
 				loading.dismiss()
+				//500 yolo
 				console.error(err)
 			})
 		} else {

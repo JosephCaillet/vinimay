@@ -43,6 +43,7 @@ export class PostsPage {
 			loading.dismiss()
 			done()
 		}, (err) => {
+			//500 yolo
 			console.error(err)
 			loading.dismiss()
 			done()
@@ -79,6 +80,8 @@ export class PostsPage {
 								})
 							}, 1100)
 						}, (err) => {
+							//500 yolo
+							//404 post inexistant
 							console.error(err)
 						})
 					}
