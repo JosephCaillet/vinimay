@@ -4,10 +4,27 @@
 	"global": {
 		"yes": "Yes",
 		"no": "No",
-		"ok": "Ok"
+		"ok": "Ok",
+		"dismiss": "Dismiss",
+		"close": "Close"
+	},
+	"error": {
+		"0": {
+			"title": "Server unreachable",
+			"sub_title": "We cannot join your server."
+		},
+		"400": {
+			"title": "Bad request",
+			"sub_title": "It probably means that there is a bug in web client :("
+		},
+		"500": {
+			"title": "Internal server error",
+			"sub_title": "An unknown error occured on the server :("
+		}
 	},
 	"p": {
 		"title": "Posts",
+		"loading": "Loading posts...",
 		"creation": "Create post",
 		"refresh": "Refresh",
 		"refreshing": "Refreshing...",
@@ -26,7 +43,7 @@
 			"public": "Public"
 		},
 		"modal": {
-			"create" :{
+			"create": {
 				"title": "Post creation",
 				"privacy": "Privacy",
 				"placeholder": "My flowers are beautiful",
@@ -36,10 +53,15 @@
 				"title": "Post deletion",
 				"message": "Delelt this post?"
 			}
+		},
+		"error":{
+
 		}
 	},
 	"f": {
 		"title": "Friends",
+		"loading": "Loading friends...",
+		"refresh": "Refresh",
 		"add": {
 			"title": "Add friend",
 			"modal": {
@@ -86,9 +108,26 @@
 			"title": "Following",
 			"details": "Details",
 			"remove": "Remove"
+		},
+		"error": {
+			"503": {
+				"title": "This server is unreachable",
+				"sub_title": "Are you that this is the right server? If yes, it may be offline, try again later."
+			},
+			"404": {
+				"title": "This user does not exist on this server.",
+				"sub_title": "Are you sure that you entered the right user on the right server?"
+			},
+			"403": {
+				"title": "You cannot be friend with yourself.",
+				"sub_title": "What did you expect?"
+			}
 		}
 	},
 	"m": {
 		"title": "Me"
+	},
+	"h": {
+		"loading": "Loading profile data..."
 	}
 }

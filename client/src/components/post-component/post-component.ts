@@ -41,6 +41,8 @@ export class PostComponent {
 					this.post.reactions--
 					this.post.reacted = !this.post.reacted
 				}, err => {
+					//500 yolo
+					//404 post ou reaction inexistants
 					console.error(err)
 				})
 		} else {
@@ -49,6 +51,9 @@ export class PostComponent {
 					this.post.reactions++
 					this.post.reacted = !this.post.reacted
 				}, err => {
+					//500 yolo
+					//404 post non trouve ou user non trouve
+					//409 user à deja réagis
 					console.error(err)
 				})
 		}

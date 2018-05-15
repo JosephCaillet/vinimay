@@ -176,6 +176,7 @@ async function add(request, reply) {
 }
 exports.add = add;
 function update(request, reply) {
+    reply(Boom.notImplemented());
 }
 exports.update = update;
 async function del(request, reply) {
@@ -349,19 +350,22 @@ async function serverAdd(request, reply) {
                 }
             }
             else {
-                author = new users_1.User(request.payload.author);
-                // Check if we know the author
-                let knownAuthor = !!(await instance.model('profile').count({ where: {
-                        url: author.instance,
-                        username: author.username
-                    } }));
-                // If we don't know the author, save it
-                if (!knownAuthor) {
-                    await instance.model('profile').create({
-                        url: author.instance,
-                        username: author.username
-                    });
-                }
+                // author = new User(request.payload.author);
+                // // Check if we know the author
+                // let knownAuthor = !!(await instance.model('profile').count({where: {
+                // 	url: author.instance,
+                // 	username: author.username
+                // }}));
+                // 
+                // // If we don't know the author, save it
+                // if(!knownAuthor) {
+                // 	await instance.model('profile').create({
+                // 		url: author.instance,
+                // 		username: author.username
+                // 	});
+                // }
+                serverLog.debug('Comments on a posts are currently only supported between friends, even in public');
+                throw Boom.forbidden();
                 // TODO: Ask the server for confirmation on the addition
             }
         }
@@ -456,6 +460,8 @@ async function serverDel(request, reply) {
             }
         }
         else {
+            serverLog.debug('Comments on a posts are currently only supported between friends, even in public');
+            throw Boom.forbidden();
             // TODO: Ask the comment's author's server to confirm the deletion
         }
         // Check if the user is the comment's author

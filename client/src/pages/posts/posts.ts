@@ -1,6 +1,6 @@
 import { V1Service } from '../../providers/apiClient/api/v1.service';
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController, AlertController, Platform } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, AlertController, Platform, LoadingController } from 'ionic-angular';
 import { PostsArray, Post, User } from "../../providers/apiClient/index";
 import { PostModal } from "../../components/post-modal/post-modal";
 import { TranslateService } from "@ngx-translate/core";
@@ -26,18 +26,26 @@ export class PostsPage {
 		public navCtrl: NavController, public navParams: NavParams,
 		public api: V1Service, public modCtrl: ModalController,
 		private alertCtrl: AlertController, private tr: TranslateService,
-		public plt: Platform
+		public plt: Platform, private loadingCtrl: LoadingController
 	) {
 		this.retrievePost()
 		this.user = this.navParams.data
 	}
 
 	retrievePost(done: Function = () => {}) {
+		let loading = this.loadingCtrl.create(
+			{ "content": this.tr.instant('p.loading') }
+		)
+		loading.present();
+
 		this.api.getV1ClientPosts().subscribe((data) => {
 			this.posts = data.posts
+			loading.dismiss()
 			done()
 		}, (err) => {
+			//500 yolo
 			console.error(err)
+			loading.dismiss()
 			done()
 		})
 	}
@@ -47,7 +55,7 @@ export class PostsPage {
 	}
 
 	createPost() {
-		let modal = this.modCtrl.create(PostModal, null, { showBackdrop: false, enableBackdropDismiss: false })
+		let modal = this.modCtrl.create(PostModal, null)
 		modal.onDidDismiss((post) => {
 			if (post) {
 				this.posts.unshift(post)
@@ -67,12 +75,13 @@ export class PostsPage {
 						this.api.deleteV1ClientPostsTimestamp(deletedPost.creationTs).subscribe(() => {
 							postComponent.deleted = true
 							setTimeout(() => {
-								console.log(this.posts)
 								this.posts = this.posts.filter((post) => {
 									return post.creationTs != deletedPost.creationTs
 								})
 							}, 1100)
 						}, (err) => {
+							//500 yolo
+							//404 post inexistant
 							console.error(err)
 						})
 					}

@@ -771,21 +771,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"var responseJSON = JSON.parse(responseBody);",
-									"",
-									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Response is an object\"] = typeof responseJSON.length === 'undefined'; // An object doesn't have a length, an array or a string does",
-									"tests[\"Response matches the input data\"] = JSON.stringify({",
-									"    author: responseJSON.author,",
-									"    content: responseJSON.content",
-									"}) === JSON.stringify({",
-									"    author: \"alice@localhost:3000\",",
-									"    content: \"Hello world\"",
-									"});",
-									"tests[\"Response contains a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
-									"tests[\"Response contains a last modification timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
-									"",
-									"postman.setGlobalVariable('commentTs', responseJSON.creationTs)"
+									"tests[\"Response is 403\"] = responseCode.code === 403;"
 								]
 							}
 						}
@@ -821,8 +807,7 @@
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
 									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
 									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
-									"tests[\"There's one comment\"] = responseJSON.comments.length === 1;",
-									"tests[\"The comment is the one we created earlier\"] = responseJSON.comments[0].creationTs === parseInt(globals.commentTs);"
+									"tests[\"We didn't create a comment\"] = responseJSON.comments.length === 0;"
 								]
 							}
 						}
@@ -844,7 +829,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"tests[\"Response is 204\"] = responseCode.code === 204;"
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
 								]
 							}
 						}
@@ -852,33 +837,6 @@
 					"request": {
 						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/comments/{{commentTs}}",
 						"method": "DELETE",
-						"header": [],
-						"body": {},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Retrieve comments on a public post",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"var responseJSON = JSON.parse(responseBody);",
-									"",
-									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
-									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
-									"tests[\"The comment has been removed\"] = responseJSON.comments.length === 0;"
-								]
-							}
-						}
-					],
-					"request": {
-						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/comments",
-						"method": "GET",
 						"header": [],
 						"body": {},
 						"description": ""

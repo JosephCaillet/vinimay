@@ -785,7 +785,7 @@
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
 									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
 									"tests[\"Reactions counter equals to 0\"] = responseJSON.reactions === 0;",
-									"tests[\"Flag on reaction is set to false\"] = !responseJSON.reacted"
+									"tests[\"Flag on reaction is set to false\"] = !responseJSON.reacted;"
 								]
 							}
 						}
@@ -807,7 +807,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"tests[\"Response is 204\"] = responseCode.code === 204;"
+									"tests[\"Response is 403\"] = responseCode.code === 403;"
 								]
 							}
 						}
@@ -842,8 +842,8 @@
 									"",
 									"tests[\"Response is 200\"] = responseCode.code === 200;",
 									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
-									"tests[\"Reactions counter equals to 1\"] = responseJSON.reactions === 1;",
-									"tests[\"Flag on reaction is set to true\"] = responseJSON.reacted === false; // We can't identify that it's Alice who requesting Frank's post"
+									"tests[\"We didn't add any reaction\"] = responseJSON.reactions === 0;",
+									"tests[\"Flag on reaction is set to false\"] = responseJSON.reacted === false;"
 								]
 							}
 						}
@@ -865,7 +865,7 @@
 							"script": {
 								"type": "text/javascript",
 								"exec": [
-									"tests[\"Response is 204\"] = responseCode.code === 204;"
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
 								]
 							}
 						}
@@ -873,33 +873,6 @@
 					"request": {
 						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/reactions",
 						"method": "DELETE",
-						"header": [],
-						"body": {},
-						"description": ""
-					},
-					"response": []
-				},
-				{
-					"name": "Check reaction flag",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"type": "text/javascript",
-								"exec": [
-									"var responseJSON = JSON.parse(responseBody);",
-									"",
-									"tests[\"Response is 200\"] = responseCode.code === 200;",
-									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
-									"tests[\"Reactions counter equals to 0\"] = responseJSON.reactions === 0;",
-									"tests[\"Flag on reaction is set to false\"] = responseJSON.reacted === false;"
-								]
-							}
-						}
-					],
-					"request": {
-						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}",
-						"method": "GET",
 						"header": [],
 						"body": {},
 						"description": ""

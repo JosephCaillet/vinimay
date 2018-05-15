@@ -2,7 +2,7 @@ import { Comment } from '../../providers/apiClient/model/comment';
 import { User } from '../../providers/apiClient/model/user';
 import { Component, Input, ViewChild } from '@angular/core';
 import { Post, CommentsArray, V1Service } from "../../providers/apiClient/index";
-import { FormGroup, FormControl, Validators } from "@angular/forms";
+import { FormGroup, FormControl } from "@angular/forms";
 import { DateFormaterService } from "../../providers/date-formater";
 
 /**
@@ -25,13 +25,16 @@ export class CommentsComponent {
 	deleted = false
 
 	constructor(public dateFormater: DateFormaterService, private api: V1Service) {
-		this.commentForm = new FormGroup({ "comment": new FormControl('', Validators.required) })
+		this.commentForm = new FormGroup({ "comment": new FormControl('') })
 	}
 
 	ngOnInit() {
 		this.api.getV1ClientPostsUserTimestampComments(this.post.author, this.post.creationTs).subscribe((data) => {
 			this.comments = data.comments
 		}, (err) => {
+			//500 yolo
+			//404 post inexistant ou user inexistant
+			//503 serveur non joignable
 			console.error(err)
 		})
 	}
@@ -43,6 +46,9 @@ export class CommentsComponent {
 				this.post.comments++
 				this.comments.push(data)
 			}, (err) => {
+				//500 yolo
+				//404 post inexistant ou user inexistant
+				//503 serveur non joignable
 				console.error(err)
 			})
 	}
@@ -51,6 +57,7 @@ export class CommentsComponent {
 		this.api.deleteV1ClientPostsUserTimestampCommentsCommenttimestamp(
 			this.post.author, this.post.creationTs, commentToDelete.creationTs)
 			.subscribe(() => {
+				this.post.comments--
 				let index = this.comments.indexOf(commentToDelete)
 				this.commentList.nativeElement.children[index].classList.add('deletedComment')
 
@@ -60,6 +67,9 @@ export class CommentsComponent {
 					})
 				}, 500)
 			}, err => {
+				//500 yolo
+				//404 post inexistant, user inexistant, ou commentaire non existant
+				//503 serveur non joignable
 				console.error(err)
 			})
 	}

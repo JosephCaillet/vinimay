@@ -4,7 +4,7 @@
 
 echo 'Building'
 
-rm -rf build
+rm -rf build/server
 tsc -p server
 
 if [[ $? -eq 1 ]]; then
@@ -12,14 +12,8 @@ if [[ $? -eq 1 ]]; then
 	exit 1
 fi
 
-./resetdb.sh
+VINIMAY_ENV=test ./resetdb.sh
 ./starTestInstances.sh start
-
-# Let the servers start
-sleep 2
-
-# Check if newman is here
-which newman > /dev/null 2>&1
 
 codes=""
 
@@ -30,6 +24,23 @@ codes="$codes $?"
 newman run tests/comments.json
 codes="$codes $?"
 newman run tests/reactions.json
+codes="$codes $?"
+
+# We need to switch to other SQL scripts, with no friends in them
+# So we need to restart the servers with newly-generated databases
+./starTestInstances.sh stop
+./starTestInstances.sh clean
+# Let the servers stop
+sleep 2
+
+lsof -i :3000
+lsof -i :3001
+lsof -i :3006
+
+./resetdb.sh
+./starTestInstances.sh start
+
+newman run tests/friends.json
 codes="$codes $?"
 
 ./starTestInstances.sh stop

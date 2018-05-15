@@ -1,7 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { PostInput, V1Service } from "../../providers/apiClient/index";
 import { FormGroup, FormControl, Validators } from "@angular/forms";
-import { ViewController } from "ionic-angular";
+import { ViewController, LoadingController } from "ionic-angular";
 import { TranslateService } from "@ngx-translate/core";
 
 /**
@@ -21,7 +21,10 @@ export class PostModal {
 	privacyLevels: Array<{ value: PostInput.PrivacyEnum, text: string }>
 	postForm: FormGroup
 
-	constructor(private viewCtrl: ViewController, public tr: TranslateService, private api: V1Service) {
+	constructor(
+		private viewCtrl: ViewController, public tr: TranslateService,
+		private api: V1Service, private loadingCtrl: LoadingController)
+	{
 		this.postForm = new FormGroup({
 			"privacy": new FormControl(PostInput.PrivacyEnum[PostInput.PrivacyEnum.Friends].toLowerCase(), Validators.required),
 			"content": new FormControl('', Validators.required)
@@ -39,9 +42,15 @@ export class PostModal {
 
 	dismiss(postPosted: boolean) {
 		if (postPosted) {
+			let loading = this.loadingCtrl.create()
+			loading.present();
+
 			this.api.postV1ClientPosts(this.postForm.value).subscribe((post) => {
+				loading.dismiss()
 				this.viewCtrl.dismiss(post)
 			}, (err) => {
+				loading.dismiss()
+				//500 yolo
 				console.error(err)
 			})
 		} else {

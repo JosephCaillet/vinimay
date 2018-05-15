@@ -197,7 +197,7 @@ export async function add(request: Hapi.Request, reply: Hapi.IReply) {
 
 
 export function update(request: Hapi.Request, reply: Hapi.IReply) {
-	
+	reply(Boom.notImplemented());
 }
 
 
@@ -368,20 +368,22 @@ export async function serverAdd(request: Hapi.Request, reply: Hapi.IReply) {
 					throw e;
 				}				
 			} else {
-				author = new User(request.payload.author);
-				// Check if we know the author
-				let knownAuthor = !!(await instance.model('profile').count({where: {
-					url: author.instance,
-					username: author.username
-				}}));
-				
-				// If we don't know the author, save it
-				if(!knownAuthor) {
-					await instance.model('profile').create({
-						url: author.instance,
-						username: author.username
-					});
-				}
+				// author = new User(request.payload.author);
+				// // Check if we know the author
+				// let knownAuthor = !!(await instance.model('profile').count({where: {
+				// 	url: author.instance,
+				// 	username: author.username
+				// }}));
+				// 
+				// // If we don't know the author, save it
+				// if(!knownAuthor) {
+				// 	await instance.model('profile').create({
+				// 		url: author.instance,
+				// 		username: author.username
+				// 	});
+				// }
+				serverLog.debug('Comments on a posts are currently only supported between friends, even in public');
+				throw Boom.forbidden();
 				
 				// TODO: Ask the server for confirmation on the addition
 			}
@@ -472,6 +474,8 @@ export async function serverDel(request: Hapi.Request, reply: Hapi.IReply) {
 				throw Boom.unauthorized('WRONG_SIGNATURE');
 			}
 		} else {
+			serverLog.debug('Comments on a posts are currently only supported between friends, even in public');
+			throw Boom.forbidden();
 			// TODO: Ask the comment's author's server to confirm the deletion
 		}
 

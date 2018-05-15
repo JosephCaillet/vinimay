@@ -6,7 +6,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { ConfigurationService } from "ionic-configuration-service";
 
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpModule, Http } from '@angular/http';
 
@@ -19,7 +19,6 @@ import { Autoresize } from "../components/autoresize/autoresize";
 import { DateFormaterService} from "../providers/date-formater";
 import { AddProfileModal } from "../components/add-profile-modal/add-profile-modal";
 import { PostModalModule } from "../components/post-modal/post-modal.module";
-//let Config = require("../config");
 
 @NgModule({
 	declarations: [
@@ -69,6 +68,12 @@ import { PostModalModule } from "../components/post-modal/post-modal.module";
 			deps: [ConfigurationService],
 			multi: true
 		},
+		{
+			provide: APP_INITIALIZER,
+			useFactory: waitTranslationToBeLoaded,
+			deps: [TranslateService],
+			multi: true
+		},
 		{ provide: V1Service, useFactory: createAPIEndpointLoader, deps: [Http, ConfigurationService] },
 		//[V1Service, { provide: BASE_PATH, useFactory: (createAPIEndpointLoader), deps: [Http] }],
 		//[V1Service, { provide: BASE_PATH, useValue: Config.apiEndpoint }],
@@ -81,6 +86,21 @@ export class AppModule { }
 
 export function createTranslateLoader(http: Http) {
 	return new TranslateHttpLoader(http, './assets/i18n/', '.json')
+}
+
+export function waitTranslationToBeLoaded(tr: TranslateService) {
+	return () => {
+		return new Promise((ok, ko) => {
+			tr.onDefaultLangChange.subscribe(data => {
+				ok()
+			}, err => {
+				console.error(err)
+				ko()
+			})
+
+			tr.setDefaultLang('en')
+		})
+	}
 }
 
 export function loadConfiguration(conf: ConfigurationService) {

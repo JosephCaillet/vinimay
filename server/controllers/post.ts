@@ -17,6 +17,7 @@ import * as reactions from './reaction';
 import * as commons from '../utils/commons';
 import * as utils from '../utils/serverUtils';
 import * as postUtils from '../utils/postUtils';
+import * as friendUtils from '../utils/friendUtils';
 
 import {username} from '../utils/username';
 
@@ -60,68 +61,111 @@ export function get(request: h.Request, reply: h.IReply) {
 	// We cast directly as post, so we don't need getters and setters
 	options.raw = true;
 
-	instance.model('post').findAll(options).then((posts: Post[]) => {
+	let failures: Array<string> = new Array<string>();
+	let posts: Post[];
+
+	instance.model('post').findAll(options)
+	.then((res: Post[]) => {
+		posts = res;
 		clientLog.debug('Got', posts.length, 'local posts');
-		let failures: Array<string> = new Array<string>();
-		instance.model('user').findOne().then(async (user: s.Instance<any>) => {
-			for(let i in posts) {
-				let post: Post = posts[i];
-				let author = new User(username, user.get('url'));
-				clientLog.debug('Got current local user', author.toString());
-				post.author = author.toString();
-				try {
-					post.comments = await comments.count(post.creationTs);
-					post.reactions = await reactions.count(post.creationTs);
-					post.reacted = await reactions.reacted(post.creationTs);
-					post.lastEditTs = post.lastModificationTs;
-					delete post.lastModificationTs;
-				} catch(e) {
-					return reply(b.wrap(e));
-				}
+		return instance.model('user').findOne()
+	}).then(async (user: s.Instance<any>) => {
+		for(let i in posts) {
+			let post: Post = posts[i];
+			let author = new User(username, user.get('url'));
+			clientLog.debug('Got current local user', author.toString());
+			post.author = author.toString();
+			try {
+				post.comments = await comments.count(post.creationTs);
+				post.reactions = await reactions.count(post.creationTs);
+				post.reacted = await reactions.reacted(post.creationTs);
+				post.lastEditTs = post.lastModificationTs;
+				delete post.lastModificationTs;
+			} catch(e) {
+				return reply(b.wrap(e));
 			}
-			instance.model('friend').findAll({ where: {
-				$or: [
-					{status: Status[Status.accepted]},
-					{status: Status[Status.following]}
-				]
-			}}).then(async (friends: s.Instance<any>[]) => {
-				clientLog.debug('Got', friends.length, 'friends to request');
-				let promises = new Array<Promise<Post[]>>();
-				for(let i in friends) {
-					promises.push(new Promise((resolve, reject) => {						
-						let friend = new User(friends[i].get('username'), friends[i].get('url'));
-						clientLog.debug('Requesting posts from', friend.toString());
-						// We need a copy of the object, and not a referece to it
-						let params = Object.assign({}, request.query);
-						postUtils.retrieveRemotePosts(friend,
-							params, friends[i].get('id_token'), 
-							friends[i].get('signature_token')
-						).then((response) => {
-							posts = posts.concat(response);
-							resolve();
-						}).catch((e) => {
-							utils.handleRequestError(friend, e, clientLog, true);
-							failures.push(friend.toString());
-							resolve();
-						});
-					}))
-				}
-				return Promise.all(promises);
-			}).then(() => {
-				clientLog.debug('Retrieved all posts')
-				posts.sort((a, b) => b.creationTs - a.creationTs);
-				// We'll have more posts than requested, so we truncate the array
-				if(request.query.nb) posts = posts.slice(0, request.query.nb);
-				let rep: any = {
-					authenticated: true, // Temporary hardcoded value
-					posts: posts,
-					failures: failures
+		}
+
+		if(request.query.author) {
+			return new User(request.query.author)
+		} else {
+			// Get all friends for which a row has been created by us
+			// This means that every friend except for accepted will behave
+			// like following
+			return instance.model('friend').findAll({ where: {
+				status: { $ne: Status[Status.incoming] }
+			}});
+		}
+	}).then(async (arg: s.Instance<any>[] | User) => {
+		if(arg instanceof User) {
+			clientLog.debug('Requesting posts only from', arg.toString());
+			// We need a copy of the object, and not a reference to it
+			let params = Object.assign({}, request.query)
+			delete params.author;
+			let friend: s.Instance<any>;
+			try { friend = await friendUtils.getFriend(arg, username); }
+			catch(e) { throw e; }
+			let idtoken, sigtoken;
+			if(friend) {
+				idtoken = friend.get('id_token');
+				sigtoken = friend.get('signature_token');
+			}
+			return postUtils.retrieveRemotePosts(arg, params, idtoken, sigtoken)
+			.then((response) => {
+				posts = posts.concat(response);
+			}).catch((e) => {
+				throw {
+					requestError: true,
+					friend: arg,
+					error: e
 				};
-				clientLog.debug('Sent', posts.length, 'posts to client, with', failures.length, 'failures')
-				return commons.checkAndSendSchema(rep, responseSchema, clientLog, reply);
-			}).catch(e => reply(b.wrap(e)));
-		}).catch(e => reply(b.wrap(e)));
-	}).catch(e => reply(b.wrap(e)));
+			});
+		} else {
+			clientLog.debug('Got', arg.length, 'friends to request');
+			let promises = new Array<Promise<Post[]>>();
+			for(let i in arg) {
+				promises.push(new Promise((resolve, reject) => {						
+					let friend = new User(arg[i].get('username'), arg[i].get('url'));
+					clientLog.debug('Requesting posts from', friend.toString());
+					// We need a copy of the object, and not a reference to it
+					let params = Object.assign({}, request.query);
+					postUtils.retrieveRemotePosts(friend,
+						params, arg[i].get('id_token'), 
+						arg[i].get('signature_token')
+					).then((response) => {
+						posts = posts.concat(response);
+						resolve();
+					}).catch((e) => {
+						// We don't want to break the chain in case of an error,
+						// so we catch it in a promise which is part of an array
+						// then resolve
+						utils.handleRequestError(friend, e, clientLog, true);
+						failures.push(friend.toString());
+						resolve();
+					});
+				}))
+			}
+			return Promise.all(promises);
+		}
+	}).then(() => {
+		clientLog.debug('Retrieved all posts')
+		posts.sort((a, b) => b.creationTs - a.creationTs);
+		// We'll have more posts than requested, so we truncate the array
+		if(request.query.nb) posts = posts.slice(0, request.query.nb);
+		let rep: any = {
+			authenticated: true, // Temporary hardcoded value
+			posts: posts,
+			failures: failures
+		};
+		clientLog.debug('Sent', posts.length, 'posts to client, with', failures.length, 'failures')
+		return commons.checkAndSendSchema(rep, responseSchema, clientLog, reply);
+	}).catch(e => {
+		if(e.requestError) {
+			return utils.handleRequestError(e.friend, e.error, clientLog, false, reply);
+		}
+
+		return reply(b.wrap(e))
+	});
 }
 
 export async function getSingle(request: h.Request, reply: h.IReply) {
@@ -228,7 +272,7 @@ export async function del(request: h.Request, reply: h.IReply) {
 		instance = SequelizeWrapper.getInstance(user.username);
 	} catch(e) {
 		// If the user doesn't exist, we return an error
-		return reply(b.badRequest(e));
+		return reply(b.wrap(e));
 	}
 
 	// Run the query
