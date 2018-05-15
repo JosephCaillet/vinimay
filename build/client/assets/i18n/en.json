@@ -1,0 +1,133 @@
+{
+	"test": "It works !",
+	"app_name": "Vinimay - alpha version",
+	"global": {
+		"yes": "Yes",
+		"no": "No",
+		"ok": "Ok",
+		"dismiss": "Dismiss",
+		"close": "Close"
+	},
+	"error": {
+		"0": {
+			"title": "Server unreachable",
+			"sub_title": "We cannot join your server."
+		},
+		"400": {
+			"title": "Bad request",
+			"sub_title": "It probably means that there is a bug in web client :("
+		},
+		"500": {
+			"title": "Internal server error",
+			"sub_title": "An unknown error occured on the server :("
+		}
+	},
+	"p": {
+		"title": "Posts",
+		"loading": "Loading posts...",
+		"creation": "Create post",
+		"refresh": "Refresh",
+		"refreshing": "Refreshing...",
+		"pull_to_refresh": "Pull to refresh",
+		"edit": "Edit",
+		"delete": "Delete",
+		"reaction": "Like",
+		"reactions": "Likes",
+		"comment": "Comment",
+		"comments": "Comments",
+		"comment_send": "Send",
+		"comment_placeholder": "Say something nice here",
+		"privacy": {
+			"me": "Me",
+			"friends": "Friends",
+			"public": "Public"
+		},
+		"modal": {
+			"create": {
+				"title": "Post creation",
+				"privacy": "Privacy",
+				"placeholder": "My flowers are beautiful",
+				"submit_post": "Post"
+			},
+			"delete": {
+				"title": "Post deletion",
+				"message": "Delelt this post?"
+			}
+		},
+		"error":{
+
+		}
+	},
+	"f": {
+		"title": "Friends",
+		"loading": "Loading friends...",
+		"refresh": "Refresh",
+		"add": {
+			"title": "Add friend",
+			"modal": {
+				"title": "Add a friend",
+				"url": "Profile's url",
+				"url_placeholder": "username@server.com",
+				"type": "Relation type",
+				"friend": "Friend",
+				"follow": "Follower",
+				"submit_follow": "Follow",
+				"submit_friend": "Send friend request"
+			}
+		},
+		"sent": {
+			"title": "Sent friend requests",
+			"cancel": "Cancel",
+			"rejected": "Your friend request has been rejected.",
+			"hide": "Hide",
+			"modal": {
+				"cancel_title": "Cancel friend request",
+				"cancel_message": "Cancel friend request to {{user}} ?"
+			}
+		},
+		"received": {
+			"title": "Received friend requests",
+			"details": "Details",
+			"accept": "Accept",
+			"decline": "Decline",
+			"modal": {
+				"decline_title": "Decline friend request",
+				"decline_message": "Decline friend request from {{user}} ?"
+			}
+		},
+		"friend": {
+			"title": "Friends",
+			"details": "Details",
+			"remove": "Remove",
+			"modal": {
+				"remove_title": "Remove friend",
+				"remove_message": "Remove friend {{user}} ?"
+			}
+		},
+		"following": {
+			"title": "Following",
+			"details": "Details",
+			"remove": "Remove"
+		},
+		"error": {
+			"503": {
+				"title": "This server is unreachable",
+				"sub_title": "Are you that this is the right server? If yes, it may be offline, try again later."
+			},
+			"404": {
+				"title": "This user does not exist on this server.",
+				"sub_title": "Are you sure that you entered the right user on the right server?"
+			},
+			"403": {
+				"title": "You cannot be friend with yourself.",
+				"sub_title": "What did you expect?"
+			}
+		}
+	},
+	"m": {
+		"title": "Me"
+	},
+	"h": {
+		"loading": "Loading profile data..."
+	}
+}

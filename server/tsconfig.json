@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "esnext",
+        "noImplicitAny": false,
+        "sourceMap": false,
+        "outDir": "../build/server",
+        "allowJs": true,
+        "strictNullChecks": true,
+        "types": [
+            "hapi",
+            "joi",
+            "node",
+            "request",
+            "sequelize"
+        ]
+    },
+    "compileOnSave": false
+}

@@ -1,0 +1,1712 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Comments",
+		"_postman_id": "f2d05c01-2030-3db1-3ad1-ac06b65f48d8",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0 - Before",
+			"description": "",
+			"item": [
+				{
+					"name": "Create local private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('localPrivateTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friend public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendPublicTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friend friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendFriendsTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"friends\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friend private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendPrivateTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingPublicTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingFriendsTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"friends\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingPrivateTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "1 - Local",
+			"description": "",
+			"item": [
+				{
+					"name": "Retrieve comments on not commented post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
+									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
+									"tests[\"For now, there isn't any comment\"] = responseJSON.comments.length === 0;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response is an object\"] = typeof responseJSON.length === 'undefined'; // An object doesn't have a length, an array or a string does",
+									"tests[\"Response matches the input data\"] = JSON.stringify({",
+									"    author: responseJSON.author,",
+									"    content: responseJSON.content",
+									"}) === JSON.stringify({",
+									"    author: \"alice@localhost:3000\",",
+									"    content: \"Hello world\"",
+									"});",
+									"tests[\"Response contains a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Response contains a last modification timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
+									"",
+									"postman.setGlobalVariable('commentTs', responseJSON.creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
+									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
+									"tests[\"There's one comment\"] = responseJSON.comments.length === 1;",
+									"tests[\"The comment is the one we created earlier\"] = responseJSON.comments[0].creationTs === parseInt(globals.commentTs);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments/{{commentTs}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
+									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
+									"tests[\"The comment has been removed\"] = responseJSON.comments.length === 0;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2 - Friend",
+			"description": "",
+			"item": [
+				{
+					"name": "Create a comment on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response is an object\"] = typeof responseJSON.length === 'undefined'; // An object doesn't have a length, an array or a string does",
+									"tests[\"Response matches the input data\"] = JSON.stringify({",
+									"    author: responseJSON.author,",
+									"    content: responseJSON.content",
+									"}) === JSON.stringify({",
+									"    author: \"alice@localhost:3000\",",
+									"    content: \"Hello world\"",
+									"});",
+									"tests[\"Response contains a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Response contains a last modification timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
+									"",
+									"postman.setGlobalVariable('commentTs', responseJSON.creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
+									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
+									"tests[\"There's one comment\"] = responseJSON.comments.length === 1;",
+									"tests[\"The comment is the one we created earlier\"] = responseJSON.comments[0].creationTs === parseInt(globals.commentTs);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}/comments/{{commentTs}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
+									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
+									"tests[\"The comment has been removed\"] = responseJSON.comments.length === 0;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response is an object\"] = typeof responseJSON.length === 'undefined'; // An object doesn't have a length, an array or a string does",
+									"tests[\"Response matches the input data\"] = JSON.stringify({",
+									"    author: responseJSON.author,",
+									"    content: responseJSON.content",
+									"}) === JSON.stringify({",
+									"    author: \"alice@localhost:3000\",",
+									"    content: \"Hello world\"",
+									"});",
+									"tests[\"Response contains a creation timestamp\"] = typeof responseJSON.creationTs === 'number';",
+									"tests[\"Response contains a last modification timestamp\"] = typeof responseJSON.lastEditTs === 'number';",
+									"",
+									"postman.setGlobalVariable('commentTs', responseJSON.creationTs)"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
+									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
+									"tests[\"There's one comment\"] = responseJSON.comments.length === 1;",
+									"tests[\"The comment is the one we created earlier\"] = responseJSON.comments[0].creationTs === parseInt(globals.commentTs);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}/comments/{{commentTs}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
+									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
+									"tests[\"The comment has been removed\"] = responseJSON.comments.length === 0;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPrivateTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment on a non existing post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/424242424242/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment on a non existing post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}/comments/{{commentTs}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3 - Following",
+			"description": "",
+			"item": [
+				{
+					"name": "Create a comment on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 403\"] = responseCode.code === 403;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on authentication\"] = typeof responseJSON.authenticated === 'boolean';",
+									"tests[\"Response contains an array of comments\"] = responseJSON.comments instanceof Array;",
+									"tests[\"We didn't create a comment\"] = responseJSON.comments.length === 0;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete comment on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/comments/{{commentTs}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingFriendsTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingFriendsTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve comments on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPrivateTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4 - Populate",
+			"description": "",
+			"item": [
+				{
+					"name": "Create a comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('comment1', JSON.parse(responseBody).creationTs);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('comment2', JSON.parse(responseBody).creationTs);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('comment3', JSON.parse(responseBody).creationTs);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create a comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('comment4', JSON.parse(responseBody).creationTs);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5 - Retrieve comments",
+			"description": "",
+			"item": [
+				{
+					"name": "Get comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var comments = JSON.parse(responseBody).comments;",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains our 3 comments\"] = comments.length === 4;",
+									"tests[\"First created comment comes first\"] = comments[0].creationTs === parseInt(globals.comment1);",
+									"tests[\"Second created comment comes second\"] = comments[1].creationTs === parseInt(globals.comment2);",
+									"tests[\"Third created comment comes third\"] = comments[2].creationTs === parseInt(globals.comment3);",
+									"tests[\"Fourth created comment comes fourth\"] = comments[3].creationTs === parseInt(globals.comment4);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get comments with params",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var comments = JSON.parse(responseBody).comments;",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains only 2 comments\"] = comments.length === 2;",
+									"tests[\"The first comment is the one used in the from param\"] = comments[0].creationTs === parseInt(globals.comment2);",
+									"tests[\"The second comment is the one created directly after the first one\"] = comments[1].creationTs === parseInt(globals.comment3);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments?from={{comment2}}&nb=2",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get comments with from",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var comments = JSON.parse(responseBody).comments;",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains only 2 comments\"] = comments.length === 3;",
+									"tests[\"The first comment is the one used in the from param\"] = comments[0].creationTs === parseInt(globals.comment2);",
+									"tests[\"The second comment is the one created directly after the first one\"] = comments[1].creationTs === parseInt(globals.comment3);",
+									"tests[\"The third comment is the one created directly after the second one\"] = comments[2].creationTs === parseInt(globals.comment4);",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments?from={{comment2}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get comments with nb",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var comments = JSON.parse(responseBody).comments;",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response contains only 2 comments\"] = comments.length === 2;",
+									"tests[\"The first comment is first one created\"] = comments[0].creationTs === parseInt(globals.comment1);",
+									"tests[\"The second comment is the second one created\"] = comments[1].creationTs === parseInt(globals.comment2);"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments?nb=2",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "6 - Retrieving errors",
+			"description": "",
+			"item": [
+				{
+					"name": "Non existing post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/42424242424242/comments",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non numeric from",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400\"] = responseCode.code === 400;",
+									"tests[\"Error is about the from parameter\"] = responseJSON.validation.keys.includes('from');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments?from=foobar",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non numeric nb",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400\"] = responseCode.code === 400;",
+									"tests[\"Error is about the nb parameter\"] = responseJSON.validation.keys.includes('nb');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments?nb=foobar",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "7 - Creating errors",
+			"description": "",
+			"item": [
+				{
+					"name": "Non existing post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/424242424242/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Unauthorized post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "No content",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400\"] = responseCode.code === 400;",
+									"tests[\"Error is about the content parameter\"] = responseJSON.validation.keys.includes('content');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "No body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400\"] = responseCode.code === 400;",
+									"tests[\"Error is about the body (Comment input)\"] = responseJSON.validation.keys.includes('Comment input');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Non string content",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 400\"] = responseCode.code === 400;",
+									"tests[\"Error is about the content parameter\"] = responseJSON.validation.keys.includes('content');"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": 4242424242\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "8 - Cascade",
+			"description": "",
+			"item": [
+				{
+					"name": "Delete local private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/{{localPrivateTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get comments",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var comments = JSON.parse(responseBody).comments;",
+									"",
+									"tests[\"The comment has been deleted along with the post\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/comments/{{comment1}}",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "9 - After",
+			"description": "",
+			"item": [
+				{
+					"name": "Delete friend public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendPublicTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete friend friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendFriendsTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete friend private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendPrivateTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts/{{followingPublicTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts/{{followingFriendsTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts/{{followingPrivateTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

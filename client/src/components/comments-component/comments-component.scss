@@ -1,0 +1,14 @@
+comments-component {
+	ion-list > div {
+		border-bottom: 1px solid #dedede
+	}
+
+	@keyframes foldingComment {
+		from {max-height: 150px}
+		to {max-height: 0px}
+	}
+
+	div.deletedComment {
+		animation: ease-in foldingComment .5s forwards;
+	}
+}

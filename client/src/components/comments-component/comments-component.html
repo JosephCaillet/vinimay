@@ -1,0 +1,46 @@
+<!-- Generated template for the CommentsComponent component -->
+<ion-list [class.deletedComment]="deleted" #commentsList>
+	<div *ngFor="let comment of comments">
+		<ion-row>
+			<ion-col>{{ comment.author.split('@')[0] }}<i>@{{ comment.author.split('@')[1] }}</i></ion-col>
+			<ion-col>
+				<ion-note>
+					<ion-icon name="calendar">&nbsp;&nbsp;</ion-icon>
+					{{ dateFormater.fullDate(comment.creationTs) }}
+				</ion-note>
+			</ion-col>
+			<ion-col>
+				<ion-note>
+					<div *ngIf="comment.creationTs != comment.lastEditTs">
+						<ion-icon name="create">&nbsp;&nbsp;</ion-icon>
+						{{ dateFormater.fullDate(comment.lastEditTs) }}
+					</div>
+				</ion-note>
+			</ion-col>
+		</ion-row>
+		<ion-row>
+			<ion-col col-11>{{ comment.content }}</ion-col>
+			<ion-col col-1 *ngIf="user.username + '@' + user.url == post.author || user.username + '@' + user.url == comment.author">
+				<button ion-button icon-only color="danger" (click)="deleteComment(comment)" small round outline>
+					<ion-icon name="trash"></ion-icon>
+				</button>
+			</ion-col>
+		</ion-row>
+	</div>
+
+	<form [formGroup]="commentForm" (submit)="createComment()">
+		<ion-row align-items-center text-center>
+			<ion-col col-9>
+				<ion-item>
+					<ion-input #input autocomplete="on" [placeholder]=" 'p.comment_placeholder' | translate " formControlName="comment"></ion-input>
+				</ion-item>
+			</ion-col>
+			<ion-col col-3 text-center>
+				<button ion-button small icon-left type="submit" [disabled]="input.value == ''">
+					<ion-icon name="text"></ion-icon>
+					{{ 'p.comment_send' | translate }}
+				</button>
+			</ion-col>
+		</ion-row>
+	</form>
+</ion-list>

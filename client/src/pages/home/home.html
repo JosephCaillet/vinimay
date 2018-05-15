@@ -1,0 +1,6 @@
+<ion-tabs>
+	<!-- spaces after " in tabTitle atribute are required to display the text in the tab bar. -->
+	<ion-tab root="PostsPage" [rootParams]="user" tabUrlPath="n" tabTitle=" {{'p.title' | translate }}" tabIcon="text"></ion-tab>
+	<ion-tab root="MePage" [rootParams]="user" tabUrlPath="n" tabTitle=" {{'m.title' | translate }}" tabIcon="information-circle" selected></ion-tab>
+	<ion-tab root="FriendsPage" tabUrlPath="n" tabTitle=" {{'f.title' | translate }}" tabIcon="contacts"></ion-tab>
+</ion-tabs>

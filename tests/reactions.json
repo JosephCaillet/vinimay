@@ -1,0 +1,1361 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Reactions",
+		"_postman_id": "d12f0035-434b-9c8e-1aef-597db563ff9c",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0 - Before",
+			"description": "",
+			"item": [
+				{
+					"name": "Create local private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('localPrivateTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friend public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendPublicTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friend friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendFriendsTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"friends\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create friend private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('friendPrivateTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingPublicTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"public\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingFriendsTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"friends\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create following private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"postman.setGlobalVariable('followingPrivateTs', JSON.parse(responseBody).creationTs);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world, testing new schemas!\",\n\t\"privacy\": \"private\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "1 - Local",
+			"description": "",
+			"item": [
+				{
+					"name": "Reaction info on not reacted post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 0\"] = responseJSON.reactions === 0;",
+									"tests[\"Flag on reaction is set to false\"] = !responseJSON.reacted"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "React to an already reacted post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 409\"] = responseCode.code === 409;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 1\"] = responseJSON.reactions === 1;",
+									"tests[\"Flag on reaction is set to true\"] = responseJSON.reacted === true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 0\"] = responseJSON.reactions === 0;",
+									"tests[\"Flag on reaction is set to false\"] = responseJSON.reacted === false;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/alice@localhost:3000/{{localPrivateTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "2 - Friend",
+			"description": "",
+			"item": [
+				{
+					"name": "Reaction info on not reacted remote post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 0\"] = responseJSON.reactions === 0;",
+									"tests[\"Flag on reaction is set to false\"] = !responseJSON.reacted"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "React to an already reacted post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 409\"] = responseCode.code === 409;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 1\"] = responseJSON.reactions === 1;",
+									"tests[\"Flag on reaction is set to true\"] = responseJSON.reacted === true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reaction on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 0\"] = responseJSON.reactions === 0;",
+									"tests[\"Flag on reaction is set to false\"] = responseJSON.reacted === false;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPublicTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 1\"] = responseJSON.reactions === 1;",
+									"tests[\"Flag on reaction is set to true\"] = responseJSON.reacted === true;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reaction on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 0\"] = responseJSON.reactions === 0;",
+									"tests[\"Flag on reaction is set to false\"] = responseJSON.reacted === false;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendFriendsTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPrivateTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPrivateTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reaction on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/bob@localhost:3001/{{friendPrivateTs}}/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "3 - Following",
+			"description": "",
+			"item": [
+				{
+					"name": "Reaction info on not reacted remote post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"Reactions counter equals to 0\"] = responseJSON.reactions === 0;",
+									"tests[\"Flag on reaction is set to false\"] = !responseJSON.reacted;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 403\"] = responseCode.code === 403;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"var responseJSON = JSON.parse(responseBody);",
+									"",
+									"tests[\"Response is 200\"] = responseCode.code === 200;",
+									"tests[\"Response has a flag on reaction\"] = typeof responseJSON.reacted === 'boolean';",
+									"tests[\"We didn't add any reaction\"] = responseJSON.reactions === 0;",
+									"tests[\"Flag on reaction is set to false\"] = responseJSON.reacted === false;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reaction on a public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingFriendsTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingFriendsTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reaction on a friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingFriendsTs}}/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPrivateTs}}/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Check reaction flag on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPrivateTs}}",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reaction on a private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPrivateTs}}/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "4 - Errors",
+			"description": "",
+			"item": [
+				{
+					"name": "Delete reaction on a non existing post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/424242424242/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete reaction on a non existing user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 503\"] = responseCode.code === 503;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/foo@bar.baz/424242424242/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction on a non existing post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/424242424242/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Add a reaction on a non existing user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 503\"] = responseCode.code === 503;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/foo@bar.baz/42424242424242/reactions",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"content\": \"Hello world\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a non existing reaction",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 404\"] = responseCode.code === 404;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "alice@localhost:3000/v1/client/posts/frank@localhost:3006/{{followingPublicTs}}/reactions",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "5 - After",
+			"description": "",
+			"item": [
+				{
+					"name": "Delete friend public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendPublicTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete friend friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendFriendsTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete friend private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "bob@localhost:3001/v1/client/posts/{{friendPrivateTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following public post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts/{{followingPublicTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following friends post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts/{{followingFriendsTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete following private post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Response is 204\"] = responseCode.code === 204;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "frank@localhost:3006/v1/client/posts/{{followingPrivateTs}}",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

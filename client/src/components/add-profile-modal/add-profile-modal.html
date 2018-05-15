@@ -1,0 +1,38 @@
+<!-- Generated template for the AddProfileModal component -->
+<ion-header>
+	<ion-navbar>
+		<ion-buttons start>
+			<button ion-button icon-only (click)="dismiss(false)">
+        <ion-icon name="close"></ion-icon>
+      </button>
+		</ion-buttons>
+		<ion-title>{{ 'f.add.modal.title' | translate }}</ion-title>
+	</ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<form [formGroup]="addProfileForm" (submit)="dismiss(true)">
+		<div padding>
+			<h1>{{ 'f.add.modal.url' | translate }}</h1>
+			<ion-item>
+				<ion-input #urlInput type="url" [placeholder]="'f.add.modal.url_placeholder' | translate" formControlName="to"></ion-input>
+			</ion-item>
+		</div>
+
+		<div padding>
+			<ion-list radio-group formControlName="type">
+				<h1>{{ 'f.add.modal.type' | translate }}</h1>
+				<ion-item>
+					<ion-label>{{ 'f.add.modal.friend' | translate }}</ion-label>
+					<ion-radio [value]="TypeEnum.Friend" (ionSelect)="relationType = TypeEnum.Friend"></ion-radio>
+				</ion-item>
+				<ion-item>
+					<ion-label>{{ 'f.add.modal.follow' | translate }}</ion-label>
+					<ion-radio [value]="TypeEnum.Following" (ionSelect)="relationType = TypeEnum.Following"></ion-radio>
+				</ion-item>
+			</ion-list>
+		</div>
+
+		<button ion-button full type="submit" [disabled]="!addProfileForm.valid">{{ relationType == TypeEnum.Friend ? ('f.add.modal.submit_friend' | translate) : ('f.add.modal.submit_follow' | translate) }}</button>
+	</form>
+</ion-content>
